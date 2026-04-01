@@ -3,6 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Content Security Policy — restricts what scripts/resources can load -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src  'self' 'unsafe-inline'
+                https://www.gstatic.com
+                https://www.google.com
+                https://apis.google.com
+                https://recaptchaenterprise.googleapis.com;
+    style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src    'self' https://fonts.gstatic.com;
+    img-src     'self' data: https: blob:;
+    connect-src 'self'
+                https://*.googleapis.com
+                https://*.firebaseio.com
+                https://firestore.googleapis.com
+                https://identitytoolkit.googleapis.com
+                wss://*.firebaseio.com;
+    frame-src   https://www.google.com
+                https://grid-iq-520cb.firebaseapp.com;
+    object-src  'none';
+    base-uri    'self';
+  ">
   <meta name="theme-color" content="#080808">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

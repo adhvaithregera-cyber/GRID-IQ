@@ -2,15 +2,15 @@
    GridIQ — Authentication  |  auth.js
    Firebase Auth (modular SDK v9+)
    Providers: Google, GitHub, Email/Password, Phone (SMS OTP)
-   Security: App Check (reCAPTCHA v3), email rate limiting
+   Security: App Check (reCAPTCHA v3), email rate limiting,
+             Firestore server-side PRO verification
 
    ── APP CHECK SETUP (one-time) ──────────────────────────────
    1. Go to console.firebase.google.com → your project
    2. App Check → Register app → reCAPTCHA v3
-   3. Go to console.cloud.google.com → reCAPTCHA Enterprise
-      OR g.co/recaptcha/v3 → register site (add both
+   3. Go to g.co/recaptcha → register site (add both
       adhvaithregera-cyber.github.io AND localhost)
-   4. Copy the Site Key and paste into RECAPTCHA_SITE_KEY below
+   4. Copy the Site Key into .env → VITE_RECAPTCHA_SITE_KEY
    ── ─────────────────────────────────────────────────────── */
 
 import { initializeApp }                                          from 'firebase/app';
@@ -21,20 +21,19 @@ import { getAuth, signInWithPopup, signOut as fbSignOut,
          GoogleAuthProvider, GithubAuthProvider,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
          signInWithPhoneNumber, RecaptchaVerifier }               from 'firebase/auth';
+import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
 
-/* ── App Check config ────────────────────────────────────── */
-// Paste your reCAPTCHA v3 site key here after completing setup above
-const RECAPTCHA_SITE_KEY = 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE';
-
+/* ── Config — values injected by Vite at build time ─────── */
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyDJ2DaKWEBANaF21kf5kdRL5BL89uPPPrM",
-  authDomain:        "grid-iq-520cb.firebaseapp.com",
-  projectId:         "grid-iq-520cb",
-  storageBucket:     "grid-iq-520cb.firebasestorage.app",
-  messagingSenderId: "862615362572",
-  appId:             "1:862615362572:web:22dfef581a971be0d16229",
-  measurementId:     "G-ZHCKH7LTRY"
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
 /* ── Rate limiting (email/password only) ─────────────────── */
 const _RL = { MAX: 5, LOCKOUT_MS: 10 * 60 * 1000 };
@@ -43,7 +42,6 @@ function _isLockedOut() {
   const ts = localStorage.getItem('gridiq_auth_lockout');
   if (!ts) return false;
   if (Date.now() < parseInt(ts, 10)) return true;
-  // Lockout expired — clean up
   localStorage.removeItem('gridiq_auth_lockout');
   localStorage.removeItem('gridiq_auth_attempts');
   return false;
@@ -70,6 +68,7 @@ function _clearRateLimit() {
 
 /* ── Init ─────────────────────────────────────────────────── */
 let _auth               = null;
+let _db                 = null;
 let _emailMode          = 'signin';
 let _confirmationResult = null;
 let _recaptchaVerifier  = null;
@@ -79,14 +78,14 @@ function _getAuth() {
   try {
     const app = initializeApp(FIREBASE_CONFIG);
     getAnalytics(app);
-    // App Check — attach only when site key is configured
-    if (RECAPTCHA_SITE_KEY !== 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE') {
+    if (RECAPTCHA_SITE_KEY && RECAPTCHA_SITE_KEY !== 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE') {
       initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
         isTokenAutoRefreshEnabled: true
       });
     }
     _auth = getAuth(app);
+    _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     return _auth;
   } catch (e) {
@@ -95,16 +94,77 @@ function _getAuth() {
   }
 }
 
+/* ── Server-side PRO sync ─────────────────────────────────── */
+/*
+ * Reads the user's PRO status from Firestore (the authoritative source).
+ * If Firestore says not PRO → clear the localStorage flag so it can't be
+ * faked by opening DevTools. If Firestore says PRO → confirm the flag.
+ */
+async function _syncProFromFirestore(uid) {
+  if (!_db || !uid) return;
+  try {
+    const snap = await getDoc(doc(_db, 'users', uid));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.isPro) {
+        localStorage.setItem('gridiq_pro', 'true');
+      } else {
+        // Server says not PRO — strip any locally-set flag
+        localStorage.removeItem('gridiq_pro');
+      }
+      if (data.isOwner) {
+        localStorage.setItem('gridiq_owner', 'true');
+        localStorage.removeItem('gridiq_trial_start');
+      }
+    } else {
+      // No Firestore record → not a paid user; remove any stale pro flag
+      localStorage.removeItem('gridiq_pro');
+    }
+    if (typeof updateProNavBadge === 'function') updateProNavBadge();
+  } catch (e) {
+    // Firestore read failed (offline, rules, etc.) — keep existing localStorage state
+    console.warn('[GridIQ auth] Firestore PRO sync failed:', e.message);
+  }
+}
+
+/*
+ * Writes owner PRO status to Firestore for the current user.
+ * Only runs for emails in OWNER_EMAILS (defined in pro.js).
+ * Firestore Security Rules must allow writes only from this function
+ * (enforced by denying client writes in rules.firestore).
+ */
+async function _writeOwnerToFirestore(uid) {
+  if (!_db || !uid) return;
+  try {
+    await setDoc(doc(_db, 'users', uid), { isPro: true, isOwner: true }, { merge: true });
+  } catch (e) {
+    console.warn('[GridIQ auth] Firestore owner write failed:', e.message);
+  }
+}
+
 /* ── Auth state listener ──────────────────────────────────── */
 function _onAuthStateChanged(user) {
+  // Expose auth state to pro.js so isGridIQPro() can trust localStorage only when signed in
+  window._gridiqAuthUser = user || null;
+
   _renderAuthBtn(user);
   closeAuthModal();
   if (user) {
     closeUserMenu();
-    _clearRateLimit(); // successful auth clears any lockout
+    _clearRateLimit();
+    // Owner check (sets localStorage immediately, then confirms via Firestore)
     if (typeof grantOwnerProIfMatch === 'function') {
-      grantOwnerProIfMatch(user.email);
+      const wasOwner = grantOwnerProIfMatch(user.email);
+      if (wasOwner) _writeOwnerToFirestore(user.uid);
     }
+    // Always sync PRO status from Firestore (authoritative source)
+    _syncProFromFirestore(user.uid);
+  } else {
+    // Signed out — strip PRO flags that require auth (owner/paid)
+    // Leave trial flag alone (trial doesn't require sign-in)
+    localStorage.removeItem('gridiq_pro');
+    localStorage.removeItem('gridiq_owner');
+    if (typeof updateProNavBadge === 'function') updateProNavBadge();
   }
 }
 
@@ -160,7 +220,6 @@ function authSetEmailMode(mode) {
 }
 
 function authSubmitEmail() {
-  // Rate limit check before attempting auth
   if (_isLockedOut()) {
     _showError(`Too many failed attempts. Try again in ${_lockoutMinsLeft()} minute(s).`);
     return;
@@ -235,7 +294,6 @@ function _switchView(activeId) {
 
 function authShowMainView()  { _switchView('auth-view-main');  }
 function authShowEmailView() {
-  // Show lockout state immediately if applicable
   if (_isLockedOut()) {
     _switchView('auth-view-email');
     _showError(`Too many failed attempts. Try again in ${_lockoutMinsLeft()} minute(s).`);
@@ -285,7 +343,6 @@ function _clearError() {
 function _handleAuthError(err) {
   if (err.code === 'auth/popup-closed-by-user') return;
 
-  // Count credential failures toward rate limit (email sign-in only)
   const rateLimitedCodes = [
     'auth/wrong-password',
     'auth/user-not-found',
@@ -303,10 +360,10 @@ function _handleAuthError(err) {
     const remaining = _RL.MAX - attempts;
     const suffix = remaining === 1 ? '1 attempt remaining.' : `${remaining} attempts remaining.`;
     const messages = {
-      'auth/wrong-password':       `Incorrect password. ${suffix}`,
-      'auth/user-not-found':       `No account found with that email. ${suffix}`,
-      'auth/invalid-credential':   `Invalid credentials. ${suffix}`,
-      'auth/invalid-email':        'Please enter a valid email address.',
+      'auth/wrong-password':     `Incorrect password. ${suffix}`,
+      'auth/user-not-found':     `No account found with that email. ${suffix}`,
+      'auth/invalid-credential': `Invalid credentials. ${suffix}`,
+      'auth/invalid-email':      'Please enter a valid email address.',
     };
     _showError(messages[err.code] || `Sign-in failed. ${suffix}`);
     setTimeout(() => _clearError(), 6000);

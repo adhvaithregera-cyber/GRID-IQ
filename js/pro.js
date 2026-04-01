@@ -37,8 +37,16 @@ var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';
 ───────────────────────────────────────────────────────── */
 function isGridIQPro() {
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
-  if (localStorage.getItem('gridiq_owner') === 'true') return true;
-  if (localStorage.getItem('gridiq_pro') === 'true') return true;
+  // owner/paid flags are only trustworthy when the user is signed in
+  // (auth.js strips them on sign-out and syncs them from Firestore on sign-in)
+  var signedIn = typeof firebase !== 'undefined'
+    ? false // legacy guard — unused
+    : !!(window._gridiqAuthUser);
+  // window._gridiqAuthUser is set by auth.js when Firebase confirms the session
+  if (window._gridiqAuthUser) {
+    if (localStorage.getItem('gridiq_owner') === 'true') return true;
+    if (localStorage.getItem('gridiq_pro') === 'true') return true;
+  }
   return _isOnActiveTrial();
 }
 
@@ -79,14 +87,18 @@ function startTrial() {
 }
 
 /* ── Owner auto-grant (called from auth.js on sign-in) ──── */
+/* Returns true if the signed-in email is an owner, so auth.js
+   can also write the status to Firestore. */
 function grantOwnerProIfMatch(email) {
-  if (!email) return;
+  if (!email) return false;
   if (OWNER_EMAILS.indexOf(email) !== -1) {
     localStorage.setItem('gridiq_pro', 'true');
     localStorage.setItem('gridiq_owner', 'true');
     localStorage.removeItem('gridiq_trial_start');
     updateProNavBadge();
+    return true;
   }
+  return false;
 }
 
 /* ─────────────────────────────────────────────────────────
