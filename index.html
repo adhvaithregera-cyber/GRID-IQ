@@ -87,11 +87,15 @@
         <span class="pro-price-sub">Cancel anytime</span>
       </div>
 
-      <!-- Beta trial badge — shown only when trial is available -->
-      <div id="pro-trial-badge" class="pro-trial-badge hidden">&#9733; 7-DAY FREE TRIAL — BETA</div>
-
-      <button class="btn-primary pro-upgrade-btn" onclick="handleUpgradeClick()">UPGRADE TO PRO</button>
+      <button class="btn-primary pro-upgrade-btn" onclick="handleUpgradeClick()">UPGRADE TO PRO →</button>
       <div id="pro-payment-note" class="pro-payment-note hidden"></div>
+
+      <!-- Trial section — shown only when trial is still available -->
+      <div id="pro-trial-section" class="hidden">
+        <div class="auth-divider"><span>OR</span></div>
+        <button class="pro-trial-btn" onclick="startTrial()">START 3-DAY FREE TRIAL</button>
+        <p class="pro-trial-note">No card needed &bull; Beta only &bull; One per user</p>
+      </div>
 
       <!-- Promo code section — shown 3 months after launch -->
       <div id="pro-promo-section" class="pro-promo-section hidden">

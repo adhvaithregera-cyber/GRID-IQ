@@ -1,52 +1,43 @@
 /* ============================================================
    GridIQ — PRO Subscription  |  pro.js
 
-   ── CONFIG YOU NEED TO FILL IN ──────────────────────────────
-   1. OWNER_EMAILS       — your sign-in email(s), get PRO free
-   2. PAYMENT_LINK_*     — your Razorpay / Gumroad link
-   3. LAUNCH_DATE        — set to today's date when you officially
-                           launch (enables the promo code offer)
+   ── CONFIG ──────────────────────────────────────────────────
+   PAYMENT_LINK_* — paste your Razorpay / Gumroad link here
+   LAUNCH_DATE    — set to launch date to activate promo codes
    ── ─────────────────────────────────────────────────────── */
 
 /* ── Owner config ───────────────────────────────────────── */
 var OWNER_EMAILS = [
-  'ADD_YOUR_EMAIL_HERE'   // your sign-in email — gets PRO automatically
+  'adhvaith.regera@gmail.com'
 ];
 
 /* ── Beta & trial config ────────────────────────────────── */
-var BETA_END_DATE = '2026-11-30';   // end of 2026 F1 season — beta trial offered until this date
-var TRIAL_DAYS    = 7;
+var BETA_END_DATE = '2026-11-30';
+var TRIAL_DAYS    = 3;
 
 /* ── Launch & promo config ──────────────────────────────── */
-// Set LAUNCH_DATE to today's date when you officially go live (e.g. '2026-06-01').
-// This activates the "follow us = 1 month free" promo code for 3 months.
-var LAUNCH_DATE = null;   // e.g. '2026-06-01'
-
-// Social handle for the promo instructions
-var SOCIAL_HANDLE = '@gridiq';       // update with your actual handle
-var SOCIAL_PLATFORM = 'Instagram';   // or 'X' / 'Twitter'
+var LAUNCH_DATE     = null;
+var SOCIAL_HANDLE   = '@gridiq';
+var SOCIAL_PLATFORM = 'Instagram';
 
 /* ── Payment link config ────────────────────────────────── */
-var PAYMENT_LINK_GLOBAL = 'PASTE_PAYMENT_LINK_HERE';  // $1.99/mo
-var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';  // ₹199/mo (can be same if using Gumroad)
+var PAYMENT_LINK_GLOBAL = 'PASTE_PAYMENT_LINK_HERE';
+var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';
 
 /* ─────────────────────────────────────────────────────────
    PRO STATUS
 ───────────────────────────────────────────────────────── */
 function isGridIQPro() {
-  // Always PRO on localhost (dev environment)
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
   if (localStorage.getItem('gridiq_pro') === 'true') return true;
   return _isOnActiveTrial();
 }
 
+/* Trial is only active if the user explicitly started it */
 function _isOnActiveTrial() {
   if (new Date() > new Date(BETA_END_DATE)) return false;
   var ts = localStorage.getItem('gridiq_trial_start');
-  if (!ts) {
-    localStorage.setItem('gridiq_trial_start', Date.now().toString());
-    return true;
-  }
+  if (!ts) return false;
   return (Date.now() - parseInt(ts, 10)) < TRIAL_DAYS * 86400000;
 }
 
@@ -62,6 +53,22 @@ function getTrialDaysLeft() {
   return Math.max(0, left);
 }
 
+/* True if the user can still opt into a trial */
+function trialAvailable() {
+  if (localStorage.getItem('gridiq_pro') === 'true') return false;
+  if (new Date() > new Date(BETA_END_DATE)) return false;
+  return !localStorage.getItem('gridiq_trial_start');
+}
+
+/* Called when user clicks "Start free trial" in the modal */
+function startTrial() {
+  if (localStorage.getItem('gridiq_trial_start')) return;
+  localStorage.setItem('gridiq_trial_start', Date.now().toString());
+  updateProNavBadge();
+  closeProModal();
+  showProSuccessToast('★ ' + TRIAL_DAYS + '-day free trial started — full PRO access unlocked!');
+}
+
 /* ── Owner auto-grant (called from auth.js on sign-in) ──── */
 function grantOwnerProIfMatch(email) {
   if (!email) return;
@@ -72,7 +79,7 @@ function grantOwnerProIfMatch(email) {
 }
 
 /* ─────────────────────────────────────────────────────────
-   PROMO CODES  (activated 3 months after LAUNCH_DATE)
+   PROMO CODES
 ───────────────────────────────────────────────────────── */
 function _getPromoCodes() {
   if (!LAUNCH_DATE) return {};
@@ -106,7 +113,6 @@ function handlePromoSubmit() {
   if (result === 'success') return;
   msgEl.textContent = result;
   msgEl.classList.remove('hidden');
-  msgEl.classList.toggle('pro-promo-msg--err', true);
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -139,15 +145,8 @@ function handleUpgradeClick() {
 }
 
 /* ── Detect payment success redirect (?pro=1) ───────────── */
-/* ── Owner secret setup (?ownersetup=GRIDIQ2026) ─────────── */
-(function detectRedirects() {
-  var params = new URLSearchParams(location.search);
-  if (params.get('pro') === '1') {
-    localStorage.setItem('gridiq_pro', 'true');
-    history.replaceState({}, '', location.pathname);
-    window._proJustUnlocked = true;
-  }
-  if (params.get('ownersetup') === 'GRIDIQ2026') {
+(function detectProRedirect() {
+  if (new URLSearchParams(location.search).get('pro') === '1') {
     localStorage.setItem('gridiq_pro', 'true');
     history.replaceState({}, '', location.pathname);
     window._proJustUnlocked = true;
@@ -161,30 +160,27 @@ function openProModal() {
   var modal = document.getElementById('pro-modal');
   if (!modal) return;
 
-  // Update locale price
+  // Locale price
   var priceEl = document.getElementById('pro-price-display');
   if (priceEl) priceEl.textContent = getProPrice();
 
-  // Trial badge — show only if beta is still active and user hasn't started trial yet
-  var trialBadge = document.getElementById('pro-trial-badge');
-  var betaActive = new Date() <= new Date(BETA_END_DATE);
-  var trialStarted = !!localStorage.getItem('gridiq_trial_start');
-  if (trialBadge) {
-    trialBadge.classList.toggle('hidden', !betaActive || trialStarted);
-  }
+  // Trial button — only show if user can still opt in
+  var trialSection = document.getElementById('pro-trial-section');
+  if (trialSection) trialSection.classList.toggle('hidden', !trialAvailable());
 
-  // Promo section — show only if LAUNCH_DATE is set and offer is active
+  // Promo code section — only show after launch + within 3 months
   var promoSection = document.getElementById('pro-promo-section');
   var codes = _getPromoCodes();
   var promoActive = LAUNCH_DATE && Object.keys(codes).length > 0 &&
                     new Date() <= new Date(Object.values(codes)[0].expires);
   if (promoSection) promoSection.classList.toggle('hidden', !promoActive);
 
-  // Update promo instructions
-  var promoInstr = document.getElementById('pro-promo-instr');
-  if (promoInstr && promoActive) {
-    promoInstr.textContent = 'Follow ' + SOCIAL_HANDLE + ' on ' + SOCIAL_PLATFORM +
-      ' and DM us your username — we\'ll send you a code for 1 month free.';
+  if (promoActive) {
+    var promoInstr = document.getElementById('pro-promo-instr');
+    if (promoInstr) {
+      promoInstr.textContent = 'Follow ' + SOCIAL_HANDLE + ' on ' + SOCIAL_PLATFORM +
+        ' and DM us your username — we\'ll send you a code for 1 month free.';
+    }
   }
 
   modal.classList.remove('hidden');
@@ -201,7 +197,8 @@ function closeProModal() {
 function updateProNavBadge() {
   var badge = document.getElementById('pro-nav-btn');
   if (!badge) return;
-  if (localStorage.getItem('gridiq_pro') === 'true') {
+  if (localStorage.getItem('gridiq_pro') === 'true' ||
+      location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     badge.className = 'pro-nav-badge pro-nav-badge--active';
     badge.innerHTML = '&#9733; PRO';
     badge.onclick = null;
@@ -211,6 +208,7 @@ function updateProNavBadge() {
     badge.className = 'pro-nav-badge pro-nav-badge--trial';
     badge.innerHTML = '&#9733; TRIAL &bull; ' + days + 'D LEFT';
     badge.onclick = openProModal;
+    badge.style.cursor = 'pointer';
   }
 }
 
@@ -229,24 +227,11 @@ function showProSuccessToast(msg) {
   }, 4500);
 }
 
-function _showTrialWelcomeToast() {
-  var days = getTrialDaysLeft();
-  showProSuccessToast('★ ' + days + '-day free trial active — full PRO access unlocked!');
-}
-
 /* ─────────────────────────────────────────────────────────
-   WELCOME POPUP LOGIC
+   WELCOME POPUP
 ───────────────────────────────────────────────────────── */
 function maybeShowProPopup() {
-  if (isGridIQPro()) {
-    // If this is their very first session on trial, show welcome toast
-    if (isOnTrial() && !sessionStorage.getItem('gridiq_trial_welcome')) {
-      sessionStorage.setItem('gridiq_trial_welcome', '1');
-      setTimeout(_showTrialWelcomeToast, 1200);
-    }
-    return;
-  }
-  // Expired/non-trial users: show upgrade popup once per session
+  if (isGridIQPro()) return;
   if (sessionStorage.getItem('gridiq_promo_shown')) return;
   sessionStorage.setItem('gridiq_promo_shown', '1');
   setTimeout(openProModal, 1800);
@@ -267,13 +252,15 @@ document.addEventListener('DOMContentLoaded', function() {
 /* ─────────────────────────────────────────────────────────
    GLOBALS
 ───────────────────────────────────────────────────────── */
-window.isGridIQPro        = isGridIQPro;
-window.isOnTrial          = isOnTrial;
-window.getTrialDaysLeft   = getTrialDaysLeft;
-window.openProModal       = openProModal;
-window.closeProModal      = closeProModal;
-window.handleUpgradeClick = handleUpgradeClick;
-window.handlePromoSubmit  = handlePromoSubmit;
+window.isGridIQPro          = isGridIQPro;
+window.isOnTrial            = isOnTrial;
+window.trialAvailable       = trialAvailable;
+window.getTrialDaysLeft     = getTrialDaysLeft;
+window.startTrial           = startTrial;
+window.openProModal         = openProModal;
+window.closeProModal        = closeProModal;
+window.handleUpgradeClick   = handleUpgradeClick;
+window.handlePromoSubmit    = handlePromoSubmit;
 window.grantOwnerProIfMatch = grantOwnerProIfMatch;
-window.redeemPromoCode    = redeemPromoCode;
-window.getPaymentLink     = getPaymentLink;
+window.redeemPromoCode      = redeemPromoCode;
+window.getPaymentLink       = getPaymentLink;
