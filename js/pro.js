@@ -34,6 +34,8 @@ var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';  // ₹199/mo (can be same 
    PRO STATUS
 ───────────────────────────────────────────────────────── */
 function isGridIQPro() {
+  // Always PRO on localhost (dev environment)
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
   if (localStorage.getItem('gridiq_pro') === 'true') return true;
   return _isOnActiveTrial();
 }
@@ -137,8 +139,15 @@ function handleUpgradeClick() {
 }
 
 /* ── Detect payment success redirect (?pro=1) ───────────── */
-(function detectProRedirect() {
-  if (new URLSearchParams(location.search).get('pro') === '1') {
+/* ── Owner secret setup (?ownersetup=GRIDIQ2026) ─────────── */
+(function detectRedirects() {
+  var params = new URLSearchParams(location.search);
+  if (params.get('pro') === '1') {
+    localStorage.setItem('gridiq_pro', 'true');
+    history.replaceState({}, '', location.pathname);
+    window._proJustUnlocked = true;
+  }
+  if (params.get('ownersetup') === 'GRIDIQ2026') {
     localStorage.setItem('gridiq_pro', 'true');
     history.replaceState({}, '', location.pathname);
     window._proJustUnlocked = true;
