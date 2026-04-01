@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.formula1.com)",
+      "Bash(start:*)",
+      "WebFetch(domain:fantasy.formula1.com)",
+      "WebFetch(domain:www.autosport.com)",
+      "WebFetch(domain:www.f1fanatic.co.uk)",
+      "WebFetch(domain:reddit.com)",
+      "Read(//c/Users/Adhvaith/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/.claude/skills/ui-ux-pro-max/**)",
+      "Bash(python scripts/search.py \"F1 racing sports app professional dark light mode\" --design-system -p \"GridIQ\" -f markdown)",
+      "Bash(grep -E \"\\\\.\\(js|json|css|html|md\\)$\")",
+      "Bash(node -e \":*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
