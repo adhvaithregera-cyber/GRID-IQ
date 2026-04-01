@@ -1,20 +1,16 @@
 /* ============================================================
    GridIQ — Authentication  |  auth.js
-   Firebase Auth (modular SDK v9+) — Google & GitHub OAuth.
+   Firebase Auth (modular SDK v9+)
+   Providers: Google, GitHub, Email/Password, Phone (SMS OTP)
+   ============================================================ */
 
-   ── SETUP (one-time) ────────────────────────────────────────
-   1. Go to https://console.firebase.google.com
-   2. Create a project → Add a Web app → copy firebaseConfig
-   3. Authentication → Sign-in method → enable Google & GitHub
-      (GitHub needs Client ID/Secret from github.com/settings/developers)
-   4. Paste your values into FIREBASE_CONFIG below
-   ── ─────────────────────────────────────────────────────── */
-
-import { initializeApp }                                     from 'firebase/app';
-import { getAnalytics }                                      from 'firebase/analytics';
+import { initializeApp }                                          from 'firebase/app';
+import { getAnalytics }                                           from 'firebase/analytics';
 import { getAuth, signInWithPopup, signOut as fbSignOut,
          onAuthStateChanged,
-         GoogleAuthProvider, GithubAuthProvider }            from 'firebase/auth';
+         GoogleAuthProvider, GithubAuthProvider,
+         createUserWithEmailAndPassword, signInWithEmailAndPassword,
+         signInWithPhoneNumber, RecaptchaVerifier }               from 'firebase/auth';
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyDJ2DaKWEBANaF21kf5kdRL5BL89uPPPrM",
@@ -27,15 +23,13 @@ const FIREBASE_CONFIG = {
 };
 
 /* ── Init ─────────────────────────────────────────────────── */
-let _auth = null;
-
-function _isConfigured() {
-  return FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
-}
+let _auth              = null;
+let _emailMode         = 'signin';   // 'signin' | 'signup'
+let _confirmationResult = null;      // phone OTP confirmation handle
+let _recaptchaVerifier  = null;
 
 function _getAuth() {
   if (_auth) return _auth;
-  if (!_isConfigured()) return null;
   try {
     const app = initializeApp(FIREBASE_CONFIG);
     getAnalytics(app);
@@ -55,10 +49,10 @@ function _onAuthStateChanged(user) {
   if (user) closeUserMenu();
 }
 
-/* ── Sign-in providers ────────────────────────────────────── */
+/* ── OAuth providers ─────────────────────────────────────── */
 function authSignInGoogle() {
   const auth = _getAuth();
-  if (!auth) { _showConfigError(); return; }
+  if (!auth) return;
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
@@ -67,7 +61,7 @@ function authSignInGoogle() {
 
 function authSignInGitHub() {
   const auth = _getAuth();
-  if (!auth) { _showConfigError(); return; }
+  if (!auth) return;
   const provider = new GithubAuthProvider();
   provider.addScope('user:email');
   signInWithPopup(auth, provider).catch(_handleAuthError);
@@ -77,6 +71,107 @@ function authSignOut() {
   if (!_auth) return;
   fbSignOut(_auth).then(() => closeUserMenu());
 }
+
+/* ── Email / password ─────────────────────────────────────── */
+function authSetEmailMode(mode) {
+  _emailMode = mode;
+  const confirmInput = document.getElementById('auth-confirm-input');
+  const submitBtn    = document.getElementById('auth-email-submit');
+  const title        = document.getElementById('auth-email-title');
+  const tabSignin    = document.getElementById('auth-tab-signin');
+  const tabSignup    = document.getElementById('auth-tab-signup');
+  const pwdInput     = document.getElementById('auth-password-input');
+
+  if (mode === 'signup') {
+    confirmInput?.classList.remove('hidden');
+    if (submitBtn)  submitBtn.textContent  = 'CREATE ACCOUNT';
+    if (title)      title.textContent      = 'CREATE ACCOUNT';
+    tabSignin?.classList.remove('active');
+    tabSignup?.classList.add('active');
+    pwdInput?.setAttribute('autocomplete', 'new-password');
+  } else {
+    confirmInput?.classList.add('hidden');
+    if (submitBtn) submitBtn.textContent  = 'SIGN IN';
+    if (title)     title.textContent      = 'SIGN IN';
+    tabSignin?.classList.add('active');
+    tabSignup?.classList.remove('active');
+    pwdInput?.setAttribute('autocomplete', 'current-password');
+  }
+  _clearError();
+}
+
+function authSubmitEmail() {
+  const auth  = _getAuth();
+  if (!auth) return;
+  const email = document.getElementById('auth-email-input')?.value.trim();
+  const pwd   = document.getElementById('auth-password-input')?.value;
+  const cpwd  = document.getElementById('auth-confirm-input')?.value;
+
+  if (!email || !pwd) { _showError('Please enter your email and password.'); return; }
+
+  if (_emailMode === 'signup') {
+    if (pwd !== cpwd) { _showError('Passwords do not match.'); return; }
+    if (pwd.length < 6) { _showError('Password must be at least 6 characters.'); return; }
+    createUserWithEmailAndPassword(auth, email, pwd).catch(_handleAuthError);
+  } else {
+    signInWithEmailAndPassword(auth, email, pwd).catch(_handleAuthError);
+  }
+}
+
+/* ── Phone / SMS OTP ─────────────────────────────────────── */
+function authSendPhoneCode() {
+  const auth  = _getAuth();
+  if (!auth) return;
+  const phone = document.getElementById('auth-phone-input')?.value.trim();
+  if (!phone) { _showError('Please enter your phone number.'); return; }
+
+  // Clear any existing verifier so it can be rebuilt
+  if (_recaptchaVerifier) {
+    _recaptchaVerifier.clear();
+    _recaptchaVerifier = null;
+  }
+
+  const container = document.getElementById('recaptcha-container');
+  if (container) container.innerHTML = '';
+
+  _recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    size: 'invisible',
+    callback: () => {}
+  });
+
+  signInWithPhoneNumber(auth, phone, _recaptchaVerifier)
+    .then(confirmationResult => {
+      _confirmationResult = confirmationResult;
+      const sub = document.getElementById('auth-otp-sub');
+      if (sub) sub.textContent = `Enter the 6-digit code sent to ${phone}.`;
+      _switchView('auth-view-otp');
+      _clearError();
+    })
+    .catch(err => {
+      if (_recaptchaVerifier) { _recaptchaVerifier.clear(); _recaptchaVerifier = null; }
+      _handleAuthError(err);
+    });
+}
+
+function authVerifyOtp() {
+  if (!_confirmationResult) { _showError('Session expired — please resend the code.'); return; }
+  const code = document.getElementById('auth-otp-input')?.value.trim();
+  if (!code || code.length < 6) { _showError('Enter the full 6-digit code.'); return; }
+  _confirmationResult.confirm(code).catch(_handleAuthError);
+}
+
+/* ── Modal view switching ────────────────────────────────── */
+function _switchView(activeId) {
+  ['auth-view-main', 'auth-view-email', 'auth-view-phone', 'auth-view-otp'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('hidden', id !== activeId);
+  });
+  _clearError();
+}
+
+function authShowMainView()  { _switchView('auth-view-main');  }
+function authShowEmailView() { _switchView('auth-view-email'); }
+function authShowPhoneView() { _switchView('auth-view-phone'); }
 
 /* ── UI helpers ───────────────────────────────────────────── */
 function _renderAuthBtn(user) {
@@ -99,33 +194,42 @@ function _initials(name) {
   return (name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
+function _showError(msg) {
+  const el = document.getElementById('auth-error');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function _clearError() {
+  const el = document.getElementById('auth-error');
+  if (el) el.classList.add('hidden');
+}
+
 function _handleAuthError(err) {
   if (err.code === 'auth/popup-closed-by-user') return;
-  const msg = document.getElementById('auth-error');
-  if (msg) {
-    msg.textContent = err.message || 'Sign-in failed. Please try again.';
-    msg.classList.remove('hidden');
-    setTimeout(() => msg.classList.add('hidden'), 4000);
-  }
+  const messages = {
+    'auth/user-not-found':       'No account found with that email.',
+    'auth/wrong-password':       'Incorrect password.',
+    'auth/email-already-in-use': 'An account with this email already exists.',
+    'auth/invalid-email':        'Please enter a valid email address.',
+    'auth/weak-password':        'Password must be at least 6 characters.',
+    'auth/invalid-phone-number': 'Invalid phone number — include country code (e.g. +1).',
+    'auth/too-many-requests':    'Too many attempts. Please try again later.',
+    'auth/invalid-verification-code': 'Incorrect code — please try again.',
+  };
+  _showError(messages[err.code] || err.message || 'Sign-in failed. Please try again.');
+  setTimeout(() => _clearError(), 6000);
 }
 
-function _showConfigError() {
-  const msg = document.getElementById('auth-error');
-  if (msg) {
-    msg.textContent = 'Firebase is not configured yet — see js/auth.js for setup instructions.';
-    msg.classList.remove('hidden');
-    setTimeout(() => msg.classList.add('hidden'), 6000);
-  }
-}
-
-/* ── Modal ────────────────────────────────────────────────── */
+/* ── Modal open/close ─────────────────────────────────────── */
 function openAuthModal() {
   const m = document.getElementById('auth-modal');
   if (!m) return;
   m.classList.remove('hidden');
-  const msg = document.getElementById('auth-error');
-  if (msg) msg.classList.add('hidden');
+  authShowMainView();
 }
+
 function closeAuthModal() {
   const m = document.getElementById('auth-modal');
   if (m) m.classList.add('hidden');
@@ -140,21 +244,22 @@ function openUserMenu() {
   const elEmail = document.getElementById('um-email');
   const elPhoto = document.getElementById('um-photo');
   if (elName)  elName.textContent  = u.displayName || 'GridIQ User';
-  if (elEmail) elEmail.textContent = u.email || '';
+  if (elEmail) elEmail.textContent = u.email || u.phoneNumber || '';
   if (elPhoto) {
     elPhoto.innerHTML = u.photoURL
       ? `<img src="${u.photoURL}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
-      : _initials(u.displayName || u.email);
+      : _initials(u.displayName || u.email || u.phoneNumber);
   }
   document.getElementById('user-menu')?.classList.toggle('hidden');
 }
+
 function closeUserMenu() {
   document.getElementById('user-menu')?.classList.add('hidden');
 }
 
 /* ── Auth button click dispatcher ────────────────────────── */
 function onAuthBtnClick() {
-  _getAuth(); // ensure init
+  _getAuth();
   const btn = document.getElementById('auth-btn');
   if (btn?.dataset.state === 'in') openUserMenu();
   else openAuthModal();
@@ -173,13 +278,20 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ── Expose functions to global scope (called from HTML onclick) */
-window.onAuthBtnClick  = onAuthBtnClick;
-window.authSignInGoogle = authSignInGoogle;
-window.authSignInGitHub = authSignInGitHub;
-window.authSignOut      = authSignOut;
-window.closeAuthModal   = closeAuthModal;
+/* ── Expose to global scope (HTML onclick needs globals) ─── */
+window.onAuthBtnClick      = onAuthBtnClick;
+window.authSignInGoogle    = authSignInGoogle;
+window.authSignInGitHub    = authSignInGitHub;
+window.authSignOut         = authSignOut;
+window.closeAuthModal      = closeAuthModal;
+window.authShowMainView    = authShowMainView;
+window.authShowEmailView   = authShowEmailView;
+window.authShowPhoneView   = authShowPhoneView;
+window.authSetEmailMode    = authSetEmailMode;
+window.authSubmitEmail     = authSubmitEmail;
+window.authSendPhoneCode   = authSendPhoneCode;
+window.authVerifyOtp       = authVerifyOtp;
 
 /* ── Kick off auth state on load ─────────────────────────── */
 _getAuth();
-_renderAuthBtn(null); // default signed-out state before Firebase responds
+_renderAuthBtn(null);

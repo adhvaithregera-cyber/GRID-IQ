@@ -1374,3 +1374,130 @@ select, input { font-family: var(--font-body); }
   line-height: 1.6;
   text-align: center;
 }
+
+/* ── Auth modal: multi-view system ── */
+.auth-view.hidden { display: none; }
+
+/* OR divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 16px;
+  color: var(--text-3);
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Alternative provider row (email + phone) */
+.auth-alt-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.auth-email-btn,
+.auth-phone-btn {
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.auth-email-btn:hover,
+.auth-phone-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+/* Back button */
+.auth-back-btn {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color .15s;
+}
+.auth-back-btn:hover { color: var(--text); }
+
+/* Sign in / Sign up tab switcher */
+.auth-tab-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  padding: 3px;
+}
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .15s;
+}
+.auth-tab.active {
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* Form fields */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-input {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+}
+.auth-input::placeholder { color: var(--text-3); }
+.auth-input:focus { border-color: var(--accent); }
+.auth-input.hidden { display: none; }
+
+/* OTP: large centered digits */
+.auth-otp-input {
+  text-align: center;
+  font-family: var(--font-tech);
+  font-size: 28px;
+  letter-spacing: 12px;
+  padding-left: 24px;
+}
+
+/* Full-width submit button */
+.auth-form-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
