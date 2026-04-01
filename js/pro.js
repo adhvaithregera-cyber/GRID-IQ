@@ -29,6 +29,7 @@ var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';
 ───────────────────────────────────────────────────────── */
 function isGridIQPro() {
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
+  if (localStorage.getItem('gridiq_owner') === 'true') return true;
   if (localStorage.getItem('gridiq_pro') === 'true') return true;
   return _isOnActiveTrial();
 }
@@ -74,6 +75,8 @@ function grantOwnerProIfMatch(email) {
   if (!email) return;
   if (OWNER_EMAILS.indexOf(email) !== -1) {
     localStorage.setItem('gridiq_pro', 'true');
+    localStorage.setItem('gridiq_owner', 'true');
+    localStorage.removeItem('gridiq_trial_start');
     updateProNavBadge();
   }
 }
