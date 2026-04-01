@@ -46,7 +46,12 @@ function _getAuth() {
 function _onAuthStateChanged(user) {
   _renderAuthBtn(user);
   closeAuthModal();
-  if (user) closeUserMenu();
+  if (user) {
+    closeUserMenu();
+    if (typeof grantOwnerProIfMatch === 'function') {
+      grantOwnerProIfMatch(user.email);
+    }
+  }
 }
 
 /* ── OAuth providers ─────────────────────────────────────── */

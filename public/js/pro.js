@@ -11,6 +11,12 @@
       (and PAYMENT_LINK_INDIA if using separate India pricing)
    ── ─────────────────────────────────────────────────────── */
 
+/* ── Owner config ───────────────────────────────────────── */
+// Add your sign-in email(s) here — these accounts get PRO for free automatically
+var OWNER_EMAILS = [
+  'ADD_YOUR_EMAIL_HERE'
+];
+
 /* ── Payment link config ────────────────────────────────── */
 var PAYMENT_LINK_GLOBAL = 'PASTE_PAYMENT_LINK_HERE';  // $1.99/mo (Razorpay or Gumroad)
 var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';  // ₹199/mo  (can be same as above if using Gumroad)
@@ -19,6 +25,16 @@ var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';  // ₹199/mo  (can be same
 function isGridIQPro() {
   return localStorage.getItem('gridiq_pro') === 'true';
 }
+
+/* ── Owner auto-grant (called from auth.js on sign-in) ──── */
+function grantOwnerProIfMatch(email) {
+  if (!email) return;
+  if (OWNER_EMAILS.indexOf(email) !== -1) {
+    localStorage.setItem('gridiq_pro', 'true');
+    updateProNavBadge();
+  }
+}
+window.grantOwnerProIfMatch = grantOwnerProIfMatch;
 
 /* ── Detect payment success redirect (?pro=1) ───────────── */
 (function detectProRedirect() {
