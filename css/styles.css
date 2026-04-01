@@ -142,9 +142,10 @@ select, input { font-family: var(--font-body); }
 /* ─── SECTION LABELS ─────────────────────────────────────── */
 .label {
   font-family: var(--font-tech);
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 3px;
-  color: var(--text-3);
+  color: var(--text-2);
   margin: 18px 0 8px;
 }
 
