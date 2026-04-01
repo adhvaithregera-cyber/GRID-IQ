@@ -1501,3 +1501,203 @@ select, input { font-family: var(--font-body); }
   font-size: 12px;
   letter-spacing: 2px;
 }
+
+/* ══════════════════════════════════════════
+   GRID IQ PRO
+══════════════════════════════════════════ */
+
+/* ── Nav PRO badge ── */
+.pro-nav-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #F5A623, #E8920F);
+  border: none;
+  border-radius: 20px;
+  padding: 0 12px;
+  height: 30px;
+  font-family: var(--font-tech);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #000;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity .18s, transform .18s;
+  box-shadow: 0 2px 8px rgba(245,166,35,0.35);
+}
+.pro-nav-badge:hover {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+.pro-nav-badge--active {
+  background: rgba(245,166,35,0.15);
+  color: #F5A623;
+  border: 1px solid rgba(245,166,35,0.3);
+  box-shadow: none;
+  cursor: default;
+}
+.pro-nav-badge--active:hover {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── PRO modal box ── */
+.pro-modal-box {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid rgba(245,166,35,0.3);
+  border-radius: 16px;
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,166,35,0.08);
+  animation: scaleIn .2s cubic-bezier(.32,.72,0,1);
+  text-align: center;
+}
+
+/* Crown icon */
+.pro-modal-crown {
+  font-size: 32px;
+  color: #F5A623;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 12px rgba(245,166,35,0.5));
+}
+
+/* "GRID IQ PRO" label */
+.pro-modal-badge-label {
+  display: inline-block;
+  background: linear-gradient(135deg, #F5A623, #E8920F);
+  color: #000;
+  font-family: var(--font-tech);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.pro-modal-title {
+  margin-bottom: 8px;
+}
+
+/* ── Features list ── */
+.pro-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pro-features-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.pro-check {
+  color: #F5A623;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.pro-check--dim {
+  color: var(--text-3);
+}
+
+/* ── Price block ── */
+.pro-price-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 20px 0 16px;
+}
+.pro-price {
+  font-family: var(--font-tech);
+  font-size: 26px;
+  font-weight: 700;
+  color: #F5A623;
+  letter-spacing: 1px;
+}
+.pro-price-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: .5px;
+}
+
+/* ── Upgrade button ── */
+.pro-upgrade-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #F5A623, #E8920F);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-tech);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .18s, transform .18s;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 16px rgba(245,166,35,0.35);
+}
+.pro-upgrade-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ── Payment note (coming soon) ── */
+.pro-payment-note {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.pro-payment-note.hidden { display: none; }
+
+/* ── Skip / maybe later ── */
+.pro-skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color .15s;
+  display: block;
+  margin: 0 auto;
+}
+.pro-skip-btn:hover { color: var(--text-2); }
+
+/* ── Success toast ── */
+.pro-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, #F5A623, #E8920F);
+  color: #000;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 8px 24px rgba(245,166,35,0.4);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity .3s, transform .3s;
+  white-space: nowrap;
+}
+.pro-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

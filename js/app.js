@@ -41,6 +41,10 @@ function teamColor(constructorId) {
 
 /* ─── NAVIGATION ─────────────────────────────────────────── */
 function switchTab(tab) {
+  if (tab === 'fantasy' && typeof isGridIQPro === 'function' && !isGridIQPro()) {
+    openProModal();
+    return;
+  }
   if (STATE.activeTab === tab) return;
   STATE.activeTab = tab;
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));

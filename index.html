@@ -34,6 +34,9 @@
 
     <div class="nav-actions">
 
+      <!-- PRO nav badge -->
+      <button id="pro-nav-btn" class="pro-nav-badge" onclick="openProModal()">&#9733; GO PRO</button>
+
       <!-- Auth button: shows SIGN IN or user avatar -->
       <div class="auth-wrap">
         <button id="auth-btn" class="auth-btn" data-state="out" onclick="onAuthBtnClick()" aria-label="Sign in">
@@ -57,6 +60,38 @@
       <button id="nav-hamburger" class="nav-hamburger" aria-label="Open menu">☰</button>
     </div>
   </nav>
+
+  <!-- ══════════════════════════════════════════
+       PRO UPGRADE MODAL
+  ══════════════════════════════════════════════ -->
+  <div id="pro-modal" class="auth-modal-overlay hidden" onclick="if(event.target===this)closeProModal()">
+    <div class="pro-modal-box">
+
+      <button class="auth-modal-close" onclick="closeProModal()" aria-label="Close">✕</button>
+
+      <div class="pro-modal-crown">&#9733;</div>
+      <div class="pro-modal-badge-label">GRID IQ PRO</div>
+      <h2 class="auth-modal-title pro-modal-title">UNLOCK THE FULL GRID</h2>
+      <p class="auth-modal-sub">Get access to the Fantasy Team Builder and everything we add to PRO throughout the 2026 season.</p>
+
+      <ul class="pro-features-list">
+        <li><span class="pro-check">✓</span> Fantasy Team Builder — 5 drivers + 2 constructors</li>
+        <li><span class="pro-check">✓</span> Points-per-million value rankings</li>
+        <li><span class="pro-check">✓</span> Auto-optimize lineup</li>
+        <li><span class="pro-check pro-check--dim">✦</span> More PRO features coming this season</li>
+      </ul>
+
+      <div class="pro-price-block">
+        <span class="pro-price" id="pro-price-display">$1.99 / month</span>
+        <span class="pro-price-sub">Cancel anytime</span>
+      </div>
+
+      <button class="btn-primary pro-upgrade-btn" onclick="handleUpgradeClick()">UPGRADE TO PRO</button>
+      <div id="pro-payment-note" class="pro-payment-note hidden"></div>
+      <button class="pro-skip-btn" onclick="closeProModal()">Maybe Later</button>
+
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════
        AUTH MODAL
@@ -416,6 +451,7 @@
 
 <script src="js/database.js"></script>
 <script src="js/smoke.js"></script>
+<script src="js/pro.js"></script>
 <script src="js/app.js"></script>
 <script type="module" src="js/auth.js"></script>
 </body>
