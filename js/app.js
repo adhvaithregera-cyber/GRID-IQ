@@ -41,7 +41,7 @@ function teamColor(constructorId) {
 
 /* ─── NAVIGATION ─────────────────────────────────────────── */
 function switchTab(tab) {
-  if (tab === 'fantasy' && typeof isGridIQPro === 'function' && !isGridIQPro()) {
+  if ((tab === 'fantasy' || tab === 'compare') && typeof isGridIQPro === 'function' && !isGridIQPro()) {
     openProModal();
     return;
   }
@@ -917,6 +917,136 @@ function showToast(msg) {
   toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
 }
 
+/* ─── HEAD-TO-HEAD COMPARE ───────────────────────────────── */
+function initCompare() {
+  const selA = document.getElementById('compare-sel-a');
+  const selB = document.getElementById('compare-sel-b');
+  if (!selA || !selB) return;
+
+  const opts = GRIDIQ_DATABASE.drivers
+    .slice()
+    .sort((a, b) => a.lastName.localeCompare(b.lastName))
+    .map(d => `<option value="${d.id}">${d.firstName} ${d.lastName}</option>`)
+    .join('');
+  selA.innerHTML = opts;
+  selB.innerHTML = opts;
+
+  // Default: top 2 by points
+  const sorted = GRIDIQ_DATABASE.drivers.slice().sort((a, b) => b.points - a.points);
+  if (sorted[0]) selA.value = sorted[0].id;
+  if (sorted[1]) selB.value = sorted[1].id;
+
+  renderCompare();
+  selA.addEventListener('change', renderCompare);
+  selB.addEventListener('change', renderCompare);
+}
+
+function renderCompare() {
+  const selA = document.getElementById('compare-sel-a');
+  const selB = document.getElementById('compare-sel-b');
+  if (!selA || !selB) return;
+  const dA = getDriver(selA.value);
+  const dB = getDriver(selB.value);
+  if (!dA || !dB) return;
+  _renderCompareBadge('compare-badge-a', dA, '#FF1E00');
+  _renderCompareBadge('compare-badge-b', dB, '#00D2BE');
+  _renderCompareRadar(dA, dB);
+  _renderCompareStats(dA, dB);
+}
+
+function _renderCompareBadge(id, d, color) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML =
+    `<span class="compare-badge-dot" style="background:${color}"></span>` +
+    `<span class="compare-badge-name">${d.lastName.toUpperCase()}</span>` +
+    `<span class="compare-badge-team">${d.constructor}</span>`;
+}
+
+function _renderCompareRadar(dA, dB) {
+  const el = document.getElementById('compare-radar');
+  if (!el) return;
+
+  const keys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
+  const labels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
+  const n = keys.length;
+  const cx = 150, cy = 158, r = 100;
+  const colorA = '#FF1E00', colorB = '#00D2BE';
+
+  const pt = (val, i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    return `${(cx + r * val * Math.cos(angle)).toFixed(1)},${(cy + r * val * Math.sin(angle)).toFixed(1)}`;
+  };
+
+  const gridPolys = [0.25, 0.5, 0.75, 1.0].map(f =>
+    `<polygon points="${keys.map((_, i) => pt(f, i)).join(' ')}" class="radar-grid"/>`
+  ).join('');
+
+  const axes = keys.map((_, i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    return `<line x1="${cx}" y1="${cy}" x2="${(cx + r * Math.cos(angle)).toFixed(1)}" y2="${(cy + r * Math.sin(angle)).toFixed(1)}" class="radar-axis"/>`;
+  }).join('');
+
+  const polyA = `<polygon points="${keys.map((k, i) => pt((dA.rating[k] || 0) / 100, i)).join(' ')}" class="radar-poly" style="fill:${colorA}28;stroke:${colorA}"/>`;
+  const polyB = `<polygon points="${keys.map((k, i) => pt((dB.rating[k] || 0) / 100, i)).join(' ')}" class="radar-poly" style="fill:${colorB}28;stroke:${colorB}"/>`;
+
+  const lbls = labels.map((lbl, i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    const lr = r + 20;
+    const x = (cx + lr * Math.cos(angle)).toFixed(1);
+    const y = (cy + lr * Math.sin(angle)).toFixed(1);
+    const anchor = Math.cos(angle) > 0.15 ? 'start' : Math.cos(angle) < -0.15 ? 'end' : 'middle';
+    const dy = Math.sin(angle) < -0.1 ? '-0.4em' : '0.85em';
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" dy="${dy}" class="radar-label">${lbl}</text>`;
+  }).join('');
+
+  const legend =
+    `<rect x="20" y="14" width="14" height="3" rx="1.5" fill="${colorA}"/>` +
+    `<text x="40" y="19" class="radar-legend">${dA.lastName.toUpperCase()}</text>` +
+    `<rect x="160" y="14" width="14" height="3" rx="1.5" fill="${colorB}"/>` +
+    `<text x="180" y="19" class="radar-legend">${dB.lastName.toUpperCase()}</text>`;
+
+  el.innerHTML =
+    `<svg viewBox="0 0 300 308" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
+    gridPolys + axes + polyA + polyB + lbls + legend +
+    `</svg>`;
+}
+
+function _renderCompareStats(dA, dB) {
+  const el = document.getElementById('compare-stats');
+  if (!el) return;
+  const keys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
+  const labels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
+
+  const rows = keys.map((k, i) => {
+    const vA = dA.rating[k] || 0, vB = dB.rating[k] || 0;
+    const wA = vA > vB, wB = vB > vA;
+    return `<div class="cstat-row">
+      <span class="cstat-val${wA ? ' cstat-winner--a' : ''}">${vA}</span>
+      <div class="cstat-bar-wrap">
+        <div class="cstat-bar-a" style="width:${vA}%"></div>
+        <span class="cstat-lbl">${labels[i]}</span>
+        <div class="cstat-bar-b" style="width:${vB}%"></div>
+      </div>
+      <span class="cstat-val${wB ? ' cstat-winner--b' : ''}">${vB}</span>
+    </div>`;
+  }).join('');
+
+  const totalA = keys.reduce((s, k) => s + (dA.rating[k] || 0), 0);
+  const totalB = keys.reduce((s, k) => s + (dB.rating[k] || 0), 0);
+  const winner = totalA >= totalB ? dA : dB;
+  const winColor = totalA >= totalB ? '#FF1E00' : '#00D2BE';
+
+  el.innerHTML =
+    `<div class="cstat-header">
+      <span class="cstat-name" style="color:#FF1E00">${dA.lastName.toUpperCase()}</span>
+      <span class="cstat-header-mid">RATINGS</span>
+      <span class="cstat-name" style="color:#00D2BE">${dB.lastName.toUpperCase()}</span>
+    </div>` +
+    rows +
+    `<div class="cstat-verdict" style="color:${winColor}">★ ${winner.lastName.toUpperCase()} WINS ON RATINGS</div>`;
+}
+
 /* ─── INIT ───────────────────────────────────────────────── */
 function init() {
   renderHeroStats();
@@ -926,6 +1056,7 @@ function init() {
   renderConstructorStandings();
   renderDriverStandings();
   initPredictor();
+  initCompare();
   renderLineupSlots();
   renderPPMTable();
   updateBudgetDisplay();

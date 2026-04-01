@@ -29,6 +29,7 @@
       <button class="nav-btn active" data-tab="home"><span class="nav-lbl">HOME</span></button>
       <button class="nav-btn" data-tab="predictor"><span class="nav-lbl">PREDICTOR</span></button>
       <button class="nav-btn" data-tab="fantasy"><span class="nav-lbl">FANTASY</span></button>
+      <button class="nav-btn" data-tab="compare"><span class="nav-lbl">H2H</span></button>
       <button class="nav-btn" data-tab="more"><span class="nav-lbl">MORE</span></button>
     </div>
 
@@ -86,8 +87,23 @@
         <span class="pro-price-sub">Cancel anytime</span>
       </div>
 
+      <!-- Beta trial badge — shown only when trial is available -->
+      <div id="pro-trial-badge" class="pro-trial-badge hidden">&#9733; 7-DAY FREE TRIAL — BETA</div>
+
       <button class="btn-primary pro-upgrade-btn" onclick="handleUpgradeClick()">UPGRADE TO PRO</button>
       <div id="pro-payment-note" class="pro-payment-note hidden"></div>
+
+      <!-- Promo code section — shown 3 months after launch -->
+      <div id="pro-promo-section" class="pro-promo-section hidden">
+        <div class="pro-promo-divider"><span>OR EARN 1 MONTH FREE</span></div>
+        <p id="pro-promo-instr" class="pro-promo-instr"></p>
+        <div class="pro-promo-row">
+          <input id="pro-promo-input" type="text" class="auth-input pro-promo-input" placeholder="ENTER PROMO CODE">
+          <button class="pro-promo-submit" onclick="handlePromoSubmit()">APPLY</button>
+        </div>
+        <div id="pro-promo-msg" class="pro-promo-msg hidden"></div>
+      </div>
+
       <button class="pro-skip-btn" onclick="closeProModal()">Maybe Later</button>
 
     </div>
@@ -319,6 +335,56 @@
           </div>
         </div>
 
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       HEAD-TO-HEAD COMPARE (PRO)
+  ══════════════════════════════════════════════ -->
+  <section id="section-compare" class="tab-section">
+    <div class="section-scroll">
+
+      <header class="app-header">
+        <div class="header-logo">
+          <span class="logo-w">HEAD</span><span class="logo-r">2HEAD</span>
+        </div>
+        <div class="header-chip pro-chip">PRO</div>
+      </header>
+
+      <!-- Driver pickers -->
+      <div class="compare-picker-row">
+        <div class="compare-picker">
+          <div class="label" style="margin-top:0">DRIVER A</div>
+          <div class="sel-wrap">
+            <select id="compare-sel-a" class="custom-sel"></select>
+            <div class="sel-arrow">▼</div>
+          </div>
+          <div id="compare-badge-a" class="compare-driver-badge"></div>
+        </div>
+
+        <div class="compare-vs">VS</div>
+
+        <div class="compare-picker">
+          <div class="label" style="margin-top:0">DRIVER B</div>
+          <div class="sel-wrap">
+            <select id="compare-sel-b" class="custom-sel"></select>
+            <div class="sel-arrow">▼</div>
+          </div>
+          <div id="compare-badge-b" class="compare-driver-badge"></div>
+        </div>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="card compare-chart-card">
+        <div id="compare-radar"></div>
+      </div>
+
+      <!-- Stat breakdown -->
+      <div class="card compare-stats-card">
+        <div id="compare-stats"></div>
       </div>
 
       <div class="spacer"></div>
