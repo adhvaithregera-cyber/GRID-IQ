@@ -2,15 +2,29 @@
    GridIQ — Authentication  |  auth.js
    Firebase Auth (modular SDK v9+)
    Providers: Google, GitHub, Email/Password, Phone (SMS OTP)
-   ============================================================ */
+   Security: App Check (reCAPTCHA v3), email rate limiting
+
+   ── APP CHECK SETUP (one-time) ──────────────────────────────
+   1. Go to console.firebase.google.com → your project
+   2. App Check → Register app → reCAPTCHA v3
+   3. Go to console.cloud.google.com → reCAPTCHA Enterprise
+      OR g.co/recaptcha/v3 → register site (add both
+      adhvaithregera-cyber.github.io AND localhost)
+   4. Copy the Site Key and paste into RECAPTCHA_SITE_KEY below
+   ── ─────────────────────────────────────────────────────── */
 
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
+import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
 import { getAuth, signInWithPopup, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
          signInWithPhoneNumber, RecaptchaVerifier }               from 'firebase/auth';
+
+/* ── App Check config ────────────────────────────────────── */
+// Paste your reCAPTCHA v3 site key here after completing setup above
+const RECAPTCHA_SITE_KEY = 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE';
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyDJ2DaKWEBANaF21kf5kdRL5BL89uPPPrM",
@@ -22,10 +36,42 @@ const FIREBASE_CONFIG = {
   measurementId:     "G-ZHCKH7LTRY"
 };
 
+/* ── Rate limiting (email/password only) ─────────────────── */
+const _RL = { MAX: 5, LOCKOUT_MS: 10 * 60 * 1000 };
+
+function _isLockedOut() {
+  const ts = localStorage.getItem('gridiq_auth_lockout');
+  if (!ts) return false;
+  if (Date.now() < parseInt(ts, 10)) return true;
+  // Lockout expired — clean up
+  localStorage.removeItem('gridiq_auth_lockout');
+  localStorage.removeItem('gridiq_auth_attempts');
+  return false;
+}
+
+function _lockoutMinsLeft() {
+  const ts = parseInt(localStorage.getItem('gridiq_auth_lockout') || '0', 10);
+  return Math.ceil((ts - Date.now()) / 60000);
+}
+
+function _recordFailedAttempt() {
+  const n = parseInt(localStorage.getItem('gridiq_auth_attempts') || '0', 10) + 1;
+  localStorage.setItem('gridiq_auth_attempts', String(n));
+  if (n >= _RL.MAX) {
+    localStorage.setItem('gridiq_auth_lockout', String(Date.now() + _RL.LOCKOUT_MS));
+  }
+  return n;
+}
+
+function _clearRateLimit() {
+  localStorage.removeItem('gridiq_auth_attempts');
+  localStorage.removeItem('gridiq_auth_lockout');
+}
+
 /* ── Init ─────────────────────────────────────────────────── */
-let _auth              = null;
-let _emailMode         = 'signin';   // 'signin' | 'signup'
-let _confirmationResult = null;      // phone OTP confirmation handle
+let _auth               = null;
+let _emailMode          = 'signin';
+let _confirmationResult = null;
 let _recaptchaVerifier  = null;
 
 function _getAuth() {
@@ -33,6 +79,13 @@ function _getAuth() {
   try {
     const app = initializeApp(FIREBASE_CONFIG);
     getAnalytics(app);
+    // App Check — attach only when site key is configured
+    if (RECAPTCHA_SITE_KEY !== 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE') {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
+        isTokenAutoRefreshEnabled: true
+      });
+    }
     _auth = getAuth(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     return _auth;
@@ -48,6 +101,7 @@ function _onAuthStateChanged(user) {
   closeAuthModal();
   if (user) {
     closeUserMenu();
+    _clearRateLimit(); // successful auth clears any lockout
     if (typeof grantOwnerProIfMatch === 'function') {
       grantOwnerProIfMatch(user.email);
     }
@@ -106,6 +160,12 @@ function authSetEmailMode(mode) {
 }
 
 function authSubmitEmail() {
+  // Rate limit check before attempting auth
+  if (_isLockedOut()) {
+    _showError(`Too many failed attempts. Try again in ${_lockoutMinsLeft()} minute(s).`);
+    return;
+  }
+
   const auth  = _getAuth();
   if (!auth) return;
   const email = document.getElementById('auth-email-input')?.value.trim();
@@ -130,7 +190,6 @@ function authSendPhoneCode() {
   const phone = document.getElementById('auth-phone-input')?.value.trim();
   if (!phone) { _showError('Please enter your phone number.'); return; }
 
-  // Clear any existing verifier so it can be rebuilt
   if (_recaptchaVerifier) {
     _recaptchaVerifier.clear();
     _recaptchaVerifier = null;
@@ -175,7 +234,19 @@ function _switchView(activeId) {
 }
 
 function authShowMainView()  { _switchView('auth-view-main');  }
-function authShowEmailView() { _switchView('auth-view-email'); }
+function authShowEmailView() {
+  // Show lockout state immediately if applicable
+  if (_isLockedOut()) {
+    _switchView('auth-view-email');
+    _showError(`Too many failed attempts. Try again in ${_lockoutMinsLeft()} minute(s).`);
+    const btn = document.getElementById('auth-email-submit');
+    if (btn) btn.disabled = true;
+    return;
+  }
+  const btn = document.getElementById('auth-email-submit');
+  if (btn) btn.disabled = false;
+  _switchView('auth-view-email');
+}
 function authShowPhoneView() { _switchView('auth-view-phone'); }
 
 /* ── UI helpers ───────────────────────────────────────────── */
@@ -213,14 +284,40 @@ function _clearError() {
 
 function _handleAuthError(err) {
   if (err.code === 'auth/popup-closed-by-user') return;
+
+  // Count credential failures toward rate limit (email sign-in only)
+  const rateLimitedCodes = [
+    'auth/wrong-password',
+    'auth/user-not-found',
+    'auth/invalid-credential',
+    'auth/invalid-email',
+  ];
+  if (rateLimitedCodes.includes(err.code)) {
+    const attempts = _recordFailedAttempt();
+    if (_isLockedOut()) {
+      _showError(`Too many failed attempts. Sign-in locked for 10 minutes.`);
+      const btn = document.getElementById('auth-email-submit');
+      if (btn) btn.disabled = true;
+      return;
+    }
+    const remaining = _RL.MAX - attempts;
+    const suffix = remaining === 1 ? '1 attempt remaining.' : `${remaining} attempts remaining.`;
+    const messages = {
+      'auth/wrong-password':       `Incorrect password. ${suffix}`,
+      'auth/user-not-found':       `No account found with that email. ${suffix}`,
+      'auth/invalid-credential':   `Invalid credentials. ${suffix}`,
+      'auth/invalid-email':        'Please enter a valid email address.',
+    };
+    _showError(messages[err.code] || `Sign-in failed. ${suffix}`);
+    setTimeout(() => _clearError(), 6000);
+    return;
+  }
+
   const messages = {
-    'auth/user-not-found':       'No account found with that email.',
-    'auth/wrong-password':       'Incorrect password.',
-    'auth/email-already-in-use': 'An account with this email already exists.',
-    'auth/invalid-email':        'Please enter a valid email address.',
-    'auth/weak-password':        'Password must be at least 6 characters.',
-    'auth/invalid-phone-number': 'Invalid phone number — include country code (e.g. +1).',
-    'auth/too-many-requests':    'Too many attempts. Please try again later.',
+    'auth/email-already-in-use':      'An account with this email already exists.',
+    'auth/weak-password':             'Password must be at least 6 characters.',
+    'auth/invalid-phone-number':      'Invalid phone number — include country code (e.g. +1).',
+    'auth/too-many-requests':         'Too many attempts. Please try again later.',
     'auth/invalid-verification-code': 'Incorrect code — please try again.',
   };
   _showError(messages[err.code] || err.message || 'Sign-in failed. Please try again.');
@@ -283,7 +380,7 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ── Expose to global scope (HTML onclick needs globals) ─── */
+/* ── Expose to global scope ───────────────────────────────── */
 window.onAuthBtnClick      = onAuthBtnClick;
 window.authSignInGoogle    = authSignInGoogle;
 window.authSignInGitHub    = authSignInGitHub;

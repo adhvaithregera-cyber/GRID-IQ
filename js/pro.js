@@ -11,6 +11,14 @@ var OWNER_EMAILS = [
   'adhvaith.regera@gmail.com'
 ];
 
+/* ── PRO features list (shown in upgrade modal) ─────────── */
+var PRO_FEATURES = [
+  { label: 'Fantasy Team Builder',   desc: '5 drivers + 2 constructors, budget cap & PPM rankings', live: true  },
+  { label: 'H2H Driver Comparison',  desc: 'Radar chart comparing any two drivers across 5 axes',   live: true  },
+  { label: 'Driver Form Index',      desc: 'Hot/cold streak indicator based on recent race results', live: false },
+  { label: 'More features this season', desc: 'New PRO tools added throughout the 2026 F1 season',  live: false },
+];
+
 /* ── Beta & trial config ────────────────────────────────── */
 var BETA_END_DATE = '2026-11-30';
 var TRIAL_DAYS    = 3;
@@ -162,6 +170,17 @@ function handleUpgradeClick() {
 function openProModal() {
   var modal = document.getElementById('pro-modal');
   if (!modal) return;
+
+  // Features list
+  var listEl = document.getElementById('pro-features-list');
+  if (listEl) {
+    listEl.innerHTML = PRO_FEATURES.map(function(f) {
+      var icon = f.live
+        ? '<span class="pro-check">✓</span>'
+        : '<span class="pro-check pro-check--dim">✦</span>';
+      return '<li>' + icon + ' <strong>' + f.label + '</strong> — ' + f.desc + '</li>';
+    }).join('');
+  }
 
   // Locale price
   var priceEl = document.getElementById('pro-price-display');
