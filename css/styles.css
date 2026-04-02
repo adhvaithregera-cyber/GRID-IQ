@@ -2112,6 +2112,16 @@ select, input { font-family: var(--font-body); }
   color: var(--text);
   line-height: 1;
 }
+.cdc-win-a {
+  color: #FF1E00;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 30, 0, 0.6);
+}
+.cdc-win-b {
+  color: #00D2BE;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 210, 190, 0.6);
+}
 .cdc-verdict--a { color: #FF1E00; }
 .cdc-verdict--b { color: #00D2BE; }
 

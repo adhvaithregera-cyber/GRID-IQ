@@ -1075,20 +1075,24 @@ function _renderCompareStats(dA, dB) {
   const careerKeys   = ['wins', 'poles', 'podiums', 'points', 'championships'];
   const careerLabels = ['WINS', 'POLES', 'PODIUMS', 'POINTS', 'CHAMPS'];
 
-  function buildCard(d) {
+  function buildCard(d, other, winCls) {
     const dotColor = d.color || '#FF1E00';
 
     const careerRows = careerKeys.map((k, i) => {
+      const vThis = d[k] || 0, vOther = other[k] || 0;
+      const hi = vThis > vOther ? ' ' + winCls : '';
       return `<div class="cdc-stat-row">
         <span class="cdc-stat-lbl">${careerLabels[i]}</span>
-        <span class="cdc-stat-val">${d[k] || 0}</span>
+        <span class="cdc-stat-val${hi}">${vThis}</span>
       </div>`;
     }).join('');
 
     const ratingRows = ratingKeys.map((k, i) => {
+      const vThis = d.rating[k] || 0, vOther = other.rating[k] || 0;
+      const hi = vThis > vOther ? ' ' + winCls : '';
       return `<div class="cdc-stat-row">
         <span class="cdc-stat-lbl">${ratingLabels[i]}</span>
-        <span class="cdc-stat-val">${d.rating[k] || 0}</span>
+        <span class="cdc-stat-val${hi}">${vThis}</span>
       </div>`;
     }).join('');
 
@@ -1107,7 +1111,7 @@ function _renderCompareStats(dA, dB) {
     </div>`;
   }
 
-  el.innerHTML = `<div class="cdc-grid">${buildCard(dA)}${buildCard(dB)}</div>`;
+  el.innerHTML = `<div class="cdc-grid">${buildCard(dA, dB, 'cdc-win-a')}${buildCard(dB, dA, 'cdc-win-b')}</div>`;
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */
