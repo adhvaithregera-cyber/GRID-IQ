@@ -1197,4 +1197,10 @@ function init() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.applyLiveData === 'function') {
+    window.applyLiveData().then(init);
+  } else {
+    init();
+  }
+});
