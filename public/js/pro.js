@@ -23,10 +23,8 @@ var PRO_FEATURES = [
 var BETA_END_DATE = '2026-11-30';
 var TRIAL_DAYS    = 3;
 
-/* ── Launch & promo config ──────────────────────────────── */
+/* ── Launch config ──────────────────────────────────────── */
 var LAUNCH_DATE     = null;
-var SOCIAL_HANDLE   = '@gridiq.app';
-var SOCIAL_PLATFORM = 'Instagram';
 
 /* ── Payment link config ────────────────────────────────── */
 var PAYMENT_LINK_GLOBAL = 'PASTE_PAYMENT_LINK_HERE';
@@ -103,42 +101,6 @@ function grantOwnerProIfMatch(email) {
   return false;
 }
 
-/* ─────────────────────────────────────────────────────────
-   PROMO CODES
-───────────────────────────────────────────────────────── */
-function _getPromoCodes() {
-  if (!LAUNCH_DATE) return {};
-  var exp = new Date(LAUNCH_DATE);
-  exp.setMonth(exp.getMonth() + 3);
-  var expStr = exp.toISOString().split('T')[0];
-  return { 'FOLLOW2026': { expires: expStr } };
-}
-
-function redeemPromoCode(code) {
-  var upper = (code || '').trim().toUpperCase();
-  if (!upper) return 'Please enter a code.';
-  var codes = _getPromoCodes();
-  var promo = codes[upper];
-  if (!promo)                               return 'Invalid promo code.';
-  if (new Date() > new Date(promo.expires)) return 'This code has expired.';
-  if (localStorage.getItem('gridiq_promo_used') === upper) return 'You have already used this code.';
-  localStorage.setItem('gridiq_pro', 'true');
-  localStorage.setItem('gridiq_promo_used', upper);
-  updateProNavBadge();
-  closeProModal();
-  showProSuccessToast('★ 1 month of GRID IQ PRO unlocked!');
-  return 'success';
-}
-
-function handlePromoSubmit() {
-  var input = document.getElementById('pro-promo-input');
-  var msgEl = document.getElementById('pro-promo-msg');
-  if (!input || !msgEl) return;
-  var result = redeemPromoCode(input.value);
-  if (result === 'success') return;
-  msgEl.textContent = result;
-  msgEl.classList.remove('hidden');
-}
 
 /* ─────────────────────────────────────────────────────────
    PAYMENT LINKS
@@ -215,14 +177,6 @@ function openProModal() {
   if (trialSection) trialSection.classList.toggle('hidden', !trialAvailable());
   var trialStartBtn = document.getElementById('pro-trial-start-btn');
   if (trialStartBtn) trialStartBtn.disabled = true;
-
-  // Promo code section — always shown
-  var promoSection = document.getElementById('pro-promo-section');
-  if (promoSection) promoSection.classList.remove('hidden');
-  var promoInstr = document.getElementById('pro-promo-instr');
-  if (promoInstr) {
-    promoInstr.textContent = 'Follow ' + SOCIAL_HANDLE + ' on Instagram and DM us — we\'ll send you a free trial code.';
-  }
 
   modal.classList.remove('hidden');
 }
@@ -305,9 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var trialBtn = document.getElementById('pro-trial-start-btn');
   if (trialBtn) trialBtn.addEventListener('click', startTrial);
 
-  var promoSubmit = document.querySelector('.pro-promo-submit');
-  if (promoSubmit) promoSubmit.addEventListener('click', handlePromoSubmit);
-
   var skipBtn = document.querySelector('.pro-skip-btn');
   if (skipBtn) skipBtn.addEventListener('click', closeProModal);
 });
@@ -323,7 +274,6 @@ window.startTrial           = startTrial;
 window.openProModal         = openProModal;
 window.closeProModal        = closeProModal;
 window.handleUpgradeClick   = handleUpgradeClick;
-window.handlePromoSubmit    = handlePromoSubmit;
 window.grantOwnerProIfMatch = grantOwnerProIfMatch;
 window.redeemPromoCode      = redeemPromoCode;
 window.getPaymentLink       = getPaymentLink;
