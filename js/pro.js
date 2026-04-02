@@ -186,6 +186,8 @@ function handleUpgradeClick() {
    PRO MODAL
 ───────────────────────────────────────────────────────── */
 function openProModal() {
+  if (!window._gridiqAuthUser) { openAuthModal(); return; }
+
   var modal = document.getElementById('pro-modal');
   if (!modal) return;
 
