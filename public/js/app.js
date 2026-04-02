@@ -789,9 +789,10 @@ function renderGuideTeams() {
 function maybeShowWelcomeModal() {
   if (sessionStorage.getItem('gridiq_welcomed')) return;
   setTimeout(function() {
+    var proModal = document.getElementById('pro-modal');
+    if (proModal && !proModal.classList.contains('hidden')) return;
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.classList.remove('hidden');
-    // Suppress PRO popup in the same session so they don't stack
     sessionStorage.setItem('gridiq_promo_shown', '1');
   }, 3000);
 }

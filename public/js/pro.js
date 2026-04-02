@@ -187,6 +187,10 @@ function openProModal() {
   var modal = document.getElementById('pro-modal');
   if (!modal) return;
 
+  // Dismiss welcome modal so they don't stack
+  var welcomeModal = document.getElementById('welcome-modal');
+  if (welcomeModal) welcomeModal.classList.add('hidden');
+
   // Features list
   var listEl = document.getElementById('pro-features-list');
   if (listEl) {
