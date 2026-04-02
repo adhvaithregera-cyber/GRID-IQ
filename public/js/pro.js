@@ -208,9 +208,11 @@ function openProModal() {
   var priceEl = document.getElementById('pro-price-display');
   if (priceEl) priceEl.textContent = getProPrice();
 
-  // Trial section — hidden; trial access is via promo code only
+  // Trial section — shown only when trial is still available; reset button lock
   var trialSection = document.getElementById('pro-trial-section');
-  if (trialSection) trialSection.classList.add('hidden');
+  if (trialSection) trialSection.classList.toggle('hidden', !trialAvailable());
+  var trialStartBtn = document.getElementById('pro-trial-start-btn');
+  if (trialStartBtn) trialStartBtn.disabled = true;
 
   // Promo code section — always shown
   var promoSection = document.getElementById('pro-promo-section');
@@ -289,7 +291,13 @@ document.addEventListener('DOMContentLoaded', function() {
   var upgradeBtn = document.querySelector('.pro-upgrade-btn');
   if (upgradeBtn) upgradeBtn.addEventListener('click', handleUpgradeClick);
 
-  var trialBtn = document.querySelector('.pro-trial-btn');
+  var igFollowBtn = document.getElementById('pro-ig-follow-btn');
+  if (igFollowBtn) igFollowBtn.addEventListener('click', function() {
+    var trialStartBtn = document.getElementById('pro-trial-start-btn');
+    if (trialStartBtn) trialStartBtn.disabled = false;
+  });
+
+  var trialBtn = document.getElementById('pro-trial-start-btn');
   if (trialBtn) trialBtn.addEventListener('click', startTrial);
 
   var promoSubmit = document.querySelector('.pro-promo-submit');

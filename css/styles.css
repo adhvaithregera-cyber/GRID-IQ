@@ -1722,9 +1722,13 @@ select, input { font-family: var(--font-body); }
   transition: background .18s, border-color .18s;
   margin-bottom: 6px;
 }
-.pro-trial-btn:hover {
+.pro-trial-btn:hover:not(:disabled) {
   background: rgba(245,166,35,0.08);
   border-color: #F5A623;
+}
+.pro-trial-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 .pro-trial-note {
   font-size: 10px;
