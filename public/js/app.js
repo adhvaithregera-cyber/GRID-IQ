@@ -208,7 +208,7 @@ function renderChampionshipHub() {
 
 /* ─── DRIVER STANDINGS ───────────────────────────────────── */
 function renderDriverStandings() {
-  const LIMIT = 5;
+  const LIMIT = 10;
   const drivers = [...GRIDIQ_DATABASE.drivers].sort((a,b) => b.points - a.points);
   const leaderPts = drivers[0].points;
   const container = document.getElementById('driver-standings');
