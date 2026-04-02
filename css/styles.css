@@ -1983,6 +1983,98 @@ select, input { font-family: var(--font-body); }
   border-top: 1px solid var(--border);
 }
 
+/* ── Driver H2H side-by-side cards ─────────────────────── */
+.cdc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.cdc-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+}
+.cdc-card--win-a {
+  background: rgba(255, 30, 0, 0.07);
+  border-color: rgba(255, 30, 0, 0.25);
+}
+.cdc-card--win-b {
+  background: rgba(0, 210, 190, 0.07);
+  border-color: rgba(0, 210, 190, 0.25);
+}
+.cdc-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.cdc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cdc-names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cdc-driver-name {
+  font-family: var(--font-tech);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cdc-team-name {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cdc-section-label {
+  font-family: var(--font-tech);
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.cdc-section-label--ratings {
+  margin-top: 10px;
+}
+.cdc-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.cdc-stat-lbl {
+  font-family: var(--font-tech);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+.cdc-stat-val {
+  font-family: var(--font-tech);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.cdc-win-a { color: #FF1E00; font-weight: 700; }
+.cdc-win-b { color: #00D2BE; font-weight: 700; }
+.cdc-verdict--a { color: #FF1E00; }
+.cdc-verdict--b { color: #00D2BE; }
+
 /* ══════════════════════════════════════════════════════════
    WELCOME MODAL
 ══════════════════════════════════════════════════════════ */

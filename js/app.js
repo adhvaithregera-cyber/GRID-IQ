@@ -793,7 +793,7 @@ function maybeShowWelcomeModal() {
     if (modal) modal.classList.remove('hidden');
     // Suppress PRO popup in the same session so they don't stack
     sessionStorage.setItem('gridiq_promo_shown', '1');
-  }, 600);
+  }, 3000);
 }
 
 function closeWelcomeModal() {
@@ -1065,36 +1065,63 @@ function _renderCompareRadar(dA, dB) {
 function _renderCompareStats(dA, dB) {
   const el = document.getElementById('compare-stats');
   if (!el) return;
-  const keys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
-  const labels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
 
-  const rows = keys.map((k, i) => {
-    const vA = dA.rating[k] || 0, vB = dB.rating[k] || 0;
-    const wA = vA > vB, wB = vB > vA;
-    return `<div class="cstat-row">
-      <span class="cstat-val${wA ? ' cstat-winner--a' : ''}">${vA}</span>
-      <div class="cstat-bar-wrap">
-        <div class="cstat-bar-a" style="width:${vA}%"></div>
-        <span class="cstat-lbl">${labels[i]}</span>
-        <div class="cstat-bar-b" style="width:${vB}%"></div>
-      </div>
-      <span class="cstat-val${wB ? ' cstat-winner--b' : ''}">${vB}</span>
-    </div>`;
-  }).join('');
+  const ratingKeys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
+  const ratingLabels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
+  const careerKeys   = ['wins', 'poles', 'podiums', 'points', 'championships'];
+  const careerLabels = ['WINS', 'POLES', 'PODIUMS', 'POINTS', 'CHAMPS'];
 
-  const totalA = keys.reduce((s, k) => s + (dA.rating[k] || 0), 0);
-  const totalB = keys.reduce((s, k) => s + (dB.rating[k] || 0), 0);
+  const totalA = ratingKeys.reduce((s, k) => s + (dA.rating[k] || 0), 0);
+  const totalB = ratingKeys.reduce((s, k) => s + (dB.rating[k] || 0), 0);
   const winner = totalA >= totalB ? dA : dB;
-  const winColor = totalA >= totalB ? '#FF1E00' : '#00D2BE';
+  const winnerIsA = totalA >= totalB;
+
+  function buildCard(d, isA, isWinner) {
+    const dotColor = d.color || (isA ? '#FF1E00' : '#00D2BE');
+    const winClass = isWinner ? (isA ? ' cdc-card--win-a' : ' cdc-card--win-b') : '';
+
+    const careerRows = careerKeys.map((k, i) => {
+      const vThis = d[k] || 0;
+      const vOther = isA ? (dB[k] || 0) : (dA[k] || 0);
+      const winValClass = vThis > vOther ? (isA ? ' cdc-win-a' : ' cdc-win-b') : '';
+      return `<div class="cdc-stat-row">
+        <span class="cdc-stat-lbl">${careerLabels[i]}</span>
+        <span class="cdc-stat-val${winValClass}">${vThis}</span>
+      </div>`;
+    }).join('');
+
+    const ratingRows = ratingKeys.map((k, i) => {
+      const vThis = d.rating[k] || 0;
+      const vOther = isA ? (dB.rating[k] || 0) : (dA.rating[k] || 0);
+      const winValClass = vThis > vOther ? (isA ? ' cdc-win-a' : ' cdc-win-b') : '';
+      return `<div class="cdc-stat-row">
+        <span class="cdc-stat-lbl">${ratingLabels[i]}</span>
+        <span class="cdc-stat-val${winValClass}">${vThis}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="cdc-card${winClass}">
+      <div class="cdc-card-header">
+        <span class="cdc-dot" style="background:${dotColor}"></span>
+        <div class="cdc-names">
+          <span class="cdc-driver-name">${d.lastName.toUpperCase()}</span>
+          <span class="cdc-team-name">${d.constructor}</span>
+        </div>
+      </div>
+      <div class="cdc-section-label">CAREER</div>
+      ${careerRows}
+      <div class="cdc-section-label cdc-section-label--ratings">RATINGS</div>
+      ${ratingRows}
+    </div>`;
+  }
+
+  const cardA = buildCard(dA, true,  winnerIsA);
+  const cardB = buildCard(dB, false, !winnerIsA);
+  const verdictClass = winnerIsA ? 'cdc-verdict--a' : 'cdc-verdict--b';
 
   el.innerHTML =
-    `<div class="cstat-header">
-      <span class="cstat-name" style="color:#FF1E00">${dA.lastName.toUpperCase()}</span>
-      <span class="cstat-header-mid">RATINGS</span>
-      <span class="cstat-name" style="color:#00D2BE">${dB.lastName.toUpperCase()}</span>
-    </div>` +
-    rows +
-    `<div class="cstat-verdict" style="color:${winColor}">★ ${winner.lastName.toUpperCase()} WINS ON RATINGS</div>`;
+    `<div class="cdc-grid">${cardA}${cardB}</div>` +
+    `<div class="cstat-verdict ${verdictClass}">★ ${winner.lastName.toUpperCase()} WINS ON RATINGS</div>`;
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */
