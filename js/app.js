@@ -854,7 +854,7 @@ function renderCalendar() {
 function openModal(html) {
   const overlay = document.getElementById('custom-modal');
   document.getElementById('modal-box').innerHTML =
-    `<button class="modal-close-btn" onclick="closeModal()">✕</button>` + html;
+    `<div class="modal-topbar"><button class="modal-close-btn" onclick="closeModal()">✕</button></div>` + html;
   overlay.classList.remove('hidden');
   STATE.modal.open = true;
 }

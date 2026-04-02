@@ -960,7 +960,8 @@ select, input { font-family: var(--font-body); }
 @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
 
 .modal-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 0; }
-.modal-close-btn { position:absolute; top:16px; right:18px; background:rgba(255,255,255,.08); border:none; border-radius:50%; width:30px; height:30px; color:var(--text); font-size:13px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:1; }
+.modal-topbar { position:sticky; top:0; z-index:10; display:flex; justify-content:flex-end; padding:12px 14px 0; background:var(--bg-card); }
+.modal-close-btn { background:rgba(255,255,255,.08); border:none; border-radius:50%; width:30px; height:30px; color:var(--text); font-size:13px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 .modal-inner { padding:16px 20px 32px; }
 
 .m-num { font-family:var(--font-tech); font-size:72px; font-weight:700; color:rgba(255,255,255,.06); line-height:1; margin-bottom:-10px; }
