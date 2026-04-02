@@ -107,12 +107,11 @@ function getNextRace() {
 
 function renderRaceHero() {
   const race = getNextRace();
-  const el   = document.getElementById('race-hero');
   const completed = GRIDIQ_DATABASE.races.filter(r => r.status === 'completed');
   const lastRace  = completed[completed.length - 1];
   const total     = GRIDIQ_DATABASE.races.length;
 
-  el.innerHTML = `
+  const html = `
     <div class="hero-eyebrow">
       <span class="live-pill"><span class="dot-pulse"></span>UPCOMING · R${race.round}/${total}</span>
       <span style="color:var(--text-3);font-size:9px">${completed.length} RACES DONE</span>
@@ -143,8 +142,13 @@ function renderRaceHero() {
     ` : ''}
     <div class="hero-divider"></div>
     <div class="cd-label">RACE DAY COUNTDOWN — ${formatDate(race.date)}</div>
-    <div id="countdown-display" class="countdown"></div>
+    <div class="countdown-display countdown"></div>
   `;
+
+  const elDesktop = document.getElementById('race-hero');
+  const elMobile  = document.getElementById('race-hero-mobile');
+  if (elDesktop) elDesktop.innerHTML = html;
+  if (elMobile)  elMobile.innerHTML  = html;
 
   updateCountdown(race);
   if (STATE.countdownTimer) clearInterval(STATE.countdownTimer);
@@ -152,31 +156,31 @@ function renderRaceHero() {
 }
 
 function updateCountdown(race) {
-  const el = document.getElementById('countdown-display');
-  if (!el) return;
+  const els = document.querySelectorAll('.countdown-display');
+  if (!els.length) return;
   const now = new Date();
   const target = new Date(race.date + 'T15:00:00Z');
   const diff = target - now;
 
+  let html;
   if (diff <= 0) {
-    el.innerHTML = `<div class="hero-past">Race weekend concluded — season continues</div>`;
-    return;
+    html = `<div class="hero-past">Race weekend concluded — season continues</div>`;
+  } else {
+    const days    = Math.floor(diff / 86400000);
+    const hours   = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000)  / 60000);
+    const seconds = Math.floor((diff % 60000)    / 1000);
+    html = `
+      <div class="cd-unit"><span class="cd-num">${String(days).padStart(2,'0')}</span><span class="cd-uname">DAYS</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num">${String(hours).padStart(2,'0')}</span><span class="cd-uname">HRS</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num">${String(minutes).padStart(2,'0')}</span><span class="cd-uname">MIN</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num">${String(seconds).padStart(2,'0')}</span><span class="cd-uname">SEC</span></div>
+    `;
   }
-
-  const days    = Math.floor(diff / 86400000);
-  const hours   = Math.floor((diff % 86400000) / 3600000);
-  const minutes = Math.floor((diff % 3600000)  / 60000);
-  const seconds = Math.floor((diff % 60000)    / 1000);
-
-  el.innerHTML = `
-    <div class="cd-unit"><span class="cd-num">${String(days).padStart(2,'0')}</span><span class="cd-uname">DAYS</span></div>
-    <span class="cd-sep">:</span>
-    <div class="cd-unit"><span class="cd-num">${String(hours).padStart(2,'0')}</span><span class="cd-uname">HRS</span></div>
-    <span class="cd-sep">:</span>
-    <div class="cd-unit"><span class="cd-num">${String(minutes).padStart(2,'0')}</span><span class="cd-uname">MIN</span></div>
-    <span class="cd-sep">:</span>
-    <div class="cd-unit"><span class="cd-num">${String(seconds).padStart(2,'0')}</span><span class="cd-uname">SEC</span></div>
-  `;
+  els.forEach(el => el.innerHTML = html);
 }
 
 /* ─── CHAMPIONSHIP HUB ───────────────────────────────────── */
@@ -1155,8 +1159,7 @@ function init() {
   });
 
   // ── View Season Calendar button ─────────────────────────
-  const calBtn = document.querySelector('.btn-view-calendar');
-  if (calBtn) calBtn.addEventListener('click', () => {
+  document.querySelectorAll('.btn-view-calendar').forEach(calBtn => calBtn.addEventListener('click', () => {
     switchTab('more');
     const moreScroll = document.querySelector('#section-more .section-scroll');
     if (moreScroll) {
@@ -1165,7 +1168,7 @@ function init() {
     }
     document.getElementById('guide-calendar')?.classList.add('active');
     document.querySelector('[data-target="guide-calendar"]')?.classList.add('active');
-  });
+  }));
 
   // ── Hamburger menu toggle ───────────────────────────────
   const hamburger = document.getElementById('nav-hamburger');

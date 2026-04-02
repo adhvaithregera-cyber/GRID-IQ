@@ -891,6 +891,15 @@ select, input { font-family: var(--font-body); }
 }
 .btn-view-calendar:hover { background: var(--accent-dim); }
 
+/* Next Race slot visibility */
+.next-race-mobile-slot  { display: block; }
+.next-race-desktop-slot { display: none; }
+
+@media (min-width: 768px) {
+  .next-race-mobile-slot  { display: none; }
+  .next-race-desktop-slot { display: block; }
+}
+
 /* ═══════════════════════════════════════════════════════════
    TOP NAV BAR
 ═══════════════════════════════════════════════════════════ */
