@@ -208,23 +208,16 @@ function openProModal() {
   var priceEl = document.getElementById('pro-price-display');
   if (priceEl) priceEl.textContent = getProPrice();
 
-  // Trial button — only show if user can still opt in
+  // Trial section — hidden; trial access is via promo code only
   var trialSection = document.getElementById('pro-trial-section');
-  if (trialSection) trialSection.classList.toggle('hidden', !trialAvailable());
+  if (trialSection) trialSection.classList.add('hidden');
 
-  // Promo code section — only show after launch + within 3 months
+  // Promo code section — always shown
   var promoSection = document.getElementById('pro-promo-section');
-  var codes = _getPromoCodes();
-  var promoActive = LAUNCH_DATE && Object.keys(codes).length > 0 &&
-                    new Date() <= new Date(Object.values(codes)[0].expires);
-  if (promoSection) promoSection.classList.toggle('hidden', !promoActive);
-
-  if (promoActive) {
-    var promoInstr = document.getElementById('pro-promo-instr');
-    if (promoInstr) {
-      promoInstr.textContent = 'Follow ' + SOCIAL_HANDLE + ' on ' + SOCIAL_PLATFORM +
-        ' and DM us your username — we\'ll send you a code for 1 month free.';
-    }
+  if (promoSection) promoSection.classList.remove('hidden');
+  var promoInstr = document.getElementById('pro-promo-instr');
+  if (promoInstr) {
+    promoInstr.textContent = 'Follow ' + SOCIAL_HANDLE + ' on Instagram and DM us — we\'ll send you a free trial code.';
   }
 
   modal.classList.remove('hidden');
