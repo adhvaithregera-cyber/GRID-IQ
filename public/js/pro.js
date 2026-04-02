@@ -25,7 +25,7 @@ var TRIAL_DAYS    = 3;
 
 /* ── Launch & promo config ──────────────────────────────── */
 var LAUNCH_DATE     = null;
-var SOCIAL_HANDLE   = '@gridiq';
+var SOCIAL_HANDLE   = '@gridiq.app';
 var SOCIAL_PLATFORM = 'Instagram';
 
 /* ── Payment link config ────────────────────────────────── */
@@ -72,6 +72,7 @@ function getTrialDaysLeft() {
 
 /* True if the user can still opt into a trial */
 function trialAvailable() {
+  if (!window._gridiqAuthUser) return false;
   if (localStorage.getItem('gridiq_pro') === 'true') return false;
   if (new Date() > new Date(BETA_END_DATE)) return false;
   return !localStorage.getItem('gridiq_trial_start');
@@ -79,6 +80,7 @@ function trialAvailable() {
 
 /* Called when user clicks "Start free trial" in the modal */
 function startTrial() {
+  if (!window._gridiqAuthUser) { openAuthModal(); return; }
   if (localStorage.getItem('gridiq_trial_start')) return;
   localStorage.setItem('gridiq_trial_start', Date.now().toString());
   updateProNavBadge();

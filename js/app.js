@@ -787,7 +787,7 @@ function renderGuideTeams() {
 
 /* ─── WELCOME MODAL ──────────────────────────────────────── */
 function maybeShowWelcomeModal() {
-  if (sessionStorage.getItem('gridiq_welcomed')) return;
+  if (localStorage.getItem('gridiq_welcomed')) return;
   setTimeout(function() {
     var proModal = document.getElementById('pro-modal');
     if (proModal && !proModal.classList.contains('hidden')) return;
@@ -800,7 +800,7 @@ function maybeShowWelcomeModal() {
 function closeWelcomeModal() {
   const modal = document.getElementById('welcome-modal');
   if (modal) modal.classList.add('hidden');
-  sessionStorage.setItem('gridiq_welcomed', '1');
+  localStorage.setItem('gridiq_welcomed', '1');
 }
 
 /* ─── MORE PAGE ──────────────────────────────────────────── */
