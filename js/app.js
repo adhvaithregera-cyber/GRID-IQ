@@ -819,8 +819,9 @@ function renderCalendar() {
     row.className = `cal-row${isPast ? ' past' : ''}${isNext ? ' next' : ''}`;
     row.innerHTML = `
       <div class="cal-rnd">R${r.round}</div>
+      <div class="cal-flag">${r.flag}</div>
       <div class="cal-info">
-        <div class="cal-name">${r.flag} ${r.country}</div>
+        <div class="cal-name">${r.country}</div>
         <div class="cal-circuit">${isPast && r.winner ? `✓ Won by ${r.winner}` : r.circuit}</div>
       </div>
       <div class="cal-date-col">
