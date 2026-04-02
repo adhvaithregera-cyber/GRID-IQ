@@ -487,6 +487,20 @@ select, input { font-family: var(--font-body); }
 /* ═══════════════════════════════════════════════════════════
    PREDICTOR
 ═══════════════════════════════════════════════════════════ */
+#section-predictor .section-scroll {
+  background: linear-gradient(160deg, #130808 0%, #0f0900 40%, #080808 100%);
+  position: relative;
+}
+#section-predictor .section-scroll::before {
+  content: '';
+  position: fixed;
+  top: 0; right: 0;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,30,0,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .pred-cols { display: flex; flex-direction: column; gap: 0; }
 .pred-col-left, .pred-col-right { width: 100%; }
 
@@ -690,17 +704,72 @@ select, input { font-family: var(--font-body); }
 .reg-txt { font-size:12px; color:var(--text-2); line-height:1.5; }
 
 .cal-list { display:flex; flex-direction:column; }
-.cal-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
-.cal-row:last-child { border-bottom:none; }
-.cal-row.past { opacity:.35; }
-.cal-row.next .cal-name { color:var(--accent); }
-.cal-rnd { font-family:var(--font-tech); font-size:10px; color:var(--text-3); width:22px; flex-shrink:0; }
-.cal-info { flex:1; }
-.cal-name { font-family:var(--font-tech); font-size:12px; color:var(--text); }
-.cal-circuit { font-size:10px; color:var(--text-2); }
-.cal-date-col { text-align:right; flex-shrink:0; }
-.cal-date { font-family:var(--font-tech); font-size:10px; color:var(--text-2); }
-.next-badge { font-family:var(--font-tech); font-size:8px; background:var(--accent); color:#fff; padding:2px 5px; border-radius:3px; letter-spacing:1px; }
+.cal-list { display: flex; flex-direction: column; gap: 8px; }
+.cal-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+.cal-row.past { opacity: .4; }
+.cal-row.next {
+  background: rgba(255,30,0,0.08);
+  border-color: var(--border-red);
+  box-shadow: 0 0 14px rgba(255,30,0,0.12);
+}
+.cal-row.next .cal-name { color: var(--accent); }
+.cal-rnd {
+  font-family: var(--font-tech);
+  font-size: 11px;
+  color: var(--text-3);
+  width: 28px;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+.cal-info { flex: 1; min-width: 0; }
+.cal-name {
+  font-family: var(--font-tech);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-circuit {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-date-col { text-align: right; flex-shrink: 0; }
+.cal-date {
+  font-family: var(--font-tech);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.03em;
+}
+.next-badge {
+  font-family: var(--font-tech);
+  font-size: 8px;
+  background: var(--accent);
+  color: #fff;
+  padding: 3px 7px;
+  border-radius: 4px;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-top: 4px;
+  text-align: center;
+}
 
 /* ─── CAL GROUP LABELS ───────────────────────────────────── */
 .cal-group-lbl {
@@ -799,6 +868,23 @@ select, input { font-family: var(--font-body); }
 .expand-btn:hover { border-color: var(--border-red); color: var(--accent); }
 .expand-btn .expand-arrow { transition: transform 0.22s ease; display: inline-block; }
 .expand-btn.expanded .expand-arrow { transform: rotate(180deg); }
+
+.btn-view-calendar {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 11px;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  transition: all 0.18s;
+}
+.btn-view-calendar:hover { background: var(--accent-dim); }
 
 /* ═══════════════════════════════════════════════════════════
    TOP NAV BAR

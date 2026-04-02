@@ -1151,6 +1151,19 @@ function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  // ── View Season Calendar button ─────────────────────────
+  const calBtn = document.querySelector('.btn-view-calendar');
+  if (calBtn) calBtn.addEventListener('click', () => {
+    switchTab('more');
+    const moreScroll = document.querySelector('#section-more .section-scroll');
+    if (moreScroll) {
+      moreScroll.querySelectorAll('.inner-pane').forEach(p => p.classList.remove('active'));
+      moreScroll.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+    }
+    document.getElementById('guide-calendar')?.classList.add('active');
+    document.querySelector('[data-target="guide-calendar"]')?.classList.add('active');
+  });
+
   // ── Hamburger menu toggle ───────────────────────────────
   const hamburger = document.getElementById('nav-hamburger');
   const topNav = document.getElementById('top-nav');
