@@ -467,64 +467,205 @@
   </section>
 
   <!-- ══════════════════════════════════════════
-       MORE
+       MORE — F1 GUIDE
   ══════════════════════════════════════════════ -->
   <section id="section-more" class="tab-section">
     <div class="section-scroll">
 
       <header class="app-header">
         <div class="header-logo">
-          <span class="logo-w">MORE</span>
+          <span class="logo-w">F1</span><span class="logo-r">GUIDE</span>
         </div>
-        <div class="header-chip">GRIDIQ v1.0</div>
+        <div class="header-chip">2026 EDITION</div>
       </header>
 
-      <div class="more-stack">
+      <!-- Guide category tabs -->
+      <div class="inner-tabs">
+        <button class="inner-tab active" data-target="guide-101">F1 101</button>
+        <button class="inner-tab" data-target="guide-teams">TEAMS</button>
+        <button class="inner-tab" data-target="guide-regs">2026 REGS</button>
+        <button class="inner-tab" data-target="guide-calendar">CALENDAR</button>
+      </div>
 
-        <div class="card more-card">
-          <div class="more-icon">⚡</div>
-          <div class="more-title">2026 TECHNICAL REGULATIONS</div>
-          <div class="more-body">
-            <p style="margin-bottom:12px">The most transformative ruleset in F1 history — a complete reimagining of power, aerodynamics, and competition.</p>
-            <div class="reg-item">
-              <span class="reg-tag">POWER</span>
-              <div class="reg-txt">50/50 ICE-to-ERS split — ~1,000 bhp total. Electric motor output now equals the combustion engine for the first time.</div>
+      <!-- ── Pane: F1 101 ── -->
+      <div id="guide-101" class="inner-pane active">
+        <div class="guide-stack">
+
+          <div class="card more-card">
+            <div class="more-icon">🏁</div>
+            <div class="more-title">WHAT IS FORMULA 1?</div>
+            <div class="more-body">
+              <p>Formula 1 is the world's premier single-seater motorsport championship, governed by the FIA. Ten constructor teams each field two drivers, competing across 22 races worldwide in the 2026 season — with Cadillac making it an 11-team, 22-driver grid for the first time since 2016.</p>
+              <p style="margin-top:10px">Teams design and build their own cars within strict technical regulations, pushing engineering and driver skill to the absolute limit. The championship awards two titles: the <strong>World Drivers' Championship (WDC)</strong> and the <strong>World Constructors' Championship (WCC)</strong>.</p>
             </div>
-            <div class="reg-item">
-              <span class="reg-tag">X MODE</span>
-              <div class="reg-txt">Active aero opens automatically on straights — reduces drag, maximises top speed. Deployed in DRS zones.</div>
+          </div>
+
+          <div class="card more-card">
+            <div class="more-icon">🏆</div>
+            <div class="more-title">POINTS SCORING SYSTEM</div>
+            <div class="more-body">
+              <p style="margin-bottom:12px">Points are awarded to the top 10 finishers in each race. An additional point goes to the driver who sets the fastest lap — but only if they finish in the top 10.</p>
+              <table class="points-table">
+                <thead>
+                  <tr><th>POSITION</th><th>DRIVER</th><th>PTS</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>P1 — WINNER</td><td>Race Winner</td><td>25</td></tr>
+                  <tr><td>P2</td><td>2nd Place</td><td>18</td></tr>
+                  <tr><td>P3</td><td>3rd Place</td><td>15</td></tr>
+                  <tr><td>P4</td><td>4th Place</td><td>12</td></tr>
+                  <tr><td>P5</td><td>5th Place</td><td>10</td></tr>
+                  <tr><td>P6</td><td>6th Place</td><td>8</td></tr>
+                  <tr><td>P7</td><td>7th Place</td><td>6</td></tr>
+                  <tr><td>P8</td><td>8th Place</td><td>4</td></tr>
+                  <tr><td>P9</td><td>9th Place</td><td>2</td></tr>
+                  <tr><td>P10</td><td>10th Place</td><td>1</td></tr>
+                  <tr><td>FASTEST LAP</td><td>Top-10 finisher only</td><td>+1</td></tr>
+                </tbody>
+              </table>
             </div>
-            <div class="reg-item">
-              <span class="reg-tag">Z MODE</span>
-              <div class="reg-txt">Active aero closes for corners — generates maximum downforce and peak lateral grip through technical sectors.</div>
+          </div>
+
+          <div class="card more-card">
+            <div class="more-icon">📋</div>
+            <div class="more-title">RACE WEEKEND FORMAT</div>
+            <div class="more-body">
+              <p style="margin-bottom:12px">A standard race weekend runs Thursday–Sunday. Some rounds use a shorter <strong>Sprint format</strong> with a mini-race on Saturday.</p>
+              <div class="weekend-steps">
+                <div class="weekend-step">
+                  <div class="weekend-step-day">THU</div>
+                  <div>
+                    <div class="weekend-step-name">MEDIA DAY</div>
+                    <div class="weekend-step-desc">Press conferences and paddock access. Teams reveal strategies publicly.</div>
+                  </div>
+                </div>
+                <div class="weekend-step">
+                  <div class="weekend-step-day">FRI</div>
+                  <div>
+                    <div class="weekend-step-name">FP1 + FP2 — FREE PRACTICE</div>
+                    <div class="weekend-step-desc">Two 60-minute sessions. Teams test setups, collect data, and evaluate tire compounds.</div>
+                  </div>
+                </div>
+                <div class="weekend-step">
+                  <div class="weekend-step-day">SAT</div>
+                  <div>
+                    <div class="weekend-step-name">FP3 + QUALIFYING</div>
+                    <div class="weekend-step-desc">Final practice, then Q1/Q2/Q3 knockout qualifying. Fastest lap in Q3 takes pole position.</div>
+                  </div>
+                </div>
+                <div class="weekend-step">
+                  <div class="weekend-step-day">SUN</div>
+                  <div>
+                    <div class="weekend-step-name">RACE DAY</div>
+                    <div class="weekend-step-desc">~300km race. Mandatory pit stop(s) for tire changes. First car across the line wins.</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="reg-item">
-              <span class="reg-tag">CHASSIS</span>
-              <div class="reg-txt">Smaller, lighter cars. Narrower front wing, revised ground effect floor. New tire compounds across the season.</div>
+          </div>
+
+          <div class="card more-card">
+            <div class="more-icon">📖</div>
+            <div class="more-title">KEY TERMS & GLOSSARY</div>
+            <div class="more-body">
+              <div class="glossary-grid">
+                <div class="glossary-item"><div class="glossary-term">X MODE</div><div class="glossary-def">2026 active aero — flaps open on straights to reduce drag and maximise top speed. Replaces the old DRS system.</div></div>
+                <div class="glossary-item"><div class="glossary-term">Z MODE</div><div class="glossary-def">Active aero flaps close through corners, generating maximum downforce for grip in technical sectors.</div></div>
+                <div class="glossary-item"><div class="glossary-term">DRS</div><div class="glossary-def">Drag Reduction System — the predecessor to X Mode. A movable rear wing flap that opened on straights to aid overtaking.</div></div>
+                <div class="glossary-item"><div class="glossary-term">PIT STOP</div><div class="glossary-def">A tyre change during the race, typically taking 2–3 seconds. Strategy determines the ideal lap to pit.</div></div>
+                <div class="glossary-item"><div class="glossary-term">UNDERCUT</div><div class="glossary-def">Pitting earlier than a rival to gain track position by running faster on fresh tyres while they're still on old rubber.</div></div>
+                <div class="glossary-item"><div class="glossary-term">OVERCUT</div><div class="glossary-def">Staying out longer than a rival to leapfrog them in the pit stop window, especially effective on circuits where track position matters.</div></div>
+                <div class="glossary-item"><div class="glossary-term">SAFETY CAR</div><div class="glossary-def">Deployed after incidents on track. Bunches up the field behind a pace car — often a critical strategic moment.</div></div>
+                <div class="glossary-item"><div class="glossary-term">VSC</div><div class="glossary-def">Virtual Safety Car. Drivers slow to a prescribed delta time without a physical safety car, minimising field bunching.</div></div>
+                <div class="glossary-item"><div class="glossary-term">POLE / P.P.</div><div class="glossary-def">Pole Position — starting at the front of the grid, earned by the fastest time in Q3 qualifying.</div></div>
+                <div class="glossary-item"><div class="glossary-term">DNF</div><div class="glossary-def">Did Not Finish — a race retirement caused by mechanical failure, accident, or driver error.</div></div>
+                <div class="glossary-item"><div class="glossary-term">WDC / WCC</div><div class="glossary-def">World Drivers' Championship / World Constructors' Championship — the two titles awarded at season's end.</div></div>
+                <div class="glossary-item"><div class="glossary-term">ERS</div><div class="glossary-def">Energy Recovery System — harvests kinetic and heat energy under braking, stored and deployed as electric power. In 2026, ERS equals the combustion engine in output.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card more-card">
+            <div class="more-icon">🏎️</div>
+            <div class="more-title">ABOUT GRIDIQ</div>
+            <div class="more-body">
+              <p>GridIQ is your intelligent F1 companion for the 2026 season. Powered by real regulation data, driver ratings, and a 2026-specific simulation engine that accounts for Active Aero X/Z modes and the 50/50 power split.</p>
+              <p style="margin-top:12px;color:var(--accent);font-family:var(--font-tech);font-size:11px;letter-spacing:1px">v1.0.0 — 2026 EDITION</p>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /guide-101 -->
+
+      <!-- ── Pane: Teams ── -->
+      <div id="guide-teams" class="inner-pane">
+        <div id="guide-teams-grid" class="guide-teams-grid"></div>
+      </div>
+
+      <!-- ── Pane: 2026 Regulations ── -->
+      <div id="guide-regs" class="inner-pane">
+        <div class="guide-stack">
+          <div class="card more-card">
+            <div class="more-icon">⚡</div>
+            <div class="more-title">2026 TECHNICAL REGULATIONS</div>
+            <div class="more-body">
+              <p style="margin-bottom:12px">The most transformative ruleset in F1 history — a complete reimagining of power, aerodynamics, and competition. Every team started from scratch.</p>
+              <div class="reg-item">
+                <span class="reg-tag">POWER</span>
+                <div class="reg-txt">50/50 ICE-to-ERS split — approximately 1,000 bhp total. Electric motor output now equals the combustion engine for the first time in F1 history.</div>
+              </div>
+              <div class="reg-item">
+                <span class="reg-tag">X MODE</span>
+                <div class="reg-txt">Active aero opens automatically on straights — reduces drag and maximises top speed. Deployed in designated zones, replacing the old DRS system entirely.</div>
+              </div>
+              <div class="reg-item">
+                <span class="reg-tag">Z MODE</span>
+                <div class="reg-txt">Active aero closes for corners — generates maximum downforce and peak lateral grip. Mastery of the Z/X transition defines fast lap times in 2026.</div>
+              </div>
+              <div class="reg-item">
+                <span class="reg-tag">CHASSIS</span>
+                <div class="reg-txt">Smaller, lighter cars. Narrower front wing, revised ground effect floor. New tyre compounds developed specifically for the 2026 regulation package.</div>
+              </div>
+              <div class="reg-item">
+                <span class="reg-tag">IMPACT</span>
+                <div class="reg-txt">The regulation reset has reshuffled the competitive order dramatically. Mercedes leads with the most effective W17 interpretation; Red Bull and Aston Martin are adapting hardest to the new power unit demands.</div>
+              </div>
             </div>
           </div>
         </div>
+      </div><!-- /guide-regs -->
 
+      <!-- ── Pane: Calendar ── -->
+      <div id="guide-calendar" class="inner-pane">
         <div class="card more-card">
           <div class="more-icon">📅</div>
           <div class="more-title">2026 RACE CALENDAR — 22 ROUNDS</div>
           <div id="full-calendar" class="cal-list"></div>
         </div>
-
-        <div class="card more-card">
-          <div class="more-icon">🏎️</div>
-          <div class="more-title">ABOUT GRIDIQ</div>
-          <div class="more-body">
-            <p>GridIQ is your intelligent F1 companion for the 2026 season. Powered by real regulation data, driver ratings, and a 2026-specific simulation engine that accounts for Active Aero modes and the 50/50 power split.</p>
-            <p style="margin-top:12px;color:var(--accent);font-family:var(--font-tech);font-size:11px;letter-spacing:1px">v1.0.0 — 2026 EDITION</p>
-            <p style="margin-top:8px;color:var(--text-2);font-size:11px">Tap any driver in Standings to view their permanent profile. Use the Predictor to simulate any race with custom weather and grid penalties. Build your Fantasy lineup within the $100M budget cap.</p>
-          </div>
-        </div>
-
       </div>
+
       <div class="spacer"></div>
     </div>
   </section>
+
+  <!-- ══════════════════════════════════════════
+       WELCOME MODAL
+  ══════════════════════════════════════════════ -->
+  <div id="welcome-modal" class="auth-modal-overlay hidden">
+    <div class="welcome-modal-box">
+      <div class="welcome-modal-logo">
+        <span class="logo-w">GRID</span><span class="logo-r">IQ</span>
+      </div>
+      <div class="welcome-modal-season">2026 SEASON</div>
+      <h2 class="welcome-modal-title">WELCOME TO GRIDIQ</h2>
+      <p class="welcome-modal-sub">Your intelligent Formula 1 companion — race predictions, fantasy teams, live standings, and now a full F1 knowledge hub.</p>
+      <div class="welcome-modal-question">Is this your first time following F1?</div>
+      <div class="welcome-modal-ctas">
+        <button id="welcome-new-btn" class="btn-primary" style="padding:14px 20px;font-size:12px">NEW TO F1 — SHOW ME THE BASICS</button>
+        <button id="welcome-skip-btn" class="welcome-skip-btn">I KNOW THE GRID →</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════
        MODAL

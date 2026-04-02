@@ -1982,3 +1982,189 @@ select, input { font-family: var(--font-body); }
   padding-top: 14px;
   border-top: 1px solid var(--border);
 }
+
+/* ══════════════════════════════════════════════════════════
+   WELCOME MODAL
+══════════════════════════════════════════════════════════ */
+.welcome-modal-box {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 36px 28px 28px;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  margin: auto;
+  text-align: center;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.welcome-modal-logo {
+  font-family: var(--font-tech);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+}
+.welcome-modal-season {
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+.welcome-modal-title {
+  font-family: var(--font-tech);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.welcome-modal-sub {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.welcome-modal-question {
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-3);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+.welcome-modal-ctas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.welcome-skip-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  width: 100%;
+}
+.welcome-skip-btn:hover { color: var(--text); border-color: var(--text-3); }
+
+/* ══════════════════════════════════════════════════════════
+   F1 GUIDE — Knowledge Hub (MORE tab)
+══════════════════════════════════════════════════════════ */
+.guide-stack { display: flex; flex-direction: column; gap: 12px; }
+
+/* Points table */
+.points-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.points-table th, .points-table td {
+  padding: 7px 8px;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-align: left;
+}
+.points-table th { color: var(--text-3); border-bottom: 1px solid var(--border); font-weight: 400; }
+.points-table td { color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.03); }
+.points-table tr:last-child td { border-bottom: none; }
+.points-table td:last-child { color: var(--accent); font-weight: 700; text-align: right; }
+.points-table th:last-child { text-align: right; }
+
+/* Race weekend timeline */
+.weekend-steps { display: flex; flex-direction: column; gap: 6px; }
+.weekend-step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+}
+.weekend-step-day {
+  font-family: var(--font-tech);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-3);
+  padding-top: 2px;
+  text-transform: uppercase;
+}
+.weekend-step-name {
+  font-family: var(--font-tech);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.weekend-step-desc { font-family: var(--font-body); font-size: 11px; color: var(--text-2); line-height: 1.5; }
+
+/* Glossary */
+.glossary-grid { display: flex; flex-direction: column; gap: 6px; }
+.glossary-item {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 12px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px;
+}
+.glossary-term { font-family: var(--font-tech); font-size: 10px; letter-spacing: 1px; color: var(--accent); padding-top: 2px; }
+.glossary-def { font-family: var(--font-body); font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+/* Team cards grid */
+.guide-teams-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.guide-team-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+.guide-team-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.guide-team-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.guide-team-name { font-family: var(--font-tech); font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: var(--text); }
+.guide-team-engine-lbl { font-family: var(--font-body); font-size: 10px; color: var(--text-3); }
+.guide-team-pos-chip {
+  margin-left: auto;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-2);
+  background: var(--bg-raised);
+  padding: 3px 9px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+.guide-team-drivers { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.guide-team-driver-pill {
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  color: var(--text-2);
+}
+.guide-team-pts-row { display: flex; align-items: baseline; gap: 5px; }
+.guide-team-pts { font-family: var(--font-tech); font-size: 22px; font-weight: 700; color: var(--accent); line-height: 1; }
+.guide-team-pts-lbl { font-family: var(--font-tech); font-size: 9px; letter-spacing: 2px; color: var(--text-3); }
+.guide-team-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .guide-teams-grid { grid-template-columns: 1fr 1fr; }
+}

@@ -752,6 +752,56 @@ function optimizeLineup() {
   showToast('⚡ Optimal lineup generated!');
 }
 
+/* ─── F1 GUIDE — TEAMS ───────────────────────────────────── */
+function renderGuideTeams() {
+  const el = document.getElementById('guide-teams-grid');
+  if (!el) return;
+  const teams = [...GRIDIQ_DATABASE.constructors].sort((a, b) => b.points - a.points);
+  el.innerHTML = teams.map((c, i) => {
+    const driverNames = c.drivers.map(id => {
+      const d = getDriver(id);
+      return d ? d.lastName : id;
+    });
+    const driverPills = driverNames.map(n =>
+      `<span class="guide-team-driver-pill">${n.toUpperCase()}</span>`
+    ).join('');
+    return `
+      <div class="guide-team-card" style="border-left-color:${c.color}">
+        <div class="guide-team-header">
+          <div class="guide-team-dot" style="background:${c.color}"></div>
+          <div>
+            <div class="guide-team-name">${c.name.toUpperCase()}</div>
+            <div class="guide-team-engine-lbl">${c.engine} power unit</div>
+          </div>
+          <div class="guide-team-pos-chip">P${i + 1}</div>
+        </div>
+        <div class="guide-team-drivers">${driverPills}</div>
+        <div class="guide-team-pts-row">
+          <span class="guide-team-pts">${c.points}</span>
+          <span class="guide-team-pts-lbl">&nbsp;PTS</span>
+        </div>
+        <div class="guide-team-desc">${c.desc}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ─── WELCOME MODAL ──────────────────────────────────────── */
+function maybeShowWelcomeModal() {
+  if (sessionStorage.getItem('gridiq_welcomed')) return;
+  setTimeout(function() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) modal.classList.remove('hidden');
+    // Suppress PRO popup in the same session so they don't stack
+    sessionStorage.setItem('gridiq_promo_shown', '1');
+  }, 600);
+}
+
+function closeWelcomeModal() {
+  const modal = document.getElementById('welcome-modal');
+  if (modal) modal.classList.add('hidden');
+  sessionStorage.setItem('gridiq_welcomed', '1');
+}
+
 /* ─── MORE PAGE ──────────────────────────────────────────── */
 function renderCalendar() {
   const nextRace  = getNextRace();
@@ -1061,6 +1111,21 @@ function init() {
   renderPPMTable();
   updateBudgetDisplay();
   renderCalendar();
+  renderGuideTeams();
+  maybeShowWelcomeModal();
+
+  // ── Welcome modal buttons ───────────────────────────────
+  const welcomeNewBtn = document.getElementById('welcome-new-btn');
+  if (welcomeNewBtn) welcomeNewBtn.addEventListener('click', function() {
+    closeWelcomeModal();
+    switchTab('more');
+  });
+  const welcomeSkipBtn = document.getElementById('welcome-skip-btn');
+  if (welcomeSkipBtn) welcomeSkipBtn.addEventListener('click', closeWelcomeModal);
+  const welcomeModal = document.getElementById('welcome-modal');
+  if (welcomeModal) welcomeModal.addEventListener('click', function(e) {
+    if (e.target === welcomeModal) closeWelcomeModal();
+  });
 
   document.getElementById('optimize-btn').addEventListener('click', optimizeLineup);
 
