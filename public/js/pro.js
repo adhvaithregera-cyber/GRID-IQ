@@ -279,7 +279,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* ── Pro modal event listeners (replaces inline onclick= attrs) ── */
   var proNavBtn = document.getElementById('pro-nav-btn');
-  if (proNavBtn) proNavBtn.addEventListener('click', openProModal);
+  if (proNavBtn) proNavBtn.addEventListener('click', function() {
+    if (isGridIQPro()) return;
+    openProModal();
+  });
 
   var proModalOverlay = document.getElementById('pro-modal');
   if (proModalOverlay) {
