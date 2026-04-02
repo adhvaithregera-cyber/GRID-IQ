@@ -168,9 +168,13 @@ function handleUpgradeClick() {
 }
 
 /* ── Detect payment success redirect (?pro=1) ───────────── */
+/* NOTE: We do NOT set localStorage here. PRO status is authoritative
+   in Firestore. After a real payment, the provider's webhook writes
+   isPro:true to Firestore, and _syncProFromFirestore (auth.js) grants
+   the flag on the next sign-in. Setting it client-side from a URL
+   param would allow any user to self-grant PRO by visiting ?pro=1. */
 (function detectProRedirect() {
   if (new URLSearchParams(location.search).get('pro') === '1') {
-    localStorage.setItem('gridiq_pro', 'true');
     history.replaceState({}, '', location.pathname);
     window._proJustUnlocked = true;
   }
@@ -262,25 +266,38 @@ function showProSuccessToast(msg) {
 }
 
 /* ─────────────────────────────────────────────────────────
-   WELCOME POPUP
-───────────────────────────────────────────────────────── */
-function maybeShowProPopup() {
-  if (isGridIQPro()) return;
-  if (sessionStorage.getItem('gridiq_promo_shown')) return;
-  sessionStorage.setItem('gridiq_promo_shown', '1');
-  setTimeout(openProModal, 1800);
-}
-
-/* ─────────────────────────────────────────────────────────
    INIT
 ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   updateProNavBadge();
   if (window._proJustUnlocked) {
     showProSuccessToast();
-  } else {
-    maybeShowProPopup();
   }
+
+  /* ── Pro modal event listeners (replaces inline onclick= attrs) ── */
+  var proNavBtn = document.getElementById('pro-nav-btn');
+  if (proNavBtn) proNavBtn.addEventListener('click', openProModal);
+
+  var proModalOverlay = document.getElementById('pro-modal');
+  if (proModalOverlay) {
+    proModalOverlay.addEventListener('click', function(e) {
+      if (e.target === this) closeProModal();
+    });
+    var proCloseBtn = proModalOverlay.querySelector('.auth-modal-close');
+    if (proCloseBtn) proCloseBtn.addEventListener('click', closeProModal);
+  }
+
+  var upgradeBtn = document.querySelector('.pro-upgrade-btn');
+  if (upgradeBtn) upgradeBtn.addEventListener('click', handleUpgradeClick);
+
+  var trialBtn = document.querySelector('.pro-trial-btn');
+  if (trialBtn) trialBtn.addEventListener('click', startTrial);
+
+  var promoSubmit = document.querySelector('.pro-promo-submit');
+  if (promoSubmit) promoSubmit.addEventListener('click', handlePromoSubmit);
+
+  var skipBtn = document.querySelector('.pro-skip-btn');
+  if (skipBtn) skipBtn.addEventListener('click', closeProModal);
 });
 
 /* ─────────────────────────────────────────────────────────
