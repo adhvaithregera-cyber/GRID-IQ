@@ -482,4 +482,8 @@ function _bindUIEvents() {
 /* ── Kick off auth state on load ─────────────────────────── */
 _getAuth();
 _renderAuthBtn(null);
-document.addEventListener('DOMContentLoaded', _bindUIEvents);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _bindUIEvents);
+} else {
+  _bindUIEvents();
+}
