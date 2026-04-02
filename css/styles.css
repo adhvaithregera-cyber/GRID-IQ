@@ -1945,12 +1945,27 @@ select, input { font-family: var(--font-body); }
 .compare-picker-row {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 16px;
 }
+.compare-picker .label { margin-top: 0; margin-bottom: 10px; }
 .compare-picker {
   flex: 1;
   min-width: 0;
+  background: linear-gradient(140deg, #110808 0%, #0f0a00 50%, #080808 100%);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.compare-picker::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, rgba(255,30,0,0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
 .compare-vs {
   font-family: var(--font-tech);
