@@ -854,8 +854,10 @@ function renderCalendar() {
 /* ─── MODAL SYSTEM ───────────────────────────────────────── */
 function openModal(html) {
   const overlay = document.getElementById('custom-modal');
-  document.getElementById('modal-box').innerHTML =
-    `<div class="modal-topbar"><button class="modal-close-btn" onclick="closeModal()">✕</button></div>` + html;
+  const box = document.getElementById('modal-box');
+  box.innerHTML =
+    `<div class="modal-topbar"><button class="modal-close-btn">✕</button></div>` + html;
+  box.querySelector('.modal-close-btn').addEventListener('click', closeModal);
   overlay.classList.remove('hidden');
   STATE.modal.open = true;
 }
