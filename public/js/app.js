@@ -1023,6 +1023,9 @@ function _renderCompareRadar(dA, dB) {
   const n = keys.length;
   const cx = 150, cy = 158, r = 100;
   const colorA = '#FF1E00', colorB = '#00D2BE';
+  const RADAR_MIN = 70, RADAR_MAX = 100;
+
+  const norm = v => Math.max(0, Math.min(1, (v - RADAR_MIN) / (RADAR_MAX - RADAR_MIN)));
 
   const pt = (val, i) => {
     const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
@@ -1038,8 +1041,8 @@ function _renderCompareRadar(dA, dB) {
     return `<line x1="${cx}" y1="${cy}" x2="${(cx + r * Math.cos(angle)).toFixed(1)}" y2="${(cy + r * Math.sin(angle)).toFixed(1)}" class="radar-axis"/>`;
   }).join('');
 
-  const polyA = `<polygon points="${keys.map((k, i) => pt((dA.rating[k] || 0) / 100, i)).join(' ')}" class="radar-poly" style="fill:${colorA}28;stroke:${colorA}"/>`;
-  const polyB = `<polygon points="${keys.map((k, i) => pt((dB.rating[k] || 0) / 100, i)).join(' ')}" class="radar-poly" style="fill:${colorB}28;stroke:${colorB}"/>`;
+  const polyA = `<polygon points="${keys.map((k, i) => pt(norm(dA.rating[k] || 0), i)).join(' ')}" class="radar-poly" style="fill:${colorA}28;stroke:${colorA}"/>`;
+  const polyB = `<polygon points="${keys.map((k, i) => pt(norm(dB.rating[k] || 0), i)).join(' ')}" class="radar-poly" style="fill:${colorB}28;stroke:${colorB}"/>`;
 
   const lbls = labels.map((lbl, i) => {
     const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
