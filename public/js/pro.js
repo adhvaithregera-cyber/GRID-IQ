@@ -275,5 +275,4 @@ window.openProModal         = openProModal;
 window.closeProModal        = closeProModal;
 window.handleUpgradeClick   = handleUpgradeClick;
 window.grantOwnerProIfMatch = grantOwnerProIfMatch;
-window.redeemPromoCode      = redeemPromoCode;
 window.getPaymentLink       = getPaymentLink;
