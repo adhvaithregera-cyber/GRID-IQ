@@ -2026,21 +2026,21 @@ select, input { font-family: var(--font-body); }
   margin-bottom: 4px;
 }
 .cdc-card {
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
+  background: linear-gradient(140deg, #110808 0%, #0f0a00 50%, #080808 100%);
+  border: 1px solid var(--border-red);
   border-radius: var(--radius);
   padding: 16px 14px;
-  transition: box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(255, 30, 0, 0.08);
 }
-.cdc-card--win-a {
-  background: rgba(255, 30, 0, 0.10);
-  border-color: rgba(255, 30, 0, 0.45);
-  box-shadow: 0 0 24px rgba(255, 30, 0, 0.30), inset 0 0 16px rgba(255, 30, 0, 0.06);
-}
-.cdc-card--win-b {
-  background: rgba(0, 210, 190, 0.10);
-  border-color: rgba(0, 210, 190, 0.45);
-  box-shadow: 0 0 24px rgba(0, 210, 190, 0.30), inset 0 0 16px rgba(0, 210, 190, 0.06);
+.cdc-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,30,0,0.09) 0%, transparent 70%);
+  pointer-events: none;
 }
 .cdc-card-header {
   display: flex;
@@ -2111,16 +2111,6 @@ select, input { font-family: var(--font-body); }
   font-weight: 700;
   color: var(--text);
   line-height: 1;
-}
-.cdc-win-a {
-  color: #FF1E00;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(255, 30, 0, 0.6);
-}
-.cdc-win-b {
-  color: #00D2BE;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(0, 210, 190, 0.6);
 }
 .cdc-verdict--a { color: #FF1E00; }
 .cdc-verdict--b { color: #00D2BE; }

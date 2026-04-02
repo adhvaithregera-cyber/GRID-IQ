@@ -1072,36 +1072,24 @@ function _renderCompareStats(dA, dB) {
   const careerKeys   = ['wins', 'poles', 'podiums', 'points', 'championships'];
   const careerLabels = ['WINS', 'POLES', 'PODIUMS', 'POINTS', 'CHAMPS'];
 
-  const totalA = ratingKeys.reduce((s, k) => s + (dA.rating[k] || 0), 0);
-  const totalB = ratingKeys.reduce((s, k) => s + (dB.rating[k] || 0), 0);
-  const winner = totalA >= totalB ? dA : dB;
-  const winnerIsA = totalA >= totalB;
-
-  function buildCard(d, isA, isWinner) {
-    const dotColor = d.color || (isA ? '#FF1E00' : '#00D2BE');
-    const winClass = isWinner ? (isA ? ' cdc-card--win-a' : ' cdc-card--win-b') : '';
+  function buildCard(d) {
+    const dotColor = d.color || '#FF1E00';
 
     const careerRows = careerKeys.map((k, i) => {
-      const vThis = d[k] || 0;
-      const vOther = isA ? (dB[k] || 0) : (dA[k] || 0);
-      const winValClass = vThis > vOther ? (isA ? ' cdc-win-a' : ' cdc-win-b') : '';
       return `<div class="cdc-stat-row">
         <span class="cdc-stat-lbl">${careerLabels[i]}</span>
-        <span class="cdc-stat-val${winValClass}">${vThis}</span>
+        <span class="cdc-stat-val">${d[k] || 0}</span>
       </div>`;
     }).join('');
 
     const ratingRows = ratingKeys.map((k, i) => {
-      const vThis = d.rating[k] || 0;
-      const vOther = isA ? (dB.rating[k] || 0) : (dA.rating[k] || 0);
-      const winValClass = vThis > vOther ? (isA ? ' cdc-win-a' : ' cdc-win-b') : '';
       return `<div class="cdc-stat-row">
         <span class="cdc-stat-lbl">${ratingLabels[i]}</span>
-        <span class="cdc-stat-val${winValClass}">${vThis}</span>
+        <span class="cdc-stat-val">${d.rating[k] || 0}</span>
       </div>`;
     }).join('');
 
-    return `<div class="cdc-card${winClass}">
+    return `<div class="cdc-card">
       <div class="cdc-card-header">
         <span class="cdc-dot" style="background:${dotColor}"></span>
         <div class="cdc-names">
@@ -1116,13 +1104,7 @@ function _renderCompareStats(dA, dB) {
     </div>`;
   }
 
-  const cardA = buildCard(dA, true,  winnerIsA);
-  const cardB = buildCard(dB, false, !winnerIsA);
-  const verdictClass = winnerIsA ? 'cdc-verdict--a' : 'cdc-verdict--b';
-
-  el.innerHTML =
-    `<div class="cdc-grid">${cardA}${cardB}</div>` +
-    `<div class="cstat-verdict ${verdictClass}">★ ${winner.lastName.toUpperCase()} WINS ON RATINGS</div>`;
+  el.innerHTML = `<div class="cdc-grid">${buildCard(dA)}${buildCard(dB)}</div>`;
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */
