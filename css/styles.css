@@ -430,7 +430,7 @@ select, input { font-family: var(--font-body); }
   margin-top: 3px;
 }
 @media (min-width: 640px) {
-  .hero-stats-strip { grid-template-columns: repeat(4, 1fr); }
+  .hero-stats-strip { grid-template-columns: repeat(4, 1fr); margin-top: 20px; }
 }
 
 /* ─── CHAMPIONSHIP HUB ───────────────────────────────────── */
