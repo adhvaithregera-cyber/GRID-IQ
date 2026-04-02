@@ -255,15 +255,14 @@ function renderDriverStandings() {
 
 /* ─── CONSTRUCTOR STANDINGS ──────────────────────────────── */
 function renderConstructorStandings() {
-  const LIMIT = 5;
   const constructors = [...GRIDIQ_DATABASE.constructors].sort((a,b) => b.points - a.points);
   const leaderPts = constructors[0].points;
   const container = document.getElementById('constructor-standings');
-  let expanded = false;
+  let expanded = true;
 
   function build() {
     container.innerHTML = '';
-    const visible = expanded ? constructors : constructors.slice(0, LIMIT);
+    const visible = constructors;
 
     visible.forEach((c, i) => {
       const posClass = i===0?'p1':i===1?'p2':i===2?'p3':'';
@@ -288,13 +287,6 @@ function renderConstructorStandings() {
       container.appendChild(row);
     });
 
-    const btn = document.createElement('button');
-    btn.className = 'expand-btn' + (expanded ? ' expanded' : '');
-    btn.innerHTML = expanded
-      ? `SHOW LESS <span class="expand-arrow">▼</span>`
-      : `SHOW ALL ${constructors.length} TEAMS <span class="expand-arrow">▼</span>`;
-    btn.addEventListener('click', () => { expanded = !expanded; build(); });
-    container.appendChild(btn);
   }
 
   build();
