@@ -6,11 +6,12 @@
   <!-- Content Security Policy — restricts what scripts/resources can load -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src  'self' 'unsafe-inline'
+    script-src  'self'
                 https://www.gstatic.com
                 https://www.google.com
                 https://apis.google.com
-                https://recaptchaenterprise.googleapis.com;
+                https://recaptchaenterprise.googleapis.com
+                https://www.googletagmanager.com;
     style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src    'self' https://fonts.gstatic.com;
     img-src     'self' data: https: blob:;
@@ -58,11 +59,11 @@
     <div class="nav-actions">
 
       <!-- PRO nav badge -->
-      <button id="pro-nav-btn" class="pro-nav-badge" onclick="openProModal()">&#9733; GO PRO</button>
+      <button id="pro-nav-btn" class="pro-nav-badge">&#9733; GO PRO</button>
 
       <!-- Auth button: shows SIGN IN or user avatar -->
       <div class="auth-wrap">
-        <button id="auth-btn" class="auth-btn" data-state="out" onclick="onAuthBtnClick()" aria-label="Sign in">
+        <button id="auth-btn" class="auth-btn" data-state="out" aria-label="Sign in">
           <span class="auth-btn-lbl">SIGN IN</span>
         </button>
 
@@ -76,7 +77,7 @@
             </div>
           </div>
           <div class="um-divider"></div>
-          <button class="um-signout" onclick="authSignOut()">SIGN OUT</button>
+          <button class="um-signout">SIGN OUT</button>
         </div>
       </div>
 
@@ -87,10 +88,10 @@
   <!-- ══════════════════════════════════════════
        PRO UPGRADE MODAL
   ══════════════════════════════════════════════ -->
-  <div id="pro-modal" class="auth-modal-overlay hidden" onclick="if(event.target===this)closeProModal()">
+  <div id="pro-modal" class="auth-modal-overlay hidden">
     <div class="pro-modal-box">
 
-      <button class="auth-modal-close" onclick="closeProModal()" aria-label="Close">✕</button>
+      <button class="auth-modal-close" aria-label="Close">✕</button>
 
       <div class="pro-modal-crown">&#9733;</div>
       <div class="pro-modal-badge-label">GRID IQ PRO</div>
@@ -104,13 +105,13 @@
         <span class="pro-price-sub">Cancel anytime</span>
       </div>
 
-      <button class="btn-primary pro-upgrade-btn" onclick="handleUpgradeClick()">UPGRADE TO PRO →</button>
+      <button class="btn-primary pro-upgrade-btn">UPGRADE TO PRO →</button>
       <div id="pro-payment-note" class="pro-payment-note hidden"></div>
 
       <!-- Trial section — shown only when trial is still available -->
       <div id="pro-trial-section" class="hidden">
         <div class="auth-divider"><span>OR</span></div>
-        <button class="pro-trial-btn" onclick="startTrial()">START 3-DAY FREE TRIAL</button>
+        <button class="pro-trial-btn">START 3-DAY FREE TRIAL</button>
         <p class="pro-trial-note">No card needed &bull; Beta only &bull; One per user</p>
       </div>
 
@@ -120,12 +121,12 @@
         <p id="pro-promo-instr" class="pro-promo-instr"></p>
         <div class="pro-promo-row">
           <input id="pro-promo-input" type="text" class="auth-input pro-promo-input" placeholder="ENTER PROMO CODE">
-          <button class="pro-promo-submit" onclick="handlePromoSubmit()">APPLY</button>
+          <button class="pro-promo-submit">APPLY</button>
         </div>
         <div id="pro-promo-msg" class="pro-promo-msg hidden"></div>
       </div>
 
-      <button class="pro-skip-btn" onclick="closeProModal()">Maybe Later</button>
+      <button class="pro-skip-btn">Maybe Later</button>
 
     </div>
   </div>
@@ -133,10 +134,10 @@
   <!-- ══════════════════════════════════════════
        AUTH MODAL
   ══════════════════════════════════════════════ -->
-  <div id="auth-modal" class="auth-modal-overlay hidden" onclick="if(event.target===this)closeAuthModal()">
+  <div id="auth-modal" class="auth-modal-overlay hidden">
     <div class="auth-modal-box">
 
-      <button class="auth-modal-close" onclick="closeAuthModal()" aria-label="Close">✕</button>
+      <button class="auth-modal-close" aria-label="Close">✕</button>
       <div class="auth-modal-logo">
         <span class="logo-w">GRID</span><span class="logo-r">IQ</span>
       </div>
@@ -150,7 +151,7 @@
         <p class="auth-modal-sub">Sign in to save your fantasy team and race predictions across devices.</p>
 
         <div class="auth-providers">
-          <button class="auth-provider-btn auth-google" onclick="authSignInGoogle()">
+          <button class="auth-provider-btn auth-google">
             <svg class="auth-provider-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -159,7 +160,7 @@
             </svg>
             <span>Continue with Google</span>
           </button>
-          <button class="auth-provider-btn auth-github" onclick="authSignInGitHub()">
+          <button class="auth-provider-btn auth-github">
             <svg class="auth-provider-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
               <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
             </svg>
@@ -170,14 +171,14 @@
         <div class="auth-divider"><span>OR</span></div>
 
         <div class="auth-alt-providers">
-          <button class="auth-provider-btn auth-email-btn" onclick="authShowEmailView()">
+          <button class="auth-provider-btn auth-email-btn">
             <svg class="auth-provider-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
               <path d="M2 7l10 7 10-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
             <span>Continue with Email</span>
           </button>
-          <button class="auth-provider-btn auth-phone-btn" onclick="authShowPhoneView()">
+          <button class="auth-provider-btn auth-phone-btn">
             <svg class="auth-provider-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.8"/>
               <circle cx="12" cy="18" r="1" fill="currentColor"/>
@@ -191,40 +192,40 @@
 
       <!-- ── View: email ── -->
       <div id="auth-view-email" class="auth-view hidden">
-        <button class="auth-back-btn" onclick="authShowMainView()">← BACK</button>
+        <button class="auth-back-btn">← BACK</button>
         <h2 class="auth-modal-title" id="auth-email-title">SIGN IN</h2>
         <div class="auth-tab-row">
-          <button class="auth-tab active" id="auth-tab-signin" onclick="authSetEmailMode('signin')">SIGN IN</button>
-          <button class="auth-tab" id="auth-tab-signup" onclick="authSetEmailMode('signup')">CREATE ACCOUNT</button>
+          <button class="auth-tab active" id="auth-tab-signin">SIGN IN</button>
+          <button class="auth-tab" id="auth-tab-signup">CREATE ACCOUNT</button>
         </div>
         <div class="auth-form">
           <input id="auth-email-input" type="email" class="auth-input" placeholder="Email address" autocomplete="email">
           <input id="auth-password-input" type="password" class="auth-input" placeholder="Password" autocomplete="current-password">
           <input id="auth-confirm-input" type="password" class="auth-input hidden" placeholder="Confirm password" autocomplete="new-password">
-          <button class="btn-primary auth-form-submit" id="auth-email-submit" onclick="authSubmitEmail()">SIGN IN</button>
+          <button class="btn-primary auth-form-submit" id="auth-email-submit">SIGN IN</button>
         </div>
       </div>
 
       <!-- ── View: phone ── -->
       <div id="auth-view-phone" class="auth-view hidden">
-        <button class="auth-back-btn" onclick="authShowMainView()">← BACK</button>
+        <button class="auth-back-btn">← BACK</button>
         <h2 class="auth-modal-title">PHONE SIGN IN</h2>
         <p class="auth-modal-sub">Enter your number with country code — e.g. +1 555 123 4567</p>
         <div class="auth-form">
           <input id="auth-phone-input" type="tel" class="auth-input" placeholder="+1 234 567 8900" autocomplete="tel">
           <div id="recaptcha-container"></div>
-          <button class="btn-primary auth-form-submit" onclick="authSendPhoneCode()">SEND CODE</button>
+          <button class="btn-primary auth-form-submit" id="auth-phone-submit">SEND CODE</button>
         </div>
       </div>
 
       <!-- ── View: OTP ── -->
       <div id="auth-view-otp" class="auth-view hidden">
-        <button class="auth-back-btn" onclick="authShowPhoneView()">← BACK</button>
+        <button class="auth-back-btn">← BACK</button>
         <h2 class="auth-modal-title">ENTER CODE</h2>
         <p class="auth-modal-sub" id="auth-otp-sub">Enter the 6-digit code sent to your phone.</p>
         <div class="auth-form">
           <input id="auth-otp-input" type="text" inputmode="numeric" class="auth-input auth-otp-input" placeholder="000000" maxlength="6" autocomplete="one-time-code">
-          <button class="btn-primary auth-form-submit" onclick="authVerifyOtp()">VERIFY →</button>
+          <button class="btn-primary auth-form-submit" id="auth-otp-submit">VERIFY →</button>
         </div>
       </div>
 

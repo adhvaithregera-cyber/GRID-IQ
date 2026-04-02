@@ -77,7 +77,7 @@ function _getAuth() {
   if (_auth) return _auth;
   try {
     const app = initializeApp(FIREBASE_CONFIG);
-    getAnalytics(app);
+    try { getAnalytics(app); } catch (_) {}
     if (RECAPTCHA_SITE_KEY && RECAPTCHA_SITE_KEY !== 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE') {
       initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
@@ -409,7 +409,7 @@ function openUserMenu() {
       ? `<img src="${u.photoURL}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
       : _initials(u.displayName || u.email || u.phoneNumber);
   }
-  document.getElementById('user-menu')?.classList.toggle('hidden');
+  document.getElementById('user-menu')?.classList.remove('hidden');
 }
 
 function closeUserMenu() {
