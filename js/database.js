@@ -173,7 +173,7 @@ const GRIDIQ_DATABASE = {
       id:"ANT", number:12, firstName:"Kimi",      lastName:"Antonelli",  constructor:"Mercedes",        constructorId:"mercedes",
       nationality:"Italian",      birthplace:"Bologna, Italy",          born:"25 Aug 2006", debut:"2025 (Mercedes)",
       championships:0, wins:4, poles:4, podiums:8,
-      points:72, price:23.2, color:"#27F4D2",
+      points:72, price:24.1, color:"#27F4D2",
       rating:{ overall:91, wet:90, technical:89, power:88, racecraft:88 },
       bio:"The prodigy Mercedes signed straight from the junior academy. Antonelli's debut season in 2025 showed flashes of brilliance; 2026 has confirmed his class. Championship leader after three rounds with two dominant wins in China and Japan. The youngest driver to lead the WDC since Verstappen."
     },
@@ -181,7 +181,7 @@ const GRIDIQ_DATABASE = {
       id:"RUS", number:63, firstName:"George",    lastName:"Russell",    constructor:"Mercedes",        constructorId:"mercedes",
       nationality:"British",      birthplace:"King's Lynn, England",    born:"15 Feb 1998", debut:"2019 (Williams)",
       championships:0, wins:4, poles:6, podiums:22,
-      points:63, price:27.4, color:"#27F4D2",
+      points:63, price:28.3, color:"#27F4D2",
       rating:{ overall:90, wet:88, technical:90, power:86, racecraft:88 },
       bio:"Composed, analytical, and capable of breathtaking one-lap speed. Russell claimed the opening race victory in Australia and pushed his teammate to the limit throughout. His engineering intelligence helps Mercedes maximise the W17's considerable potential every single weekend."
     },
@@ -189,7 +189,7 @@ const GRIDIQ_DATABASE = {
       id:"LEC", number:16, firstName:"Charles",   lastName:"Leclerc",    constructor:"Ferrari",         constructorId:"ferrari",
       nationality:"Monégasque",   birthplace:"Monte Carlo, Monaco",     born:"16 Oct 1997", debut:"2018 (Sauber)",
       championships:0, wins:8, poles:26, podiums:42,
-      points:49, price:22.8, color:"#E8002D",
+      points:49, price:23.7, color:"#E8002D",
       rating:{ overall:88, wet:85, technical:93, power:89, racecraft:87 },
       bio:"Leclerc sits third in the championship — his qualifying brilliance and technical feedback make him Ferrari's cornerstone. Pairing with Hamilton has sharpened his race craft immeasurably. The SF-26 is a genuine race winner, and Charles is determined to convert raw pace into a maiden world title."
     },
@@ -197,7 +197,7 @@ const GRIDIQ_DATABASE = {
       id:"HAM", number:44, firstName:"Lewis",     lastName:"Hamilton",   constructor:"Ferrari",         constructorId:"ferrari",
       nationality:"British",      birthplace:"Stevenage, England",      born:"7 Jan 1985",  debut:"2007 (McLaren)",
       championships:7, wins:103, poles:104, podiums:197,
-      points:41, price:22.5, color:"#E8002D",
+      points:41, price:23.2, color:"#E8002D",
       rating:{ overall:85, wet:95, technical:84, power:84, racecraft:96 },
       bio:"Seven-time world champion who stunned the paddock by joining Ferrari. The move has rekindled Hamilton's fire. Fourth in the championship at 41, he remains one of the most dangerous wet-weather drivers in the field. Under 2026's power regs, his tire management and racecraft give Ferrari a calculating edge."
     },
@@ -205,7 +205,7 @@ const GRIDIQ_DATABASE = {
       id:"NOR", number:4,  firstName:"Lando",     lastName:"Norris",     constructor:"McLaren",         constructorId:"mclaren",
       nationality:"British",      birthplace:"Bristol, England",        born:"13 Nov 1999", debut:"2019 (McLaren)",
       championships:0, wins:4, poles:7, podiums:28,
-      points:25, price:27.2, color:"#FF8000",
+      points:25, price:26.5, color:"#FF8000",
       rating:{ overall:84, wet:91, technical:83, power:85, racecraft:90 },
       bio:"McLaren's talisman and one of the fastest drivers on the grid in any condition. Fifth in the championship despite strong pace — McLaren's MCL60 hasn't yet unlocked full potential under the new 2026 regulations. Norris's wet-weather instinct is among the best in the field."
     },
@@ -213,7 +213,7 @@ const GRIDIQ_DATABASE = {
       id:"PIA", number:81, firstName:"Oscar",     lastName:"Piastri",    constructor:"McLaren",         constructorId:"mclaren",
       nationality:"Australian",   birthplace:"Melbourne, Australia",    born:"6 Apr 2001",  debut:"2023 (McLaren)",
       championships:0, wins:2, poles:3, podiums:16,
-      points:21, price:25.5, color:"#FF8000",
+      points:21, price:24.6, color:"#FF8000",
       rating:{ overall:82, wet:81, technical:83, power:82, racecraft:84 },
       bio:"Methodical, rapid, and a perfect technical complement to Norris. Piastri's measured approach to the 2026 regulations has earned genuine praise from McLaren's engineers. No longer his teammate's understudy — he is a co-leader with championship aspirations and the pace to back them up."
     },
@@ -221,7 +221,7 @@ const GRIDIQ_DATABASE = {
       id:"BEA", number:87, firstName:"Oliver",    lastName:"Bearman",    constructor:"Haas F1 Team",    constructorId:"haas",
       nationality:"British",      birthplace:"Chelmsford, England",     born:"8 May 2005",  debut:"2024 (Ferrari)",
       championships:0, wins:0, poles:0, podiums:0,
-      points:17, price:7.4, color:"#B6BABD",
+      points:17, price:9.2, color:"#B6BABD",
       rating:{ overall:79, wet:77, technical:79, power:77, racecraft:78 },
       bio:"The standout surprise of 2026 so far. Bearman's 17 points from three rounds has Haas in fourth in the constructors' standings — a result nobody predicted. His Ferrari junior pedigree is translating brilliantly into race results. Calm under pressure, fast over one lap, and relentless in the race."
     },
@@ -229,7 +229,7 @@ const GRIDIQ_DATABASE = {
       id:"GAS", number:10, firstName:"Pierre",    lastName:"Gasly",      constructor:"Alpine",          constructorId:"alpine",
       nationality:"French",       birthplace:"Rouen, France",           born:"7 Feb 1996",  debut:"2017 (Toro Rosso)",
       championships:0, wins:1, poles:0, podiums:6,
-      points:15, price:12.0, color:"#FF87BC",
+      points:15, price:13.0, color:"#FF87BC",
       rating:{ overall:78, wet:79, technical:78, power:77, racecraft:80 },
       bio:"Alpine's experienced leader, guiding the team through their Renault power unit step for 2026. Gasly's 15 points from three races reflects a team that has outperformed expectations. His Italian GP win remains his career highlight — the 2026 Alpine regularly puts him in positions to repeat it."
     },
@@ -237,7 +237,7 @@ const GRIDIQ_DATABASE = {
       id:"VER", number:1,  firstName:"Max",       lastName:"Verstappen",  constructor:"Red Bull Racing", constructorId:"red_bull",
       nationality:"Dutch",        birthplace:"Hasselt, Belgium",        born:"30 Sep 1997", debut:"2015 (Toro Rosso)",
       championships:4, wins:62, poles:41, podiums:110,
-      points:12, price:27.7, color:"#3671C6",
+      points:12, price:28.2, color:"#3671C6",
       rating:{ overall:95, wet:96, technical:92, power:95, racecraft:98 },
       bio:"Four-time world champion sitting ninth — perhaps the most shocking statistic of 2026. The RB22's struggles with the new 50/50 power regulations have neutralised Verstappen's typical dominance. His raw talent rating remains the highest on the grid; when Red Bull fix their power unit issues, expect this standings position to change rapidly."
     },
@@ -245,7 +245,7 @@ const GRIDIQ_DATABASE = {
       id:"LAW", number:30, firstName:"Liam",      lastName:"Lawson",     constructor:"Racing Bulls",    constructorId:"racing_bulls",
       nationality:"New Zealander", birthplace:"Hastings, New Zealand",  born:"11 Feb 2002", debut:"2023 (AlphaTauri)",
       championships:0, wins:0, poles:0, podiums:0,
-      points:10, price:6.5, color:"#6692FF",
+      points:10, price:7.5, color:"#6692FF",
       rating:{ overall:77, wet:76, technical:77, power:79, racecraft:78 },
       bio:"Lawson earned his Racing Bulls seat through consistent mid-season performances and is delivering on the investment. Tenth in the championship, he has extracted strong results from a car operating in the upper mid-field. His measured approach belies a natural aggression that emerges late in races."
     },
@@ -253,7 +253,7 @@ const GRIDIQ_DATABASE = {
       id:"LIN", number:41, firstName:"Arvid",     lastName:"Lindblad",   constructor:"Racing Bulls",    constructorId:"racing_bulls",
       nationality:"British",      birthplace:"London, England",         born:"8 Aug 2007",  debut:"2026 (Racing Bulls)",
       championships:0, wins:0, poles:0, podiums:0,
-      points:4, price:6.2, color:"#6692FF",
+      points:4, price:7.6, color:"#6692FF",
       rating:{ overall:74, wet:71, technical:74, power:72, racecraft:72 },
       bio:"The youngest driver in F1 history to start a race and the sole pure rookie on the 2026 grid. Lindblad was the youngest-ever winner in both Formula 3 and Formula 2. His composure under pressure is extraordinary for an 18-year-old, and the Racing Bulls seat is just the beginning of what could be a legendary career."
     },
@@ -261,7 +261,7 @@ const GRIDIQ_DATABASE = {
       id:"HAD", number:6,  firstName:"Isack",     lastName:"Hadjar",     constructor:"Red Bull Racing", constructorId:"red_bull",
       nationality:"French",       birthplace:"Paris, France",           born:"28 Feb 2004", debut:"2025 (Racing Bulls)",
       championships:0, wins:0, poles:0, podiums:0,
-      points:4, price:15.1, color:"#3671C6",
+      points:4, price:13.3, color:"#3671C6",
       rating:{ overall:73, wet:71, technical:73, power:74, racecraft:73 },
       bio:"Promoted to Red Bull Racing for 2026 after impressive results in his debut season with Racing Bulls. Hadjar is working through the challenges of a car still adapting to the new 2026 power regulations alongside Verstappen. His technical feedback is highly rated by Red Bull's engineering team."
     },
@@ -269,7 +269,7 @@ const GRIDIQ_DATABASE = {
       id:"BOR", number:5,  firstName:"Gabriel",   lastName:"Bortoleto",  constructor:"Audi",            constructorId:"audi",
       nationality:"Brazilian",    birthplace:"São Paulo, Brazil",       born:"14 Oct 2004", debut:"2025 (Kick Sauber)",
       championships:0, wins:0, poles:0, podiums:0,
-      points:2, price:6.4, color:"#999999",
+      points:2, price:5.8, color:"#999999",
       rating:{ overall:75, wet:73, technical:75, power:74, racecraft:74 },
       bio:"Back-to-back F2 and F3 champion, Bortoleto became the first full-time Brazilian F1 driver since Felipe Massa. His debut season with Kick Sauber showed promise amid a difficult car. Now leading Audi's works programme alongside Hülkenberg as they attempt to find the performance the new power unit promises."
     },
@@ -277,7 +277,7 @@ const GRIDIQ_DATABASE = {
       id:"SAI", number:55, firstName:"Carlos",    lastName:"Sainz",      constructor:"Williams",        constructorId:"williams",
       nationality:"Spanish",      birthplace:"Madrid, Spain",           born:"1 Sep 1994",  debut:"2015 (Toro Rosso)",
       championships:0, wins:3, poles:5, podiums:25,
-      points:2, price:11.8, color:"#64C4FF",
+      points:2, price:12.4, color:"#64C4FF",
       rating:{ overall:81, wet:83, technical:82, power:80, racecraft:87 },
       bio:"Smooth Carlos chose Williams as his launchpad to prove he can lead a technical project to the front. The FW48 has been competitive in qualifying but converting it to points has proved difficult in the opening rounds. His 2023 Singapore win shows what he can do when strategy and pace align."
     },
@@ -285,7 +285,7 @@ const GRIDIQ_DATABASE = {
       id:"OCO", number:31, firstName:"Esteban",   lastName:"Ocon",       constructor:"Haas F1 Team",    constructorId:"haas",
       nationality:"French",       birthplace:"Évreux, France",          born:"17 Sep 1996", debut:"2016 (Manor)",
       championships:0, wins:1, poles:0, podiums:5,
-      points:1, price:7.3, color:"#B6BABD",
+      points:1, price:9.1, color:"#B6BABD",
       rating:{ overall:74, wet:77, technical:74, power:73, racecraft:76 },
       bio:"Ocon's Hungarian GP win in 2021 proved he can deliver on the biggest stage when opportunity strikes. At Haas alongside Bearman, he brings experience to back up the team's early-season surprise results. His smooth tire management and crafty undercut strategies are genuine weapons in a scrappy mid-field."
     },
@@ -293,7 +293,7 @@ const GRIDIQ_DATABASE = {
       id:"COL", number:43, firstName:"Franco",    lastName:"Colapinto",  constructor:"Alpine",          constructorId:"alpine",
       nationality:"Argentine",    birthplace:"Buenos Aires, Argentina", born:"27 May 2003", debut:"2024 (Williams)",
       championships:0, wins:0, poles:0, podiums:0,
-      points:1, price:6.2, color:"#FF87BC",
+      points:1, price:7.6, color:"#FF87BC",
       rating:{ overall:72, wet:71, technical:72, power:71, racecraft:71 },
       bio:"The first Argentine in Formula 1 in 23 years, Colapinto burst onto the scene mid-2024 and never looked back. His first full season with Alpine reflects a driver learning at extraordinary speed. Strong in qualifying, he is still finding his race-craft consistency — but the talent is unmistakably there."
     },
@@ -301,7 +301,7 @@ const GRIDIQ_DATABASE = {
       id:"HUL", number:27, firstName:"Nico",      lastName:"Hülkenberg",  constructor:"Audi",            constructorId:"audi",
       nationality:"German",       birthplace:"Emmerich, Germany",       born:"19 Aug 1987", debut:"2010 (Williams)",
       championships:0, wins:0, poles:1, podiums:0,
-      points:0, price:6.8, color:"#999999",
+      points:0, price:5.0, color:"#999999",
       rating:{ overall:73, wet:74, technical:73, power:73, racecraft:78 },
       bio:"A veteran presence to anchor Audi's ambitious 2026 project. Hülkenberg's calm racecraft and meticulous engineering feedback are exactly what a new manufacturer needs during a critical development cycle. His zero podiums record belies a consistency that regularly delivers more than the car deserves."
     },
@@ -309,7 +309,7 @@ const GRIDIQ_DATABASE = {
       id:"ALB", number:23, firstName:"Alex",      lastName:"Albon",      constructor:"Williams",        constructorId:"williams",
       nationality:"Thai",         birthplace:"London, England",         born:"23 Mar 1996", debut:"2019 (Toro Rosso)",
       championships:0, wins:0, poles:0, podiums:2,
-      points:0, price:11.6, color:"#64C4FF",
+      points:0, price:10.2, color:"#64C4FF",
       rating:{ overall:74, wet:74, technical:74, power:73, racecraft:76 },
       bio:"Albon's Williams revival story is one of F1's finest redemption arcs. Written off by Red Bull, he rebuilt his career methodically. His tire management and smooth racecraft bring consistent performance in a car that can occasionally upset the established order when conditions align."
     },
@@ -317,7 +317,7 @@ const GRIDIQ_DATABASE = {
       id:"PER", number:11, firstName:"Sergio",    lastName:"Perez",      constructor:"Cadillac",        constructorId:"cadillac",
       nationality:"Mexican",      birthplace:"Guadalajara, Mexico",     born:"26 Jan 1990", debut:"2011 (Sauber)",
       championships:0, wins:16, poles:3, podiums:41,
-      points:0, price:6.0, color:"#8A9BB0",
+      points:0, price:7.0, color:"#8A9BB0",
       rating:{ overall:73, wet:75, technical:72, power:74, racecraft:76 },
       bio:"Sixteen race wins and one of the most popular drivers on the grid, Perez brings invaluable experience to Cadillac's debut season. The new American team is still finding its footing with Ferrari power, and Checo's racecraft and fan following provide both sporting results and commercial value in abundance."
     },
@@ -325,7 +325,7 @@ const GRIDIQ_DATABASE = {
       id:"BOT", number:77, firstName:"Valtteri",  lastName:"Bottas",     constructor:"Cadillac",        constructorId:"cadillac",
       nationality:"Finnish",      birthplace:"Nastola, Finland",        born:"28 Aug 1989", debut:"2013 (Williams)",
       championships:0, wins:10, poles:20, podiums:67,
-      points:0, price:5.9, color:"#8A9BB0",
+      points:0, price:4.1, color:"#8A9BB0",
       rating:{ overall:72, wet:73, technical:72, power:73, racecraft:71 },
       bio:"Ten wins, twenty poles — Bottas's career statistics tell the story of a driver who excelled at the very top. Now leading Cadillac's development programme through the most demanding regulatory change in the sport's history. His experience and precise technical feedback are the foundation on which the new team is building."
     },
@@ -333,7 +333,7 @@ const GRIDIQ_DATABASE = {
       id:"ALO", number:14, firstName:"Fernando",  lastName:"Alonso",     constructor:"Aston Martin",    constructorId:"aston_martin",
       nationality:"Spanish",      birthplace:"Oviedo, Spain",           born:"29 Jul 1981", debut:"2001 (Minardi)",
       championships:2, wins:32, poles:22, podiums:106,
-      points:0, price:10.0, color:"#229971",
+      points:0, price:8.2, color:"#229971",
       rating:{ overall:80, wet:87, technical:82, power:76, racecraft:97 },
       bio:"At 44, Fernando Alonso races with the same obsessive fury he showed at 22. Aston Martin's 2026 car hasn't yet produced the points his talent deserves, but Alonso keeps delivering race craft masterclasses regardless. A third world title remains the stated goal — nobody in the paddock doubts his capability."
     },
@@ -341,7 +341,7 @@ const GRIDIQ_DATABASE = {
       id:"STR", number:18, firstName:"Lance",     lastName:"Stroll",     constructor:"Aston Martin",    constructorId:"aston_martin",
       nationality:"Canadian",     birthplace:"Montreal, Canada",        born:"29 Oct 1998", debut:"2017 (Williams)",
       championships:0, wins:0, poles:1, podiums:3,
-      points:0, price:8.0, color:"#229971",
+      points:0, price:6.2, color:"#229971",
       rating:{ overall:68, wet:70, technical:67, power:68, racecraft:65 },
       bio:"Stroll's steadiest performances come at power circuits and street tracks where Aston Martin's raw speed shines. His three podiums have all come from exceptional race circumstances, and he continues to develop year on year under Alonso's exacting standards within the team."
     }
@@ -352,67 +352,67 @@ const GRIDIQ_DATABASE = {
   constructors: [
     {
       id:"mercedes",    name:"Mercedes",          shortName:"Mercedes",    color:"#27F4D2",
-      drivers:["ANT","RUS"], points:135, price:29.3, engine:"Mercedes",
+      drivers:["ANT","RUS"], points:135, price:30.2, engine:"Mercedes",
       chassis:"W17", rating:97,
       desc:"The Silver Arrows have shattered expectations in 2026, leading the WCC with 135 points after just three rounds. The W17's interpretation of the new regulations is a masterpiece of engineering. Antonelli and Russell form the most potent driver pairing since Hamilton-Rosberg."
     },
     {
       id:"ferrari",     name:"Ferrari",           shortName:"Ferrari",     color:"#E8002D",
-      drivers:["LEC","HAM"], points:90, price:23.3, engine:"Ferrari",
+      drivers:["LEC","HAM"], points:90, price:24.2, engine:"Ferrari",
       chassis:"SF-26", rating:92,
       desc:"Ferrari leads the WCC battle in second. The SF-26 is fast everywhere, with Hamilton and Leclerc consistently delivering 1-2 finishes. The Scuderia's 2026 power unit development has paid dividends — they are the only team consistently challenging Mercedes."
     },
     {
       id:"mclaren",     name:"McLaren",           shortName:"McLaren",     color:"#FF8000",
-      drivers:["NOR","PIA"], points:46, price:28.9, engine:"Mercedes",
+      drivers:["NOR","PIA"], points:46, price:28.6, engine:"Mercedes",
       chassis:"MCL60", rating:85,
       desc:"McLaren's MCL60 is third in the constructors' standings but has shown a clear step is still needed to close the gap to Mercedes and Ferrari. Norris and Piastri are extracting maximum from the package — when McLaren close the regulation gap, they will be title contenders."
     },
     {
       id:"haas",        name:"Haas F1 Team",      shortName:"Haas",        color:"#B6BABD",
-      drivers:["BEA","OCO"], points:18, price:7.4, engine:"Ferrari",
+      drivers:["BEA","OCO"], points:18, price:9.2, engine:"Ferrari",
       chassis:"VF-26", rating:78,
       desc:"The biggest shock of 2026 so far — Haas sit fourth in the constructors' standings. Bearman's scoring consistency and Ocon's tactical experience have combined perfectly with Ferrari power. The American outfit is punching far above its expected weight class."
     },
     {
       id:"alpine",      name:"Alpine",            shortName:"Alpine",      color:"#FF87BC",
-      drivers:["GAS","COL"], points:16, price:12.5, engine:"Renault",
+      drivers:["GAS","COL"], points:16, price:14.3, engine:"Renault",
       chassis:"A526", rating:76,
       desc:"Alpine's revamped Renault power unit has taken a meaningful performance step in 2026. Gasly's consistent points scoring and Colapinto's rapid development have the team fifth in the constructors' standings — surpassing all pre-season predictions."
     },
     {
       id:"red_bull",    name:"Red Bull Racing",   shortName:"Red Bull",    color:"#3671C6",
-      drivers:["VER","HAD"], points:16, price:28.2, engine:"Honda/RBP",
+      drivers:["VER","HAD"], points:16, price:29.1, engine:"Honda/RBP",
       chassis:"RB22", rating:75,
       desc:"Red Bull's RB22 is struggling dramatically with the 2026 regulations — a shocking contrast to their four-year dominance. Sixth in the constructors' championship with just 16 points is deeply alarming. The Honda/RBP power unit's adaptation to the 50/50 split is the core issue their engineers are racing to resolve."
     },
     {
       id:"racing_bulls",name:"Racing Bulls",      shortName:"Racing Bulls",color:"#6692FF",
-      drivers:["LAW","LIN"], points:14, price:6.3, engine:"Honda/RBP",
+      drivers:["LAW","LIN"], points:14, price:8.1, engine:"Honda/RBP",
       chassis:"VCARB02", rating:74,
       desc:"Racing Bulls sit seventh despite sharing the same Honda/RBP power unit struggles as Red Bull. Lawson's consistent scoring and the remarkable Lindblad's debut have given the junior team cause for optimism. When Red Bull's power unit issues are resolved, expect a sharp performance jump."
     },
     {
       id:"williams",    name:"Williams",          shortName:"Williams",    color:"#64C4FF",
-      drivers:["SAI","ALB"], points:2, price:12.0, engine:"Mercedes",
+      drivers:["SAI","ALB"], points:2, price:13.8, engine:"Mercedes",
       chassis:"FW48", rating:64,
       desc:"Williams have the pace to score points regularly — the FW48 has shown well in qualifying — but converting that into race finishes has been elusive. Sainz's championship pedigree gives the team direction and confidence that the performance is coming."
     },
     {
       id:"audi",        name:"Audi",              shortName:"Audi",        color:"#999999",
-      drivers:["BOR","HUL"], points:2, price:6.6, engine:"Audi",
+      drivers:["BOR","HUL"], points:2, price:5.6, engine:"Audi",
       chassis:"C45", rating:62,
       desc:"Audi's highly anticipated works debut has been modest — just two points after three rounds. The brand-new Audi power unit is still in its development infancy, and the team's resources are vast. 2027 is the real target; 2026 is essential learning."
     },
     {
       id:"cadillac",    name:"Cadillac",          shortName:"Cadillac",    color:"#8A9BB0",
-      drivers:["PER","BOT"], points:0, price:6.0, engine:"Ferrari",
+      drivers:["PER","BOT"], points:0, price:5.0, engine:"Ferrari",
       chassis:"MAC-26", rating:58,
       desc:"F1's new 11th team, backed by General Motors, makes its debut in 2026. Ferrari power and gearbox provide a solid technical foundation. Perez and Bottas bring a combined tally of 16 wins and 500+ race starts — providing crucial feedback to establish the team's infrastructure from day one."
     },
     {
       id:"aston_martin",name:"Aston Martin",      shortName:"Aston Martin",color:"#229971",
-      drivers:["ALO","STR"], points:0, price:10.3, engine:"Honda/RBP",
+      drivers:["ALO","STR"], points:0, price:8.5, engine:"Honda/RBP",
       chassis:"AMR26", rating:60,
       desc:"Aston Martin's AMR26 is suffering the same Honda/RBP power unit adaptation issues as Red Bull, leaving Alonso and Stroll scoreless through three rounds. The team's infrastructure and investment level are genuine, however — a breakthrough result feels imminent with Alonso behind the wheel."
     }
