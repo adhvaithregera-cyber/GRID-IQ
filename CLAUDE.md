@@ -207,5 +207,6 @@ The predictor in `app.js` uses a weighted scoring model. When updating ratings o
 [ ] Update constructor points
 [ ] Re-sort and re-number constructor positions
 [ ] Update driver wins / podiums if applicable
+[ ] Update driver and constructor prices to match official F1 Fantasy values (fantasy.formula1.com)
 [ ] Update "Last synced" comment at top of database.js
 ```

@@ -17,16 +17,6 @@ function mapCtor(id) {
   return CONSTRUCTOR_MAP[id] || id;
 }
 
-/* ── Fantasy price derivation ───────────────────────────────── */
-/* Validated: 72pts → $18.0M, 0pts → $8.0M floor              */
-function deriveDriverPrice(pts) {
-  return Math.round((8 + pts * 0.14) * 2) / 2;
-}
-
-/* Validated: 135pts → $14.0M, 0pts → $5.0M floor             */
-function deriveCtorPrice(pts) {
-  return Math.round((5 + pts * 0.067) * 2) / 2;
-}
 
 /* ── Fetch with abort timeout ───────────────────────────────── */
 function fetchWithTimeout(url, ms) {
@@ -51,7 +41,6 @@ function applyDriverStandings(data) {
     if (!driver) return;
     driver.points = parseInt(entry.points, 10) || driver.points;
     driver.wins   = parseInt(entry.wins,   10) || driver.wins;
-    driver.price  = deriveDriverPrice(driver.points);
   });
 }
 
@@ -70,7 +59,6 @@ function applyConstructorStandings(data) {
     var ctor = GRIDIQ_DATABASE.constructors.find(function(c) { return c.id === mapCtor(jolpicaId); });
     if (!ctor) return;
     ctor.points = parseInt(entry.points, 10) || ctor.points;
-    ctor.price  = deriveCtorPrice(ctor.points);
   });
 }
 
