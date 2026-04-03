@@ -144,7 +144,7 @@ window.applyLiveData = function() {
     if (cRes.status === 'fulfilled') { applyConstructorStandings(cRes.value); ok = true; }
     if (rRes.status === 'fulfilled') { applyRaceResults(rRes.value);          ok = true; }
 
-    if (ok) showLiveBadge();
+    /* LIVE badge removed */
   }).catch(function() {
     /* Swallow any unexpected error so init() always runs */
   });
