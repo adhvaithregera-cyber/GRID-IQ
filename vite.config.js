@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/GRID-IQ/',   // GitHub Pages serves from this subdirectory
+  base: process.env.GITHUB_PAGES ? '/GRID-IQ/' : './',
 });
