@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Dark circle background -->
+    <path
+        android:fillColor="#0D0D0D"
+        android:pathData="M54,54m-54,0a54,54 0 1,0 108,0a54,54 0 1,0 -108,0" />
+
+    <!-- Checkered flag 2x2 — red + white, GridIQ colors -->
+    <path android:fillColor="#FF1E00" android:pathData="M18,18h36v36H18z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M54,18h36v36H54z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M18,54h36v36H18z" />
+    <path android:fillColor="#FF1E00" android:pathData="M54,54h36v36H54z" />
+
+    <!-- Thin red border line at bottom of icon -->
+    <path
+        android:fillColor="#FF1E00"
+        android:pathData="M18,92h72v3H18z" />
+
+</vector>
