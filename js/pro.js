@@ -213,8 +213,13 @@ function updateProNavBadge() {
         location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       bnavBtn.classList.add('bnav-pro-btn--active');
       bnavBtn.querySelector('.bnav-lbl').textContent = 'PRO ★';
+      bnavBtn.style.cursor = 'default';
+      bnavBtn.style.pointerEvents = 'none';
     } else if (isOnTrial()) {
-      bnavBtn.querySelector('.bnav-lbl').textContent = 'TRIAL';
+      var daysLeft = getTrialDaysLeft();
+      bnavBtn.querySelector('.bnav-lbl').textContent = 'TRIAL ' + daysLeft + 'D';
+      bnavBtn.style.cursor = 'pointer';
+      bnavBtn.style.pointerEvents = '';
     }
   }
 }
