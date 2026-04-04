@@ -32,6 +32,7 @@ var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';
    PRO STATUS
 ───────────────────────────────────────────────────────── */
 function isGridIQPro() {
+  return true; // TEMP: all features free for public feedback — revert this line to re-enable PRO gating
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
   // owner/paid flags are only trustworthy when the user is signed in
   // (auth.js strips them on sign-out and syncs them from Firestore on sign-in)
