@@ -48,11 +48,11 @@ function switchTab(tab) {
   if (STATE.activeTab === tab) return;
   STATE.activeTab = tab;
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
+  document.querySelectorAll('.bnav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
   document.getElementById('section-' + tab).classList.add('active');
-  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
-  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
+  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
+  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
   // Close mobile hamburger menu
   document.getElementById('top-nav').classList.remove('nav-open');
   const hamburger = document.getElementById('nav-hamburger');
@@ -60,6 +60,9 @@ function switchTab(tab) {
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
@@ -102,7 +105,7 @@ function renderHeroStats() {
 function getNextRace() {
   const now = new Date();
   const upcoming = GRIDIQ_DATABASE.races
-    .filter(r => new Date(r.date + 'T15:00:00Z') > now)
+    .filter(r => new Date(r.date + 'T13:00:00Z') > now)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
   return upcoming[0] || GRIDIQ_DATABASE.races[GRIDIQ_DATABASE.races.length - 1];
 }
@@ -161,7 +164,7 @@ function updateCountdown(race) {
   const els = document.querySelectorAll('.countdown-display');
   if (!els.length) return;
   const now = new Date();
-  const target = new Date(race.date + 'T15:00:00Z');
+  const target = new Date(race.date + 'T13:00:00Z');
   const diff = target - now;
 
   let html;
@@ -365,7 +368,7 @@ function runSimulation() {
   // Collect penalties
   const penalties = {};
   document.querySelectorAll('.pen-input').forEach(inp => {
-    const val = parseInt(inp.value) || 0;
+    const val = Math.min(20, Math.max(0, parseInt(inp.value) || 0));
     if (val > 0) penalties[inp.dataset.driver] = val;
   });
 
@@ -966,7 +969,11 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.style.opacity = '1';
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+  clearTimeout(toast._r);
+  toast._t = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast._r = setTimeout(() => { toast.remove(); }, 300);
+  }, 2500);
 }
 
 /* ─── HEAD-TO-HEAD COMPARE ───────────────────────────────── */
@@ -1164,11 +1171,6 @@ function init() {
     document.querySelector('[data-target="guide-calendar"]')?.classList.add('active');
   }));
 
-  // ── Bottom nav tab buttons ──────────────────────────────
-  document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
-
   // ── Hamburger menu toggle ───────────────────────────────
   const hamburger = document.getElementById('nav-hamburger');
   const topNav = document.getElementById('top-nav');
@@ -1211,3 +1213,5 @@ document.addEventListener('DOMContentLoaded', function() {
     init();
   }
 });
+
+window.showToast = showToast;

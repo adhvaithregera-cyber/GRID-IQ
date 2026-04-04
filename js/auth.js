@@ -152,10 +152,11 @@ function _onAuthStateChanged(user) {
   if (user) {
     closeUserMenu();
     _clearRateLimit();
-    // Owner check (sets localStorage immediately, then confirms via Firestore)
+    // Owner check — async hash comparison, then confirms via Firestore
     if (typeof grantOwnerProIfMatch === 'function') {
-      const wasOwner = grantOwnerProIfMatch(user.email);
-      if (wasOwner) _writeOwnerToFirestore(user.uid);
+      grantOwnerProIfMatch(user.email).then(function(wasOwner) {
+        if (wasOwner) _writeOwnerToFirestore(user.uid);
+      });
     }
     // Always sync PRO status from Firestore (authoritative source)
     _syncProFromFirestore(user.uid);
@@ -313,9 +314,20 @@ function _renderAuthBtn(user) {
   if (!btn) return;
   if (user) {
     btn.dataset.state = 'in';
-    btn.innerHTML = user.photoURL
-      ? `<img src="${user.photoURL}" class="auth-avatar-img" referrerpolicy="no-referrer" alt="">`
-      : `<span class="auth-avatar-init">${_initials(user.displayName || user.email)}</span>`;
+    btn.innerHTML = '';
+    if (user.photoURL) {
+      const img = document.createElement('img');
+      img.setAttribute('src', user.photoURL);
+      img.className = 'auth-avatar-img';
+      img.setAttribute('referrerpolicy', 'no-referrer');
+      img.setAttribute('alt', '');
+      btn.appendChild(img);
+    } else {
+      const span = document.createElement('span');
+      span.className = 'auth-avatar-init';
+      span.textContent = _initials(user.displayName || user.email);
+      btn.appendChild(span);
+    }
     btn.setAttribute('aria-label', 'Account menu');
   } else {
     btn.dataset.state = 'out';
@@ -328,9 +340,12 @@ function _initials(name) {
   return (name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
+let _errorTimeout = null;
+
 function _showError(msg) {
   const el = document.getElementById('auth-error');
   if (!el) return;
+  clearTimeout(_errorTimeout);
   el.textContent = msg;
   el.classList.remove('hidden');
 }
@@ -366,7 +381,7 @@ function _handleAuthError(err) {
       'auth/invalid-email':      'Please enter a valid email address.',
     };
     _showError(messages[err.code] || `Sign-in failed. ${suffix}`);
-    setTimeout(() => _clearError(), 6000);
+    _errorTimeout = setTimeout(() => _clearError(), 6000);
     return;
   }
 
@@ -405,9 +420,17 @@ function openUserMenu() {
   if (elName)  elName.textContent  = u.displayName || 'GridIQ User';
   if (elEmail) elEmail.textContent = u.email || u.phoneNumber || '';
   if (elPhoto) {
-    elPhoto.innerHTML = u.photoURL
-      ? `<img src="${u.photoURL}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
-      : _initials(u.displayName || u.email || u.phoneNumber);
+    elPhoto.innerHTML = '';
+    if (u.photoURL) {
+      const img = document.createElement('img');
+      img.setAttribute('src', u.photoURL);
+      img.setAttribute('referrerpolicy', 'no-referrer');
+      img.setAttribute('alt', '');
+      img.className = 'um-photo-img';
+      elPhoto.appendChild(img);
+    } else {
+      elPhoto.textContent = _initials(u.displayName || u.email || u.phoneNumber);
+    }
   }
   document.getElementById('user-menu')?.classList.remove('hidden');
 }

@@ -6,10 +6,8 @@
    LAUNCH_DATE    — set to launch date to activate promo codes
    ── ─────────────────────────────────────────────────────── */
 
-/* ── Owner config ───────────────────────────────────────── */
-var OWNER_EMAILS = [
-  'adhvaith.regera@gmail.com'
-];
+/* ── Owner config (SHA-256 of owner email — never store plaintext) ── */
+var OWNER_EMAIL_HASH = '3f3f6c85347fa6ca01e2601e1ba6bbe4bbb33652e39f12bd460073bdb0d7d136';
 
 /* ── PRO features list (shown in upgrade modal) ─────────── */
 var PRO_FEATURES = [
@@ -104,15 +102,22 @@ function startTrial() {
 /* ── Owner auto-grant (called from auth.js on sign-in) ──── */
 /* Returns true if the signed-in email is an owner, so auth.js
    can also write the status to Firestore. */
-function grantOwnerProIfMatch(email) {
+async function grantOwnerProIfMatch(email) {
   if (!email) return false;
-  if (OWNER_EMAILS.indexOf(email) !== -1) {
-    localStorage.setItem('gridiq_pro', 'true');
-    localStorage.setItem('gridiq_owner', 'true');
-    localStorage.removeItem('gridiq_trial_start');
-    updateProNavBadge();
-    return true;
-  }
+  try {
+    var msgBuf  = new TextEncoder().encode(email.trim().toLowerCase());
+    var hashBuf = await crypto.subtle.digest('SHA-256', msgBuf);
+    var hashHex = Array.from(new Uint8Array(hashBuf))
+      .map(function(b) { return b.toString(16).padStart(2, '0'); })
+      .join('');
+    if (hashHex === OWNER_EMAIL_HASH) {
+      localStorage.setItem('gridiq_pro', 'true');
+      localStorage.setItem('gridiq_owner', 'true');
+      localStorage.removeItem('gridiq_trial_start');
+      updateProNavBadge();
+      return true;
+    }
+  } catch (_) {}
   return false;
 }
 
@@ -314,6 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       updateProNavBadge();
     }, 1000);
+    window.addEventListener('beforeunload', function() { clearInterval(_trialTicker); });
   }
 });
 
