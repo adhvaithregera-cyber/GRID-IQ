@@ -68,6 +68,21 @@ function getTrialDaysLeft() {
   return Math.max(0, left);
 }
 
+function getTrialTimeLeft() {
+  var ts = localStorage.getItem('gridiq_trial_start');
+  if (!ts) return '';
+  var msLeft = TRIAL_DAYS * 86400000 - (Date.now() - parseInt(ts, 10));
+  if (msLeft <= 0) return '0';
+  var totalSec = Math.floor(msLeft / 1000);
+  var d = Math.floor(totalSec / 86400);
+  var h = Math.floor((totalSec % 86400) / 3600);
+  var m = Math.floor((totalSec % 3600) / 60);
+  var s = totalSec % 60;
+  if (d > 0) return d + 'D ' + h + 'H';
+  if (h > 0) return h + 'H ' + (m < 10 ? '0' : '') + m + 'M';
+  return m + 'M ' + (s < 10 ? '0' : '') + s + 'S';
+}
+
 /* True if the user can still opt into a trial */
 function trialAvailable() {
   if (!window._gridiqAuthUser) return false;
@@ -199,9 +214,8 @@ function updateProNavBadge() {
       badge.onclick = null;
       badge.style.cursor = 'default';
     } else if (isOnTrial()) {
-      var days = getTrialDaysLeft();
       badge.className = 'pro-nav-badge pro-nav-badge--trial';
-      badge.innerHTML = '&#9733; TRIAL &bull; ' + days + 'D LEFT';
+      badge.innerHTML = '&#9733; TRIAL &bull; ' + getTrialTimeLeft() + ' LEFT';
       badge.onclick = openProModal;
       badge.style.cursor = 'pointer';
     }
@@ -216,8 +230,7 @@ function updateProNavBadge() {
       bnavBtn.style.cursor = 'default';
       bnavBtn.style.pointerEvents = 'none';
     } else if (isOnTrial()) {
-      var daysLeft = getTrialDaysLeft();
-      bnavBtn.querySelector('.bnav-lbl').textContent = 'TRIAL ' + daysLeft + 'D';
+      bnavBtn.querySelector('.bnav-lbl').textContent = getTrialTimeLeft();
       bnavBtn.style.cursor = 'pointer';
       bnavBtn.style.pointerEvents = '';
     }
@@ -284,6 +297,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var skipBtn = document.querySelector('.pro-skip-btn');
   if (skipBtn) skipBtn.addEventListener('click', closeProModal);
+
+  // Live countdown ticker — runs every second while trial is active
+  if (isOnTrial()) {
+    var _trialTicker = setInterval(function() {
+      if (!isOnTrial()) {
+        clearInterval(_trialTicker);
+        updateProNavBadge();
+        // If user is on a PRO-only tab, bounce them back to home
+        if (typeof STATE !== 'undefined' &&
+            (STATE.activeTab === 'fantasy' || STATE.activeTab === 'compare')) {
+          if (typeof switchTab === 'function') switchTab('home');
+        }
+        showProSuccessToast('Your free trial has ended — upgrade to keep full access.');
+        return;
+      }
+      updateProNavBadge();
+    }, 1000);
+  }
 });
 
 /* ─────────────────────────────────────────────────────────
