@@ -62,9 +62,6 @@ function switchTab(tab) {
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
-document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
 
 /* ─── HERO STATS STRIP ───────────────────────────────────── */
 function renderHeroStats() {
@@ -1166,6 +1163,11 @@ function init() {
     document.getElementById('guide-calendar')?.classList.add('active');
     document.querySelector('[data-target="guide-calendar"]')?.classList.add('active');
   }));
+
+  // ── Bottom nav tab buttons ──────────────────────────────
+  document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
 
   // ── Hamburger menu toggle ───────────────────────────────
   const hamburger = document.getElementById('nav-hamburger');
