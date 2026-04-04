@@ -24,6 +24,7 @@
   --border-red:   rgba(255,30,0,0.28);
   /* Layout sizing */
   --nav-h:        60px;
+  --bottom-nav-h: 62px;
   --content-pad:  16px;
   --radius:       12px;
   --radius-sm:    8px;
@@ -1051,6 +1052,82 @@ select, input { font-family: var(--font-body); }
     color: var(--text);
   }
   .nav-btn::after { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOTTOM NAV (mobile only)
+═══════════════════════════════════════════════════════════ */
+#bottom-nav { display: none; }
+
+.bnav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 6px 2px 4px;
+  transition: color .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bnav-btn svg { width: 21px; height: 21px; flex-shrink: 0; }
+.bnav-lbl {
+  font-family: var(--font-tech);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bnav-btn.active { color: var(--accent); }
+
+.bnav-pro-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: #F5A623;
+  cursor: pointer;
+  padding: 6px 2px 4px;
+  transition: opacity .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bnav-pro-btn svg { width: 21px; height: 21px; flex-shrink: 0; }
+.bnav-pro-btn .bnav-lbl {
+  font-family: var(--font-tech);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bnav-pro-btn:active { opacity: 0.7; }
+.bnav-pro-btn--active { color: rgba(245,166,35,0.5); cursor: default; }
+
+@media (max-width: 639px) {
+  #bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--bottom-nav-h);
+    background: rgba(8,8,8,0.97);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border-top: 1px solid rgba(255,30,0,0.12);
+    z-index: 100;
+    align-items: stretch;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .tab-section { bottom: var(--bottom-nav-h); }
+  .nav-hamburger { display: none !important; }
+}
+
+[data-theme="light"] #bottom-nav {
+  background: rgba(245,245,247,0.97);
 }
 
 /* ═══════════════════════════════════════════════════════════

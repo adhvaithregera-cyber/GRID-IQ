@@ -191,19 +191,31 @@ function closeProModal() {
 ───────────────────────────────────────────────────────── */
 function updateProNavBadge() {
   var badge = document.getElementById('pro-nav-btn');
-  if (!badge) return;
-  if (localStorage.getItem('gridiq_pro') === 'true' ||
-      location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    badge.className = 'pro-nav-badge pro-nav-badge--active';
-    badge.innerHTML = '&#9733; PRO';
-    badge.onclick = null;
-    badge.style.cursor = 'default';
-  } else if (isOnTrial()) {
-    var days = getTrialDaysLeft();
-    badge.className = 'pro-nav-badge pro-nav-badge--trial';
-    badge.innerHTML = '&#9733; TRIAL &bull; ' + days + 'D LEFT';
-    badge.onclick = openProModal;
-    badge.style.cursor = 'pointer';
+  if (badge) {
+    if (localStorage.getItem('gridiq_pro') === 'true' ||
+        location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      badge.className = 'pro-nav-badge pro-nav-badge--active';
+      badge.innerHTML = '&#9733; PRO';
+      badge.onclick = null;
+      badge.style.cursor = 'default';
+    } else if (isOnTrial()) {
+      var days = getTrialDaysLeft();
+      badge.className = 'pro-nav-badge pro-nav-badge--trial';
+      badge.innerHTML = '&#9733; TRIAL &bull; ' + days + 'D LEFT';
+      badge.onclick = openProModal;
+      badge.style.cursor = 'pointer';
+    }
+  }
+
+  var bnavBtn = document.getElementById('bnav-pro-btn');
+  if (bnavBtn) {
+    if (localStorage.getItem('gridiq_pro') === 'true' ||
+        location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      bnavBtn.classList.add('bnav-pro-btn--active');
+      bnavBtn.querySelector('.bnav-lbl').textContent = 'PRO ★';
+    } else if (isOnTrial()) {
+      bnavBtn.querySelector('.bnav-lbl').textContent = 'TRIAL';
+    }
   }
 }
 
@@ -234,6 +246,12 @@ document.addEventListener('DOMContentLoaded', function() {
   /* ── Pro modal event listeners (replaces inline onclick= attrs) ── */
   var proNavBtn = document.getElementById('pro-nav-btn');
   if (proNavBtn) proNavBtn.addEventListener('click', function() {
+    if (isGridIQPro()) return;
+    openProModal();
+  });
+
+  var bnavProBtn = document.getElementById('bnav-pro-btn');
+  if (bnavProBtn) bnavProBtn.addEventListener('click', function() {
     if (isGridIQPro()) return;
     openProModal();
   });

@@ -49,8 +49,10 @@ function switchTab(tab) {
   STATE.activeTab = tab;
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('section-' + tab).classList.add('active');
-  document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
+  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   // Close mobile hamburger menu
   document.getElementById('top-nav').classList.remove('nav-open');
   const hamburger = document.getElementById('nav-hamburger');
@@ -58,6 +60,9 @@ function switchTab(tab) {
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
