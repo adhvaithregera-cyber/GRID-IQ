@@ -58,7 +58,6 @@ function _activateTab(tab) {
 }
 
 // Called by user clicks — enforces auth/pro, then updates hash (which drives history).
-let _suppressHashChange = false;
 function switchTab(tab) {
   if (tab === 'fantasy' || tab === 'compare') {
     if (!window._gridiqAuthUser) { openAuthModal(); return; }
@@ -66,22 +65,19 @@ function switchTab(tab) {
   }
   if (STATE.activeTab === tab) return;
   _activateTab(tab);
-  _suppressHashChange = true;
   location.hash = tab === 'home' ? '' : tab;
-  _suppressHashChange = false;
 }
 
-// hashchange fires when the browser back/forward buttons change the URL hash.
+// hashchange fires on browser back/forward AND when switchTab sets location.hash.
+// STATE.activeTab guard prevents double-activation from the latter.
 window.addEventListener('hashchange', function() {
-  if (_suppressHashChange) return;
   const tab = location.hash.replace('#', '') || 'home';
   if (!_VALID_TABS.includes(tab)) return;
-  // Auth-gated: redirect to home and open auth modal
+  if (STATE.activeTab === tab) return; // already active — came from switchTab click
+  // Auth-gated tabs navigated to via back/forward while logged out
   if ((tab === 'fantasy' || tab === 'compare') && !window._gridiqAuthUser) {
     _activateTab('home');
-    _suppressHashChange = true;
     location.hash = '';
-    _suppressHashChange = false;
     openAuthModal();
     return;
   }
