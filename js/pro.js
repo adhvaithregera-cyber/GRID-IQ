@@ -143,6 +143,11 @@ function getPaymentLink() {
 }
 
 function handleUpgradeClick() {
+  /* On Android app: delegate to Google Play Billing */
+  if (typeof window.launchPlayStorePurchase === 'function') {
+    if (window.launchPlayStorePurchase()) return; // handled natively
+  }
+  /* Web fallback: external payment link */
   var link = getPaymentLink();
   if (!link) {
     var el = document.getElementById('pro-payment-note');
@@ -303,6 +308,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var skipBtn = document.querySelector('.pro-skip-btn');
   if (skipBtn) skipBtn.addEventListener('click', closeProModal);
+
+  var restoreBtn = document.getElementById('pro-restore-btn');
+  if (restoreBtn) restoreBtn.addEventListener('click', function() {
+    if (typeof window.restorePlayPurchases === 'function') window.restorePlayPurchases();
+  });
 
   // Live countdown ticker — runs every second while trial is active
   if (isOnTrial()) {

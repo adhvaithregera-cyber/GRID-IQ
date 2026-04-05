@@ -142,6 +142,16 @@ async function _writeOwnerToFirestore(uid) {
   }
 }
 
+/* Called by billing.js after a successful Google Play purchase */
+async function _writeProToFirestore(uid) {
+  if (!_db || !uid) return;
+  try {
+    await setDoc(doc(_db, 'users', uid), { isPro: true }, { merge: true });
+  } catch (e) {
+    console.warn('[GridIQ auth] Firestore pro write failed:', e.message);
+  }
+}
+
 /* ── Auth state listener ──────────────────────────────────── */
 function _onAuthStateChanged(user) {
   // Expose auth state to pro.js so isGridIQPro() can trust localStorage only when signed in
@@ -465,7 +475,8 @@ window.onAuthBtnClick      = onAuthBtnClick;
 window.authSignInGoogle    = authSignInGoogle;
 window.authSignInGitHub    = authSignInGitHub;
 window.authSignOut         = authSignOut;
-window.openAuthModal       = openAuthModal;
+window.openAuthModal              = openAuthModal;
+window._gridiqWriteProToFirestore = _writeProToFirestore;
 window.closeAuthModal      = closeAuthModal;
 window.authShowMainView    = authShowMainView;
 window.authShowEmailView   = authShowEmailView;
