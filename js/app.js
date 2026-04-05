@@ -1252,6 +1252,21 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     init();
   }
+
+  // ── Android hardware back button (Capacitor) ────────────
+  if (typeof window.Capacitor !== 'undefined' &&
+      window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', function() {
+      const authModal   = document.getElementById('auth-modal');
+      const proModal    = document.getElementById('pro-modal');
+      const customModal = document.getElementById('custom-modal');
+      if (authModal   && !authModal.classList.contains('hidden'))   { closeAuthModal(); return; }
+      if (proModal    && !proModal.classList.contains('hidden'))     { closeProModal();  return; }
+      if (customModal && !customModal.classList.contains('hidden'))  { closeModal();     return; }
+      if (STATE.activeTab !== 'home') { switchTab('home'); return; }
+      window.Capacitor.Plugins.App.exitApp();
+    });
+  }
 });
 
 window.showToast = showToast;

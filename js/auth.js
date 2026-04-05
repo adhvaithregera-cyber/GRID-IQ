@@ -411,7 +411,16 @@ function openAuthModal() {
   const m = document.getElementById('auth-modal');
   if (!m) return;
   m.classList.remove('hidden');
-  authShowMainView();
+  // On Android (Capacitor WebView), signInWithPopup is unsupported.
+  // Go straight to the email sign-in form — no Google/OAuth buttons shown.
+  const isAndroidApp = typeof window.Capacitor !== 'undefined' &&
+                       window.Capacitor.getPlatform() === 'android';
+  if (isAndroidApp) {
+    authSetEmailMode('signin');
+    authShowEmailView();
+  } else {
+    authShowMainView();
+  }
 }
 
 function closeAuthModal() {

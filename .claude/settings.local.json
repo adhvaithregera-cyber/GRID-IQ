@@ -1,19 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:www.formula1.com)",
-      "Bash(start:*)",
-      "WebFetch(domain:fantasy.formula1.com)",
-      "WebFetch(domain:www.autosport.com)",
-      "WebFetch(domain:www.f1fanatic.co.uk)",
-      "WebFetch(domain:reddit.com)",
-      "Read(//c/Users/Adhvaith/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/.claude/skills/ui-ux-pro-max/**)",
-      "Bash(python scripts/search.py \"F1 racing sports app professional dark light mode\" --design-system -p \"GridIQ\" -f markdown)",
-      "Bash(grep -E \"\\\\.\\(js|json|css|html|md\\)$\")",
+      "Bash(cmd /c \"robocopy \\\\\"C:\\\\Users\\\\Adhvaith\\\\Desktop\\\\Grid IQ\\\\\" \\\\\"C:\\\\Users\\\\Adhvaith\\\\OneDrive\\\\Desktop\\\\Grid IQ\\\\\" /E /XD node_modules\")",
+      "Bash(powershell -Command \"Copy-Item -Path 'C:\\\\Users\\\\Adhvaith\\\\Desktop\\\\Grid IQ\\\\*' -Destination 'C:\\\\Users\\\\Adhvaith\\\\OneDrive\\\\Desktop\\\\Grid IQ\\\\' -Recurse -Force -Exclude 'node_modules'\")",
+      "Bash(python -m json.tool)",
+      "Bash(gh api:*)",
+      "Bash(cd:*)",
+      "Bash(gh run:*)",
+      "Bash(find . -name \"* - Copy*\" -not -path \"./.git/*\" -not -path \"./node_modules/*\" -delete)",
+      "Bash(npm run:*)",
+      "Bash(mkdir -p public/js)",
+      "Bash(cp js/app.js js/database.js js/live-data.js js/pro.js js/smoke.js public/js/)",
       "Bash(node -e \":*)",
-      "Bash(npm init:*)",
+      "Bash(find /c/Users/Adhvaith -name posthog*)",
+      "Bash(curl -s \"https://adhvaithregera-cyber.github.io/GRID-IQ/\")",
       "Bash(npm install:*)",
-      "Bash(npm run:*)"
+      "Bash(npx cap:*)"
     ]
   }
 }

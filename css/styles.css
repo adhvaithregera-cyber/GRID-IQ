@@ -909,11 +909,12 @@ select, input { font-family: var(--font-body); }
 #top-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: var(--nav-h);
+  height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  padding: 0 var(--content-pad);
+  padding: 0 var(--content-pad) 0;
+  padding-top: env(safe-area-inset-top, 0px);
   background: rgba(8,8,8,0.96);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);

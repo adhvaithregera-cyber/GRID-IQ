@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Content Security Policy — restricts what scripts/resources can load -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src  'self'
+    default-src 'self' https://localhost capacitor://localhost ionic://localhost;
+    script-src  'self' https://localhost capacitor://localhost ionic://localhost
                 https://www.gstatic.com
                 https://www.google.com
                 https://apis.google.com
                 https://recaptchaenterprise.googleapis.com
                 https://www.googletagmanager.com
                 'unsafe-inline';
-    style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src    'self' https://fonts.gstatic.com;
-    img-src     'self' data: https: blob:;
+    style-src   'self' 'unsafe-inline' https://fonts.googleapis.com https://localhost;
+    font-src    'self' https://fonts.gstatic.com https://localhost;
+    img-src     'self' data: https: blob: https://localhost capacitor://localhost;
     connect-src 'self'
+                https://localhost capacitor://localhost ionic://localhost
                 https://*.googleapis.com
                 https://*.firebaseio.com
                 https://firestore.googleapis.com
@@ -26,7 +27,8 @@
                 https://www.google-analytics.com
                 https://analytics.google.com;
     frame-src   https://www.google.com
-                https://grid-iq-520cb.firebaseapp.com;
+                https://grid-iq-520cb.firebaseapp.com
+                https://localhost;
     object-src  'none';
     base-uri    'self';
   ">
