@@ -465,6 +465,7 @@ window.onAuthBtnClick      = onAuthBtnClick;
 window.authSignInGoogle    = authSignInGoogle;
 window.authSignInGitHub    = authSignInGitHub;
 window.authSignOut         = authSignOut;
+window.openAuthModal       = openAuthModal;
 window.closeAuthModal      = closeAuthModal;
 window.authShowMainView    = authShowMainView;
 window.authShowEmailView   = authShowEmailView;
