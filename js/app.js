@@ -40,10 +40,16 @@ function teamColor(constructorId) {
 }
 
 /* ─── NAVIGATION ─────────────────────────────────────────── */
-function switchTab(tab) {
-  if ((tab === 'fantasy' || tab === 'compare') && typeof isGridIQPro === 'function' && !isGridIQPro()) {
-    openProModal();
-    return;
+function switchTab(tab, pushHistory) {
+  if (tab === 'fantasy' || tab === 'compare') {
+    if (!window._gridiqAuthUser) {
+      openAuthModal();
+      return;
+    }
+    if (typeof isGridIQPro === 'function' && !isGridIQPro()) {
+      openProModal();
+      return;
+    }
   }
   if (STATE.activeTab === tab) return;
   STATE.activeTab = tab;
@@ -57,7 +63,28 @@ function switchTab(tab) {
   document.getElementById('top-nav').classList.remove('nav-open');
   const hamburger = document.getElementById('nav-hamburger');
   if (hamburger) hamburger.textContent = '☰';
+  // Browser history
+  if (pushHistory !== false) {
+    history.pushState({ tab }, '', '#' + tab);
+  }
 }
+
+// Restore tab from URL hash on load
+(function() {
+  const hash = location.hash.replace('#', '');
+  const validTabs = ['home', 'predictor', 'fantasy', 'compare', 'more'];
+  if (hash && validTabs.includes(hash)) {
+    history.replaceState({ tab: hash }, '', '#' + hash);
+  } else {
+    history.replaceState({ tab: 'home' }, '', location.href);
+  }
+})();
+
+// Browser back/forward arrows
+window.addEventListener('popstate', function(e) {
+  const tab = (e.state && e.state.tab) || 'home';
+  switchTab(tab, false);
+});
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -1211,6 +1238,12 @@ document.addEventListener('DOMContentLoaded', function() {
     window.applyLiveData().then(init);
   } else {
     init();
+  }
+  // Navigate to hash tab on initial load (after init)
+  const _initHash = location.hash.replace('#', '');
+  const _validTabs = ['home', 'predictor', 'fantasy', 'compare', 'more'];
+  if (_initHash && _validTabs.includes(_initHash) && _initHash !== 'home') {
+    setTimeout(() => switchTab(_initHash, false), 0);
   }
 });
 
