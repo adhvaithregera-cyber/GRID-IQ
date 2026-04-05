@@ -65,7 +65,11 @@ function switchTab(tab) {
   }
   if (STATE.activeTab === tab) return;
   _activateTab(tab);
-  location.hash = tab === 'home' ? '' : tab;
+  if (tab === 'home') {
+    history.replaceState(null, '', location.pathname);
+  } else {
+    location.hash = tab;
+  }
 }
 
 // hashchange fires on browser back/forward AND when switchTab sets location.hash.
@@ -74,12 +78,20 @@ window.addEventListener('hashchange', function() {
   const tab = location.hash.replace('#', '') || 'home';
   if (!_VALID_TABS.includes(tab)) return;
   if (STATE.activeTab === tab) return; // already active — came from switchTab click
-  // Auth-gated tabs navigated to via back/forward while logged out
-  if ((tab === 'fantasy' || tab === 'compare') && !window._gridiqAuthUser) {
-    _activateTab('home');
-    location.hash = '';
-    openAuthModal();
-    return;
+  // Auth/pro-gated tabs navigated to via back/forward
+  if (tab === 'fantasy' || tab === 'compare') {
+    if (!window._gridiqAuthUser) {
+      _activateTab('home');
+      history.replaceState(null, '', location.pathname);
+      openAuthModal();
+      return;
+    }
+    if (typeof isGridIQPro === 'function' && !isGridIQPro()) {
+      _activateTab('home');
+      history.replaceState(null, '', location.pathname);
+      openProModal();
+      return;
+    }
   }
   _activateTab(tab);
 });
