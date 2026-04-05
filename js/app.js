@@ -42,7 +42,7 @@ function teamColor(constructorId) {
 /* ─── NAVIGATION ─────────────────────────────────────────── */
 const _VALID_TABS = ['home', 'predictor', 'fantasy', 'compare', 'more'];
 
-// Activates a tab in the DOM only — no auth checks, no history changes.
+// Updates the DOM to show the given tab — no auth checks, no URL changes.
 function _activateTab(tab) {
   if (!_VALID_TABS.includes(tab)) tab = 'home';
   STATE.activeTab = tab;
@@ -57,30 +57,31 @@ function _activateTab(tab) {
   if (hamburger) hamburger.textContent = '☰';
 }
 
-// Public entry point — enforces auth/pro gates, updates history.
+// Called by user clicks — enforces auth/pro, then updates hash (which drives history).
+let _suppressHashChange = false;
 function switchTab(tab) {
   if (tab === 'fantasy' || tab === 'compare') {
-    if (!window._gridiqAuthUser) {
-      openAuthModal();
-      return;
-    }
-    if (typeof isGridIQPro === 'function' && !isGridIQPro()) {
-      openProModal();
-      return;
-    }
+    if (!window._gridiqAuthUser) { openAuthModal(); return; }
+    if (typeof isGridIQPro === 'function' && !isGridIQPro()) { openProModal(); return; }
   }
   if (STATE.activeTab === tab) return;
   _activateTab(tab);
-  history.pushState({ tab }, '', '#' + tab);
+  _suppressHashChange = true;
+  location.hash = tab === 'home' ? '' : tab;
+  _suppressHashChange = false;
 }
 
-// Browser back / forward
-window.addEventListener('popstate', function(e) {
-  const tab = (e.state && e.state.tab) || location.hash.replace('#', '') || 'home';
-  // Auth-gated tabs: show modal but land on home instead
+// hashchange fires when the browser back/forward buttons change the URL hash.
+window.addEventListener('hashchange', function() {
+  if (_suppressHashChange) return;
+  const tab = location.hash.replace('#', '') || 'home';
+  if (!_VALID_TABS.includes(tab)) return;
+  // Auth-gated: redirect to home and open auth modal
   if ((tab === 'fantasy' || tab === 'compare') && !window._gridiqAuthUser) {
     _activateTab('home');
-    history.replaceState({ tab: 'home' }, '', '#home');
+    _suppressHashChange = true;
+    location.hash = '';
+    _suppressHashChange = false;
     openAuthModal();
     return;
   }
@@ -92,14 +93,6 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 });
 document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-
-// Seed initial history state so back button has somewhere to go
-document.addEventListener('DOMContentLoaded', function() {
-  const initHash = location.hash.replace('#', '');
-  const initTab  = _VALID_TABS.includes(initHash) ? initHash : 'home';
-  history.replaceState({ tab: initTab }, '', initTab === 'home' ? location.pathname : '#' + initTab);
-  if (initTab !== 'home') _activateTab(initTab);
 });
 
 /* ─── HERO STATS STRIP ───────────────────────────────────── */
