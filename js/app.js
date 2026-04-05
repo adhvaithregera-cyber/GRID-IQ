@@ -40,7 +40,25 @@ function teamColor(constructorId) {
 }
 
 /* ─── NAVIGATION ─────────────────────────────────────────── */
-function switchTab(tab, pushHistory) {
+const _VALID_TABS = ['home', 'predictor', 'fantasy', 'compare', 'more'];
+
+// Activates a tab in the DOM only — no auth checks, no history changes.
+function _activateTab(tab) {
+  if (!_VALID_TABS.includes(tab)) tab = 'home';
+  STATE.activeTab = tab;
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
+  document.querySelectorAll('.bnav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
+  document.getElementById('section-' + tab).classList.add('active');
+  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
+  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
+  document.getElementById('top-nav').classList.remove('nav-open');
+  const hamburger = document.getElementById('nav-hamburger');
+  if (hamburger) hamburger.textContent = '☰';
+}
+
+// Public entry point — enforces auth/pro gates, updates history.
+function switchTab(tab) {
   if (tab === 'fantasy' || tab === 'compare') {
     if (!window._gridiqAuthUser) {
       openAuthModal();
@@ -52,38 +70,21 @@ function switchTab(tab, pushHistory) {
     }
   }
   if (STATE.activeTab === tab) return;
-  STATE.activeTab = tab;
-  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
-  document.querySelectorAll('.bnav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
-  document.getElementById('section-' + tab).classList.add('active');
-  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
-  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
-  // Close mobile hamburger menu
-  document.getElementById('top-nav').classList.remove('nav-open');
-  const hamburger = document.getElementById('nav-hamburger');
-  if (hamburger) hamburger.textContent = '☰';
-  // Browser history
-  if (pushHistory !== false) {
-    history.pushState({ tab }, '', '#' + tab);
-  }
+  _activateTab(tab);
+  history.pushState({ tab }, '', '#' + tab);
 }
 
-// Restore tab from URL hash on load
-(function() {
-  const hash = location.hash.replace('#', '');
-  const validTabs = ['home', 'predictor', 'fantasy', 'compare', 'more'];
-  if (hash && validTabs.includes(hash)) {
-    history.replaceState({ tab: hash }, '', '#' + hash);
-  } else {
-    history.replaceState({ tab: 'home' }, '', location.href);
-  }
-})();
-
-// Browser back/forward arrows
+// Browser back / forward
 window.addEventListener('popstate', function(e) {
-  const tab = (e.state && e.state.tab) || 'home';
-  switchTab(tab, false);
+  const tab = (e.state && e.state.tab) || location.hash.replace('#', '') || 'home';
+  // Auth-gated tabs: show modal but land on home instead
+  if ((tab === 'fantasy' || tab === 'compare') && !window._gridiqAuthUser) {
+    _activateTab('home');
+    history.replaceState({ tab: 'home' }, '', '#home');
+    openAuthModal();
+    return;
+  }
+  _activateTab(tab);
 });
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -91,6 +92,14 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 });
 document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// Seed initial history state so back button has somewhere to go
+document.addEventListener('DOMContentLoaded', function() {
+  const initHash = location.hash.replace('#', '');
+  const initTab  = _VALID_TABS.includes(initHash) ? initHash : 'home';
+  history.replaceState({ tab: initTab }, '', initTab === 'home' ? location.pathname : '#' + initTab);
+  if (initTab !== 'home') _activateTab(initTab);
 });
 
 /* ─── HERO STATS STRIP ───────────────────────────────────── */
@@ -1186,6 +1195,9 @@ function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  // ── Nav logo → home ─────────────────────────────────────
+  document.getElementById('nav-logo')?.addEventListener('click', () => switchTab('home'));
+
   // ── View Season Calendar button ─────────────────────────
   document.querySelectorAll('.btn-view-calendar').forEach(calBtn => calBtn.addEventListener('click', () => {
     switchTab('more');
@@ -1238,12 +1250,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.applyLiveData().then(init);
   } else {
     init();
-  }
-  // Navigate to hash tab on initial load (after init)
-  const _initHash = location.hash.replace('#', '');
-  const _validTabs = ['home', 'predictor', 'fantasy', 'compare', 'more'];
-  if (_initHash && _validTabs.includes(_initHash) && _initHash !== 'home') {
-    setTimeout(() => switchTab(_initHash, false), 0);
   }
 });
 
