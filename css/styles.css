@@ -60,7 +60,7 @@ select, input { font-family: var(--font-body); }
 /* ─── TAB SECTIONS ───────────────────────────────────────── */
 .tab-section {
   position: absolute;
-  top: var(--nav-h);
+  top: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
   left: 0;
   right: 0;
   bottom: 0;
@@ -911,10 +911,9 @@ select, input { font-family: var(--font-body); }
   top: 0; left: 0; right: 0;
   height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  padding: 0 var(--content-pad) 0;
-  padding-top: env(safe-area-inset-top, 0px);
+  padding: env(safe-area-inset-top, 0px) var(--content-pad) 0;
   background: rgba(8,8,8,0.96);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
@@ -1124,7 +1123,7 @@ select, input { font-family: var(--font-body); }
     align-items: stretch;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  .tab-section { bottom: var(--bottom-nav-h); }
+  .tab-section { bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px)); }
   .nav-hamburger { display: none !important; }
 }
 
