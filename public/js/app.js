@@ -1218,7 +1218,7 @@ function _renderCompareRadar(dA, dB) {
   const n = keys.length;
   const cx = 150, cy = 158, r = 100;
   const colorA = '#FF1E00', colorB = '#00D2BE';
-  const RADAR_MIN = 70, RADAR_MAX = 100;
+  const RADAR_MIN = 60, RADAR_MAX = 100;
 
   const norm = v => Math.max(0, Math.min(1, (v - RADAR_MIN) / (RADAR_MAX - RADAR_MIN)));
 
