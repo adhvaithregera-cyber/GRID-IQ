@@ -57,8 +57,12 @@ function _activateTab(tab) {
   if (hamburger) hamburger.textContent = '☰';
 }
 
-// Called by user clicks — updates hash (which drives history).
+// Called by user clicks — enforces auth/pro, then updates hash (which drives history).
 function switchTab(tab) {
+  if (tab === 'fantasy' || tab === 'compare') {
+    if (!window._gridiqAuthUser) { openAuthModal(); return; }
+    if (typeof isGridIQPro === 'function' && !isGridIQPro()) { openProModal(); return; }
+  }
   if (STATE.activeTab === tab) return;
   _activateTab(tab);
   if (tab === 'home') {
@@ -74,6 +78,21 @@ window.addEventListener('hashchange', function() {
   const tab = location.hash.replace('#', '') || 'home';
   if (!_VALID_TABS.includes(tab)) return;
   if (STATE.activeTab === tab) return; // already active — came from switchTab click
+  // Auth/pro-gated tabs navigated to via back/forward
+  if (tab === 'fantasy' || tab === 'compare') {
+    if (!window._gridiqAuthUser) {
+      _activateTab('home');
+      history.replaceState(null, '', location.pathname);
+      openAuthModal();
+      return;
+    }
+    if (typeof isGridIQPro === 'function' && !isGridIQPro()) {
+      _activateTab('home');
+      history.replaceState(null, '', location.pathname);
+      openProModal();
+      return;
+    }
+  }
   _activateTab(tab);
 });
 
@@ -134,6 +153,34 @@ function renderRaceHero() {
   const lastRace  = completed[completed.length - 1];
   const total     = GRIDIQ_DATABASE.races.length;
 
+  const myPicks = (() => { try { return JSON.parse(localStorage.getItem('gridiq_my_picks')) || {}; } catch(_) { return {}; } })();
+  let predHtml = '';
+  const lastPick = lastRace && myPicks[lastRace.id];
+  const nextPick = race && myPicks[race.id];
+  if (lastPick) {
+    const hit = lastPick.driverLastName === lastRace.winner;
+    predHtml = `
+      <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:12px;border-left:2px solid ${hit ? 'var(--green)' : 'var(--text-3)'}">
+        <div>
+          <div style="font-family:var(--font-tech);font-size:9px;letter-spacing:2px;color:var(--text-3);margin-bottom:2px">YOUR PICK · R${lastRace.round}</div>
+          <div style="font-family:var(--font-tech);font-size:12px;color:var(--text)">${hit
+            ? `✓ CORRECT — <strong style="color:var(--green)">${lastPick.driverName}</strong> won!`
+            : `✗ MISSED — You picked <strong style="color:var(--text-2)">${lastPick.driverName}</strong> · Winner: <strong style="color:var(--accent)">${lastRace.winner}</strong>`
+          }</div>
+        </div>
+      </div>
+    `;
+  } else if (nextPick) {
+    predHtml = `
+      <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:12px;border-left:2px solid var(--accent)">
+        <div>
+          <div style="font-family:var(--font-tech);font-size:9px;letter-spacing:2px;color:var(--text-3);margin-bottom:2px">YOUR PICK · R${race.round}</div>
+          <div style="font-family:var(--font-tech);font-size:12px;color:var(--text)">⚡ <strong style="color:var(--accent)">${nextPick.driverName}</strong> to win ${nextPick.raceName}</div>
+        </div>
+      </div>
+    `;
+  }
+
   const html = `
     <div class="hero-eyebrow">
       <span class="live-pill"><span class="dot-pulse"></span>UPCOMING · R${race.round}/${total}</span>
@@ -163,6 +210,7 @@ function renderRaceHero() {
       </div>
     </div>
     ` : ''}
+    ${predHtml}
     <div class="hero-divider"></div>
     <div class="cd-label">RACE DAY COUNTDOWN — ${formatDate(race.date)}</div>
     <div class="countdown-display countdown"></div>
@@ -376,6 +424,7 @@ function initPredictor() {
 
   buildPenaltyRows();
   document.getElementById('run-sim').addEventListener('click', runSimulation);
+  initYourPickSection();
 }
 
 function runSimulation() {
@@ -450,6 +499,12 @@ function runSimulation() {
     .slice(0, 10);
 
   renderSimResults(results, track, weather);
+
+  // Save AI pick keyed by race so user pick section can reference it
+  localStorage.setItem('gridiq_ai_pick_' + trackId, JSON.stringify({
+    driverName: results[0].driver.firstName + ' ' + results[0].driver.lastName,
+    driverLastName: results[0].driver.lastName,
+  }));
 }
 
 function renderSimResults(results, track, weather) {
@@ -500,6 +555,110 @@ function renderSimResults(results, track, weather) {
   if (window.innerWidth < 768) {
     container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+}
+
+/* ─── YOUR PICK ──────────────────────────────────────────── */
+function _getMyPicks() {
+  try { return JSON.parse(localStorage.getItem('gridiq_my_picks')) || {}; } catch(_) { return {}; }
+}
+
+function renderPickHistory() {
+  const container = document.getElementById('your-pick-history');
+  if (!container) return;
+
+  const picks = _getMyPicks();
+  const entries = Object.values(picks).sort((a,b) => a.raceRound - b.raceRound);
+  if (!entries.length) { container.innerHTML = ''; return; }
+
+  container.innerHTML = entries.map(pick => {
+    const race = getRace(pick.raceId);
+    if (!race) return '';
+    if (race.status === 'completed') {
+      const userHit = pick.driverLastName === race.winner;
+      const aiHit   = pick.aiPickLastName && pick.aiPickLastName === race.winner;
+      return `
+        <div class="pick-row">
+          <div class="pick-race-lbl">${pick.raceFlag} R${pick.raceRound} — ${pick.raceName}</div>
+          <div class="pick-vs-grid">
+            <div class="pick-vs-cell${userHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
+              <div class="pick-vs-label">YOU</div>
+              <div class="pick-vs-name">${pick.driverLastName}</div>
+              <div class="pick-vs-result">${userHit ? '✓' : '✗'}</div>
+            </div>
+            <div class="pick-vs-cell${aiHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
+              <div class="pick-vs-label">AI</div>
+              <div class="pick-vs-name">${pick.aiPickLastName || '—'}</div>
+              <div class="pick-vs-result">${pick.aiPickLastName ? (aiHit ? '✓' : '✗') : '—'}</div>
+            </div>
+            <div class="pick-vs-cell pick-vs-actual">
+              <div class="pick-vs-label">WINNER</div>
+              <div class="pick-vs-name">${race.winner}</div>
+              <div class="pick-vs-result">🏆</div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="pick-row pick-row--pending">
+          <div class="pick-race-lbl">${pick.raceFlag} R${pick.raceRound} — ${pick.raceName}</div>
+          <div class="pick-pending-txt">⚡ Your pick: <strong>${pick.driverName}</strong></div>
+        </div>
+      `;
+    }
+  }).join('');
+}
+
+function initYourPickSection() {
+  const raceEl   = document.getElementById('your-pick-race');
+  const driverEl = document.getElementById('your-pick-driver');
+  const btn      = document.getElementById('your-pick-btn');
+  if (!raceEl || !driverEl || !btn) return;
+
+  // Races dropdown
+  raceEl.innerHTML = GRIDIQ_DATABASE.races.map(r =>
+    `<option value="${r.id}">${r.flag} R${r.round} — ${r.name}${r.status === 'completed' ? ' ✓' : ''}</option>`
+  ).join('');
+  const nextRace = getNextRace();
+  if (nextRace) raceEl.value = nextRace.id;
+
+  // Drivers dropdown (sorted by points)
+  const drivers = [...GRIDIQ_DATABASE.drivers].sort((a,b) => b.points - a.points);
+  driverEl.innerHTML = drivers.map(d =>
+    `<option value="${d.id}">${d.firstName} ${d.lastName}</option>`
+  ).join('');
+
+  // Sync race selection with pred-track
+  const predTrack = document.getElementById('pred-track');
+  if (predTrack) predTrack.addEventListener('change', () => { raceEl.value = predTrack.value; });
+  raceEl.addEventListener('change', renderPickHistory);
+
+  btn.addEventListener('click', () => {
+    const race   = getRace(raceEl.value);
+    const driver = getDriver(driverEl.value);
+    if (!race || !driver) return;
+
+    let aiPick = null;
+    try { aiPick = JSON.parse(localStorage.getItem('gridiq_ai_pick_' + race.id)); } catch(_) {}
+
+    const allPicks = _getMyPicks();
+    allPicks[race.id] = {
+      raceId: race.id, raceName: race.name, raceRound: race.round, raceFlag: race.flag,
+      driverId: driver.id,
+      driverName: driver.firstName + ' ' + driver.lastName,
+      driverLastName: driver.lastName,
+      aiPickName: aiPick ? aiPick.driverName : null,
+      aiPickLastName: aiPick ? aiPick.driverLastName : null,
+    };
+    localStorage.setItem('gridiq_my_picks', JSON.stringify(allPicks));
+
+    const orig = btn.textContent;
+    btn.textContent = 'PICK SAVED ✓';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+    renderPickHistory();
+  });
+
+  renderPickHistory();
 }
 
 /* ─── FANTASY ────────────────────────────────────────────── */
@@ -808,6 +967,8 @@ function renderGuideTeams() {
 function maybeShowWelcomeModal() {
   if (localStorage.getItem('gridiq_welcomed')) return;
   setTimeout(function() {
+    var proModal = document.getElementById('pro-modal');
+    if (proModal && !proModal.classList.contains('hidden')) return;
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.classList.remove('hidden');
     sessionStorage.setItem('gridiq_promo_shown', '1');
@@ -1237,8 +1398,10 @@ document.addEventListener('DOMContentLoaded', function() {
       window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
     window.Capacitor.Plugins.App.addListener('backButton', function() {
       const authModal   = document.getElementById('auth-modal');
+      const proModal    = document.getElementById('pro-modal');
       const customModal = document.getElementById('custom-modal');
       if (authModal   && !authModal.classList.contains('hidden'))   { closeAuthModal(); return; }
+      if (proModal    && !proModal.classList.contains('hidden'))     { closeProModal();  return; }
       if (customModal && !customModal.classList.contains('hidden'))  { closeModal();     return; }
       if (STATE.activeTab !== 'home') { switchTab('home'); return; }
       window.Capacitor.Plugins.App.exitApp();
