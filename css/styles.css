@@ -2648,11 +2648,15 @@ select, input { font-family: var(--font-body); }
 
 .footer-disclaimer {
   font-family: var(--font-body);
-  font-size: 10px;
-  color: var(--text-3);
+  font-size: 11px;
+  color: var(--text-2);
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
+  padding: 8px 12px;
+  background: var(--bg-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .modal-disclaimer-title {
