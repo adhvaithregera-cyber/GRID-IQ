@@ -222,6 +222,8 @@ function updateProNavBadge() {
       bnavBtn.querySelector('.bnav-lbl').textContent = 'GO PRO';
     }
   }
+
+  if (typeof window.updateFantasyProBadge === 'function') window.updateFantasyProBadge();
 }
 
 /* ─────────────────────────────────────────────────────────

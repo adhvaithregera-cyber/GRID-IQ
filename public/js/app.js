@@ -1310,6 +1310,13 @@ function _renderCompareStats(dA, dB) {
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */
+function updateFantasyProBadge() {
+  const badge = document.getElementById('fantasy-pro-badge');
+  if (!badge) return;
+  const pro = typeof isGridIQPro === 'function' && isGridIQPro();
+  badge.classList.toggle('hidden', !pro);
+}
+
 function init() {
   renderHeroStats();
   renderRaceHero();
@@ -1324,6 +1331,7 @@ function init() {
   updateBudgetDisplay();
   renderCalendar();
   renderGuideTeams();
+  updateFantasyProBadge();
   maybeShowWelcomeModal();
 
   // ── Welcome modal buttons ───────────────────────────────
@@ -1430,3 +1438,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.showToast = showToast;
+window.updateFantasyProBadge = updateFantasyProBadge;

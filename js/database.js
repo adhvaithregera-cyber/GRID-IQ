@@ -2,11 +2,27 @@
    GRIDIQ_DATABASE — 2026 Season Live Data
    Last synced: 31 March 2026 (after Round 3 — Japanese GP)
    Source: Ergast F1 API (jolpi.ca) + public race reports
-   ============================================================ */
+   ============================================================
+
+   ██████████████████████████████████████████████████████████
+   ██  RACE WEEKEND QUICK UPDATE — edit ONLY this section  ██
+   ██████████████████████████████████████████████████████████
+
+   STEP 1 — Update racesCompleted (line ~14 below)
+   STEP 2 — Find the just-completed race in the races[] array,
+             set  status: "completed"  and  winner: "LastName"
+   STEP 3 — Update driver points & positions in drivers[] array
+             (sort by points desc, re-number positions 1–22)
+   STEP 4 — Update constructor points & positions in constructors[]
+   STEP 5 — Increment wins/podiums on the relevant drivers
+   STEP 6 — Update "Last synced" date above
+
+   Source: official results from formula1.com after the race
+   ████████████████████████████████████████████████████████ */
 
 const GRIDIQ_DATABASE = {
   season: 2026,
-  racesCompleted: 3,   // Update this after each race weekend
+  racesCompleted: 3,   // ← STEP 1: change this number
 
   /* ── 2026 RACE CALENDAR — 22 ROUNDS ────────────────────── */
   races: [

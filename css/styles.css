@@ -2178,6 +2178,14 @@ select, input { font-family: var(--font-body); }
   color: #000 !important;
   font-weight: 700;
 }
+#fantasy-pro-badge {
+  box-shadow: 0 0 8px rgba(245,166,35,0.5);
+  animation: proBadgePulse 2.5s ease-in-out infinite;
+}
+@keyframes proBadgePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(245,166,35,0.5); }
+  50%       { box-shadow: 0 0 14px rgba(245,166,35,0.85); }
+}
 
 /* ══════════════════════════════════════════
    HEAD-TO-HEAD COMPARE SECTION
