@@ -35,7 +35,7 @@
   <meta name="theme-color" content="#080808">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>GridIQ — F1 Strategy 2026</title>
+  <title>GridIQ — Race Strategy 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -67,7 +67,7 @@
       <button class="nav-btn" data-tab="predictor" aria-label="Race Predictor"><span class="nav-lbl">PREDICTOR</span></button>
       <button class="nav-btn" data-tab="fantasy" aria-label="Fantasy Team Builder"><span class="nav-lbl">FANTASY</span></button>
       <button class="nav-btn" data-tab="compare" aria-label="Head-to-Head Driver Compare"><span class="nav-lbl">H2H</span></button>
-      <button class="nav-btn" data-tab="more" aria-label="F1 Guide"><span class="nav-lbl">F1 GUIDE</span></button>
+      <button class="nav-btn" data-tab="more" aria-label="Racing Guide"><span class="nav-lbl">RACING GUIDE</span></button>
     </div>
 
     <div class="nav-actions">
@@ -119,7 +119,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7H4m0 0l4 4M4 7l4-4M16 17h4m0 0l-4-4m4 4l-4 4"/></svg>
       <span class="bnav-lbl">H2H</span>
     </button>
-    <button class="bnav-btn" data-tab="more" aria-label="F1 Guide">
+    <button class="bnav-btn" data-tab="more" aria-label="Racing Guide">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
       <span class="bnav-lbl">GUIDE</span>
     </button>
@@ -144,13 +144,19 @@
 
       <ul class="pro-features-list" id="pro-features-list"></ul>
 
-      <div class="pro-price-block">
-        <span class="pro-price" id="pro-price-display">$1.99 / month</span>
-        <span class="pro-price-sub">Cancel anytime</span>
+      <div class="upi-pay-block">
+        <div class="upi-amount-row">
+          <span class="upi-amount">₹199</span>
+          <span class="upi-period">/ month</span>
+        </div>
+        <img class="upi-qr" id="upi-qr-img" src="" alt="UPI QR Code">
+        <div class="upi-id-row">
+          <span class="upi-id-val" id="upi-id-display">—</span>
+          <button class="upi-copy-btn" id="upi-copy-btn">COPY</button>
+        </div>
+        <p class="upi-instruct">Pay via any UPI app, then send your <strong>UTR / Transaction ID</strong> and <strong>sign-in email</strong> to activate your account.</p>
+        <a id="upi-contact-link" class="upi-contact-btn hidden" href="#" target="_blank" rel="noopener">EMAIL PAYMENT PROOF →</a>
       </div>
-
-      <button class="btn-primary pro-upgrade-btn">UPGRADE TO PRO →</button>
-      <div id="pro-payment-note" class="pro-payment-note hidden"></div>
 
       <!-- Trial section — shown only when trial is still available -->
       <div id="pro-trial-section" class="hidden">
@@ -161,9 +167,7 @@
         <p class="pro-trial-note">No card needed &bull; Beta only &bull; One per user</p>
       </div>
 
-
       <button class="pro-skip-btn">Maybe Later</button>
-      <button class="pro-restore-btn" id="pro-restore-btn">Restore Purchase</button>
 
     </div>
   </div>
@@ -245,11 +249,11 @@
       <div class="home-hero">
         <canvas id="smoke-canvas" class="smoke-canvas"></canvas>
         <div class="home-hero-inner">
-          <div class="home-hero-eyebrow">F1 STRATEGY INTELLIGENCE</div>
+          <div class="home-hero-eyebrow">RACE STRATEGY INTELLIGENCE</div>
           <div class="home-hero-title">
             <span class="logo-w">GRID</span><span class="logo-r">IQ</span>
           </div>
-          <div class="home-hero-tagline">YOUR INTELLIGENT F1 COMPANION — 2026 SEASON</div>
+          <div class="home-hero-tagline">YOUR INTELLIGENT RACING COMPANION — 2026 SEASON</div>
           <div class="home-hero-ctas">
             <button class="btn-hero-primary" data-tab="predictor">RACE PREDICTOR</button>
             <button class="btn-hero-outline" data-tab="fantasy">FANTASY TEAM</button>
@@ -601,7 +605,7 @@
                   <div class="weekend-step-day">SUN</div>
                   <div>
                     <div class="weekend-step-name">RACE DAY</div>
-                    <div class="weekend-step-desc">The full Grand Prix runs as normal. Sprint results have no bearing on the main race starting order.</div>
+                    <div class="weekend-step-desc">The full GP runs as normal. Sprint results have no bearing on the main race starting order.</div>
                   </div>
                 </div>
               </div>
@@ -730,14 +734,47 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       FOOTER DISCLAIMER
+  ══════════════════════════════════════════════ -->
+  <footer id="app-footer">
+    <p class="footer-disclaimer">This app is unofficial and is not associated in any way with the Formula 1 companies. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>
+  </footer>
+
+  <!-- ══════════════════════════════════════════
+       DISCLAIMER MODAL — shown once on first launch
+  ══════════════════════════════════════════════ -->
+  <div id="disclaimer-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
+    <div class="modal-box">
+      <div class="modal-handle"></div>
+      <div class="modal-inner">
+        <p class="modal-disclaimer-title" id="disclaimer-title">UNOFFICIAL FAN APP</p>
+        <p class="modal-disclaimer-body">GridIQ is an unofficial fan application and is not associated in any way with the Formula 1 companies, Formula One Digital Media Limited, or the FIA.</p>
+        <p class="modal-disclaimer-body">F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V. All rights reserved.</p>
+        <button id="disclaimer-accept-btn" class="btn-disclaimer-accept">I UNDERSTAND</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /#app -->
 
 <script src="js/database.js"></script>
 <script src="js/smoke.js"></script>
-<script src="js/pro.js"></script>
 <script src="js/live-data.js"></script>
+<script src="js/pro.js"></script>
 <script src="js/app.js"></script>
 <script type="module" src="js/auth.js"></script>
-<script src="js/billing.js"></script>
+<script>
+  (function() {
+    var KEY = 'gridiq_disclaimer_accepted';
+    if (!localStorage.getItem(KEY)) {
+      document.getElementById('disclaimer-modal').classList.remove('hidden');
+    }
+    document.getElementById('disclaimer-accept-btn').addEventListener('click', function() {
+      localStorage.setItem(KEY, '1');
+      document.getElementById('disclaimer-modal').classList.add('hidden');
+    });
+  })();
+</script>
 </body>
 </html>

@@ -16,12 +16,12 @@
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
-import { getAuth, signInWithPopup, signOut as fbSignOut,
+import { getAuth, signInWithPopup, signInWithCredential, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
          signInWithPhoneNumber, RecaptchaVerifier }               from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
+import { getRemoteConfig, fetchAndActivate, getValue }           from 'firebase/remote-config';
 
 /* ── Config — values injected by Vite at build time ─────── */
 const FIREBASE_CONFIG = {
@@ -68,7 +68,6 @@ function _clearRateLimit() {
 
 /* ── Init ─────────────────────────────────────────────────── */
 let _auth               = null;
-let _db                 = null;
 let _emailMode          = 'signin';
 let _confirmationResult = null;
 let _recaptchaVerifier  = null;
@@ -85,8 +84,8 @@ function _getAuth() {
       });
     }
     _auth = getAuth(app);
-    _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
+    _fetchRemoteConfig(app);
     return _auth;
   } catch (e) {
     console.warn('[GridIQ auth] Firebase init failed:', e.message);
@@ -94,88 +93,56 @@ function _getAuth() {
   }
 }
 
-/* ── Server-side PRO sync ─────────────────────────────────── */
-/*
- * Reads the user's PRO status from Firestore (the authoritative source).
- * If Firestore says not PRO → clear the localStorage flag so it can't be
- * faked by opening DevTools. If Firestore says PRO → confirm the flag.
- */
-async function _syncProFromFirestore(uid) {
-  if (!_db || !uid) return;
-  try {
-    const snap = await getDoc(doc(_db, 'users', uid));
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data.isPro) {
-        localStorage.setItem('gridiq_pro', 'true');
-      } else {
-        // Server says not PRO — strip any locally-set flag
-        localStorage.removeItem('gridiq_pro');
-      }
-      if (data.isOwner) {
-        localStorage.setItem('gridiq_owner', 'true');
-        localStorage.removeItem('gridiq_trial_start');
-      }
-    } else {
-      // No Firestore record → not a paid user; remove any stale pro flag
-      localStorage.removeItem('gridiq_pro');
-    }
-    if (typeof updateProNavBadge === 'function') updateProNavBadge();
-  } catch (e) {
-    // Firestore read failed (offline, rules, etc.) — keep existing localStorage state
-    console.warn('[GridIQ auth] Firestore PRO sync failed:', e.message);
-  }
-}
-
-/*
- * Writes owner PRO status to Firestore for the current user.
- * Only runs for emails in OWNER_EMAILS (defined in pro.js).
- * Firestore Security Rules must allow writes only from this function
- * (enforced by denying client writes in rules.firestore).
- */
-async function _writeOwnerToFirestore(uid) {
-  if (!_db || !uid) return;
-  try {
-    await setDoc(doc(_db, 'users', uid), { isPro: true, isOwner: true }, { merge: true });
-  } catch (e) {
-    console.warn('[GridIQ auth] Firestore owner write failed:', e.message);
-  }
-}
-
-/* Called by billing.js after a successful Google Play purchase */
-async function _writeProToFirestore(uid) {
-  if (!_db || !uid) return;
-  try {
-    await setDoc(doc(_db, 'users', uid), { isPro: true }, { merge: true });
-  } catch (e) {
-    console.warn('[GridIQ auth] Firestore pro write failed:', e.message);
-  }
-}
-
 /* ── Auth state listener ──────────────────────────────────── */
 function _onAuthStateChanged(user) {
-  // Expose auth state to pro.js so isGridIQPro() can trust localStorage only when signed in
   window._gridiqAuthUser = user || null;
-
   _renderAuthBtn(user);
   closeAuthModal();
+  if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
   if (user) {
     closeUserMenu();
     _clearRateLimit();
-    // Owner check — async hash comparison, then confirms via Firestore
-    if (typeof grantOwnerProIfMatch === 'function') {
-      grantOwnerProIfMatch(user.email).then(function(wasOwner) {
-        if (wasOwner) _writeOwnerToFirestore(user.uid);
+  }
+}
+
+/* ── Remote Config ────────────────────────────────────────── */
+async function _fetchRemoteConfig(app) {
+  try {
+    const rc = getRemoteConfig(app);
+    rc.settings.minimumFetchIntervalMillis = 3_600_000; // 1 hour cache
+    rc.defaultConfig = { standings_json: '' };
+    await fetchAndActivate(rc);
+    const raw = getValue(rc, 'standings_json').asString();
+    if (!raw) return;
+    const data = JSON.parse(raw);
+
+    // Patch GRIDIQ_DATABASE in-memory (same shape as live-data.js patches)
+    if (typeof data.racesCompleted === 'number') {
+      GRIDIQ_DATABASE.racesCompleted = data.racesCompleted;
+    }
+    if (Array.isArray(data.drivers)) {
+      data.drivers.forEach(d => {
+        const existing = GRIDIQ_DATABASE.drivers.find(x => x.id === d.id);
+        if (existing) Object.assign(existing, d);
       });
     }
-    // Always sync PRO status from Firestore (authoritative source)
-    _syncProFromFirestore(user.uid);
-  } else {
-    // Signed out — strip PRO flags that require auth (owner/paid)
-    // Leave trial flag alone (trial doesn't require sign-in)
-    localStorage.removeItem('gridiq_pro');
-    localStorage.removeItem('gridiq_owner');
-    if (typeof updateProNavBadge === 'function') updateProNavBadge();
+    if (Array.isArray(data.constructors)) {
+      data.constructors.forEach(c => {
+        const existing = GRIDIQ_DATABASE.constructors.find(x => x.id === c.id);
+        if (existing) Object.assign(existing, c);
+      });
+    }
+    if (Array.isArray(data.races)) {
+      data.races.forEach(r => {
+        const existing = GRIDIQ_DATABASE.races.find(x => x.id === r.id);
+        if (existing) Object.assign(existing, r);
+      });
+    }
+
+    // Re-render if the app is already initialised
+    if (typeof renderAll === 'function') renderAll();
+  } catch (e) {
+    console.warn('[GridIQ remote-config]', e.message);
   }
 }
 
@@ -183,6 +150,29 @@ function _onAuthStateChanged(user) {
 function authSignInGoogle() {
   const auth = _getAuth();
   if (!auth) return;
+
+  const isAndroid = typeof window.Capacitor !== 'undefined' &&
+                    window.Capacitor.getPlatform() === 'android';
+
+  if (isAndroid) {
+    // Use the native Capacitor plugin to get a Google ID token, then
+    // exchange it for a Firebase credential (popup doesn't work in WebView).
+    const plugin = window.Capacitor?.Plugins?.FirebaseBridge;
+    if (plugin) {
+      plugin.signInWithGoogle()
+        .then(({ idToken }) => {
+          const credential = GoogleAuthProvider.credential(idToken);
+          return signInWithCredential(auth, credential);
+        })
+        .catch(_handleAuthError);
+    } else {
+      // Plugin unavailable — fall back to email sign-in
+      authSetEmailMode('signin');
+      authShowEmailView();
+    }
+    return;
+  }
+
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
@@ -411,16 +401,9 @@ function openAuthModal() {
   const m = document.getElementById('auth-modal');
   if (!m) return;
   m.classList.remove('hidden');
-  // On Android (Capacitor WebView), signInWithPopup is unsupported.
-  // Go straight to the email sign-in form — no Google/OAuth buttons shown.
-  const isAndroidApp = typeof window.Capacitor !== 'undefined' &&
-                       window.Capacitor.getPlatform() === 'android';
-  if (isAndroidApp) {
-    authSetEmailMode('signin');
-    authShowEmailView();
-  } else {
-    authShowMainView();
-  }
+  // Google Sign-In now works on Android via the native FirebaseBridgePlugin,
+  // so always show the main view with the Google button.
+  authShowMainView();
 }
 
 function closeAuthModal() {
@@ -484,8 +467,7 @@ window.onAuthBtnClick      = onAuthBtnClick;
 window.authSignInGoogle    = authSignInGoogle;
 window.authSignInGitHub    = authSignInGitHub;
 window.authSignOut         = authSignOut;
-window.openAuthModal              = openAuthModal;
-window._gridiqWriteProToFirestore = _writeProToFirestore;
+window.openAuthModal       = openAuthModal;
 window.closeAuthModal      = closeAuthModal;
 window.authShowMainView    = authShowMainView;
 window.authShowEmailView   = authShowEmailView;

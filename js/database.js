@@ -1,7 +1,7 @@
 /* ============================================================
    GRIDIQ_DATABASE — 2026 Season Live Data
    Last synced: 31 March 2026 (after Round 3 — Japanese GP)
-   Source: formula1.com official standings & driver profiles
+   Source: Ergast F1 API (jolpi.ca) + public race reports
    ============================================================ */
 
 const GRIDIQ_DATABASE = {
@@ -11,154 +11,154 @@ const GRIDIQ_DATABASE = {
   /* ── 2026 RACE CALENDAR — 22 ROUNDS ────────────────────── */
   races: [
     {
-      round:1,  id:"AUS", name:"Australian Grand Prix",    country:"Australia",    city:"Melbourne",
+      round:1,  id:"AUS", name:"Australian GP",    country:"Australia",    city:"Melbourne",
       circuit:"Albert Park Circuit",       date:"2026-03-08", laps:58, length:5.278, flag:"🇦🇺",
       trackType:"balanced",  preferredAeroMode:"Z", drsZones:4, tireWear:"medium",
       winner:"Russell", status:"completed",
       desc:"Street-park hybrid with a sweeping back sector. Z-mode downforce dominates the technical turn sequences."
     },
     {
-      round:2,  id:"CHN", name:"Chinese Grand Prix",       country:"China",        city:"Shanghai",
+      round:2,  id:"CHN", name:"Chinese GP",       country:"China",        city:"Shanghai",
       circuit:"Shanghai International Circuit",date:"2026-03-15", laps:56, length:5.451, flag:"🇨🇳",
       trackType:"balanced",  preferredAeroMode:"X", drsZones:2, tireWear:"medium",
       winner:"Antonelli", status:"completed",
       desc:"Long back straight rewards X-mode aerodynamics and pure powertrain output from Turn 14."
     },
     {
-      round:3,  id:"JPN", name:"Japanese Grand Prix",      country:"Japan",        city:"Suzuka",
+      round:3,  id:"JPN", name:"Japanese GP",      country:"Japan",        city:"Suzuka",
       circuit:"Suzuka Circuit",            date:"2026-03-29", laps:53, length:5.807, flag:"🇯🇵",
       trackType:"technical", preferredAeroMode:"Z", drsZones:2, tireWear:"high",
       winner:"Antonelli", status:"completed",
       desc:"The ultimate driver's circuit. Suzuka's Esses and 130R define champions. Z-mode mastery is essential."
     },
     {
-      round:4,  id:"MIA", name:"Miami Grand Prix",         country:"USA",          city:"Miami",
+      round:4,  id:"MIA", name:"Miami GP",         country:"USA",          city:"Miami",
       circuit:"Miami International Autodrome",date:"2026-05-03", laps:57, length:5.412, flag:"🇺🇸",
       trackType:"balanced",  preferredAeroMode:"X", drsZones:3, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Purpose-built circuit blending power straights with a technical stadium section. X-mode speed is rewarded."
     },
     {
-      round:5,  id:"CAN", name:"Canadian Grand Prix",      country:"Canada",       city:"Montreal",
+      round:5,  id:"CAN", name:"Canadian GP",      country:"Canada",       city:"Montreal",
       circuit:"Circuit Gilles Villeneuve", date:"2026-05-24", laps:70, length:4.361, flag:"🇨🇦",
       trackType:"power",     preferredAeroMode:"X", drsZones:2, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Stop-and-go layout with long straights. X-mode acceleration out of the hairpin chicanes is decisive."
     },
     {
-      round:6,  id:"MON", name:"Monaco Grand Prix",        country:"Monaco",       city:"Monte Carlo",
+      round:6,  id:"MON", name:"Monaco GP",        country:"Monaco",       city:"Monte Carlo",
       circuit:"Circuit de Monaco",         date:"2026-06-07", laps:78, length:3.337, flag:"🇲🇨",
       trackType:"technical", preferredAeroMode:"Z", drsZones:1, tireWear:"low",
       winner:null, status:"upcoming",
       desc:"Maximum Z-mode downforce through the chicanes. Strategy and qualifying position are everything."
     },
     {
-      round:7,  id:"ESP", name:"Spanish Grand Prix",       country:"Spain",        city:"Barcelona",
+      round:7,  id:"ESP", name:"Spanish GP",       country:"Spain",        city:"Barcelona",
       circuit:"Circuit de Barcelona-Catalunya",date:"2026-06-14", laps:66, length:4.657, flag:"🇪🇸",
       trackType:"balanced",  preferredAeroMode:"Z", drsZones:2, tireWear:"high",
       winner:null, status:"upcoming",
       desc:"The benchmark circuit. Teams optimise setup here — high aero loads and relentless tire stress throughout."
     },
     {
-      round:8,  id:"AUT", name:"Austrian Grand Prix",      country:"Austria",      city:"Spielberg",
+      round:8,  id:"AUT", name:"Austrian GP",      country:"Austria",      city:"Spielberg",
       circuit:"Red Bull Ring",             date:"2026-06-28", laps:71, length:4.318, flag:"🇦🇹",
       trackType:"power",     preferredAeroMode:"X", drsZones:3, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Short, punchy layout dominated by three big braking zones. X-mode straight-line speed wins."
     },
     {
-      round:9,  id:"GBR", name:"British Grand Prix",       country:"Great Britain",city:"Silverstone",
+      round:9,  id:"GBR", name:"British GP",       country:"Great Britain",city:"Silverstone",
       circuit:"Silverstone Circuit",       date:"2026-07-05", laps:52, length:5.891, flag:"🇬🇧",
       trackType:"balanced",  preferredAeroMode:"Z", drsZones:2, tireWear:"high",
       winner:null, status:"upcoming",
       desc:"High-speed flowing corners demand maximum mechanical grip. The Maggots-Becketts-Chapel complex is iconic."
     },
     {
-      round:10, id:"BEL", name:"Belgian Grand Prix",       country:"Belgium",      city:"Spa-Francorchamps",
+      round:10, id:"BEL", name:"Belgian GP",       country:"Belgium",      city:"Spa-Francorchamps",
       circuit:"Circuit de Spa-Francorchamps",date:"2026-07-19", laps:44, length:7.004, flag:"🇧🇪",
       trackType:"power",     preferredAeroMode:"X", drsZones:2, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Longest circuit on the calendar. Eau Rouge-Raidillon tests courage. Kemmel straight maximises X-mode."
     },
     {
-      round:11, id:"HUN", name:"Hungarian Grand Prix",     country:"Hungary",      city:"Budapest",
+      round:11, id:"HUN", name:"Hungarian GP",     country:"Hungary",      city:"Budapest",
       circuit:"Hungaroring",               date:"2026-07-26", laps:70, length:4.381, flag:"🇭🇺",
       trackType:"technical", preferredAeroMode:"Z", drsZones:1, tireWear:"high",
       winner:null, status:"upcoming",
       desc:"Twisty, low-speed circuit resembling Monaco on a larger scale. Maximum Z-mode downforce is essential."
     },
     {
-      round:12, id:"NED", name:"Dutch Grand Prix",         country:"Netherlands",  city:"Zandvoort",
+      round:12, id:"NED", name:"Dutch GP",         country:"Netherlands",  city:"Zandvoort",
       circuit:"Circuit Zandvoort",         date:"2026-08-23", laps:72, length:4.259, flag:"🇳🇱",
       trackType:"technical", preferredAeroMode:"Z", drsZones:2, tireWear:"high",
       winner:null, status:"upcoming",
       desc:"Banked corners and flowing layout demand precise Z-mode aero management throughout the lap."
     },
     {
-      round:13, id:"ITA", name:"Italian Grand Prix",       country:"Italy",        city:"Monza",
+      round:13, id:"ITA", name:"Italian GP",       country:"Italy",        city:"Monza",
       circuit:"Autodromo Nazionale Monza", date:"2026-09-06", laps:53, length:5.793, flag:"🇮🇹",
       trackType:"power",     preferredAeroMode:"X", drsZones:2, tireWear:"low",
       winner:null, status:"upcoming",
       desc:"Temple of Speed. Maximum X-mode — lowest drag configuration on the calendar. Slipstream racing at its purest."
     },
     {
-      round:14, id:"MAD", name:"Madrid Grand Prix",        country:"Spain",        city:"Madrid",
+      round:14, id:"MAD", name:"Madrid GP",        country:"Spain",        city:"Madrid",
       circuit:"Madrid Street Circuit",     date:"2026-09-13", laps:55, length:5.476, flag:"🇪🇸",
       trackType:"technical", preferredAeroMode:"Z", drsZones:3, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Brand-new street circuit through the Spanish capital. Z-mode essential through the tight urban chicanes."
     },
     {
-      round:15, id:"AZE", name:"Azerbaijan Grand Prix",    country:"Azerbaijan",   city:"Baku",
+      round:15, id:"AZE", name:"Azerbaijan GP",    country:"Azerbaijan",   city:"Baku",
       circuit:"Baku City Circuit",         date:"2026-09-26", laps:51, length:6.003, flag:"🇦🇿",
       trackType:"power",     preferredAeroMode:"X", drsZones:2, tireWear:"low",
       winner:null, status:"upcoming",
       desc:"Longest straight in F1 at 2.2 km. X-mode creates enormous speed gaps. Safety cars are frequent."
     },
     {
-      round:16, id:"SGP", name:"Singapore Grand Prix",     country:"Singapore",    city:"Singapore",
+      round:16, id:"SGP", name:"Singapore GP",     country:"Singapore",    city:"Singapore",
       circuit:"Marina Bay Street Circuit", date:"2026-10-11", laps:62, length:5.063, flag:"🇸🇬",
       trackType:"technical", preferredAeroMode:"Z", drsZones:3, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Night race with 23 corners. Humidity and concrete walls make it the most physically demanding circuit."
     },
     {
-      round:17, id:"USA", name:"United States Grand Prix", country:"USA",          city:"Austin",
+      round:17, id:"USA", name:"United States GP", country:"USA",          city:"Austin",
       circuit:"Circuit of The Americas",   date:"2026-10-25", laps:56, length:5.513, flag:"🇺🇸",
       trackType:"balanced",  preferredAeroMode:"Z", drsZones:2, tireWear:"high",
       winner:null, status:"upcoming",
       desc:"COTA's signature Turn 1 elevation change and technical back sector reward well-rounded setups."
     },
     {
-      round:18, id:"MEX", name:"Mexico City Grand Prix",   country:"Mexico",       city:"Mexico City",
+      round:18, id:"MEX", name:"Mexico City GP",   country:"Mexico",       city:"Mexico City",
       circuit:"Autodromo Hermanos Rodriguez",date:"2026-11-01", laps:71, length:4.304, flag:"🇲🇽",
       trackType:"power",     preferredAeroMode:"X", drsZones:3, tireWear:"low",
       winner:null, status:"upcoming",
       desc:"High altitude reduces both aero and engine efficiency equally — X-mode straight-line advantage is amplified."
     },
     {
-      round:19, id:"BRA", name:"Brazilian Grand Prix",     country:"Brazil",       city:"São Paulo",
+      round:19, id:"BRA", name:"Brazilian GP",     country:"Brazil",       city:"São Paulo",
       circuit:"Autodromo Jose Carlos Pace", date:"2026-11-08", laps:71, length:4.309, flag:"🇧🇷",
       trackType:"balanced",  preferredAeroMode:"X", drsZones:2, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Interlagos atmosphere is electric. Weather can swing from dry to monsoon mid-race. Unpredictable."
     },
     {
-      round:20, id:"LVG", name:"Las Vegas Grand Prix",     country:"USA",          city:"Las Vegas",
+      round:20, id:"LVG", name:"Las Vegas GP",     country:"USA",          city:"Las Vegas",
       circuit:"Las Vegas Strip Circuit",   date:"2026-11-21", laps:50, length:6.201, flag:"🇺🇸",
       trackType:"power",     preferredAeroMode:"X", drsZones:2, tireWear:"low",
       winner:null, status:"upcoming",
       desc:"Night race on the Strip. Extreme cold tires and massive straights create X-mode slipstream battles."
     },
     {
-      round:21, id:"QAT", name:"Qatar Grand Prix",         country:"Qatar",        city:"Lusail",
+      round:21, id:"QAT", name:"Qatar GP",         country:"Qatar",        city:"Lusail",
       circuit:"Lusail International Circuit",date:"2026-11-29", laps:57, length:5.380, flag:"🇶🇦",
       trackType:"balanced",  preferredAeroMode:"Z", drsZones:2, tireWear:"extreme",
       winner:null, status:"upcoming",
       desc:"Brutal tire degradation — the fastest tire-wear circuit on the calendar. Strategy defines every outcome."
     },
     {
-      round:22, id:"ABU", name:"Abu Dhabi Grand Prix",     country:"UAE",          city:"Abu Dhabi",
+      round:22, id:"ABU", name:"Abu Dhabi GP",     country:"UAE",          city:"Abu Dhabi",
       circuit:"Yas Marina Circuit",        date:"2026-12-06", laps:58, length:5.281, flag:"🇦🇪",
       trackType:"balanced",  preferredAeroMode:"X", drsZones:2, tireWear:"low",
       winner:null, status:"upcoming",

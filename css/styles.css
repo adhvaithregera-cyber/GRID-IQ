@@ -1113,7 +1113,7 @@ select, input { font-family: var(--font-body); }
     display: flex;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: var(--bottom-nav-h);
+    height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
     background: rgba(12,12,12,0.55);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -1871,14 +1871,97 @@ select, input { font-family: var(--font-body); }
   transform: translateY(-1px);
 }
 
-/* ── Payment note (coming soon) ── */
-.pro-payment-note {
-  font-size: 11px;
-  color: var(--text-2);
-  margin-bottom: 8px;
-  text-align: center;
+/* ── UPI payment block ── */
+.upi-pay-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 4px;
+  padding: 16px;
+  background: var(--bg-raised);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
 }
-.pro-payment-note.hidden { display: none; }
+.upi-amount-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.upi-amount {
+  font-family: var(--font-tech);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.upi-period {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-2);
+}
+.upi-qr {
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 6px;
+}
+.upi-id-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+.upi-id-val {
+  font-family: var(--font-tech);
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+.upi-copy-btn {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-tech);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.upi-instruct {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-2);
+  text-align: center;
+  line-height: 1.65;
+  margin: 0;
+}
+.upi-contact-btn {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.upi-contact-btn:hover { background: var(--accent-dim); }
+.upi-contact-btn.hidden { display: none; }
 
 /* ── Skip / maybe later ── */
 .pro-skip-btn {
@@ -2548,4 +2631,52 @@ select, input { font-family: var(--font-body); }
 
 @media (min-width: 768px) {
   .guide-teams-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Footer disclaimer ──────────────────────────────────── */
+#app-footer {
+  padding: 16px var(--content-pad) calc(16px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.footer-disclaimer {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modal-disclaimer-title {
+  font-family: var(--font-tech);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+.modal-disclaimer-body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.65;
+  margin: 0 0 10px;
+}
+.btn-disclaimer-accept {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-tech);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
