@@ -501,10 +501,20 @@ function runSimulation() {
   renderSimResults(results, track, weather);
 
   // Save AI pick keyed by race so user pick section can reference it
-  localStorage.setItem('gridiq_ai_pick_' + trackId, JSON.stringify({
+  const _aiPickData = {
     driverName: results[0].driver.firstName + ' ' + results[0].driver.lastName,
     driverLastName: results[0].driver.lastName,
-  }));
+  };
+  localStorage.setItem('gridiq_ai_pick_' + trackId, JSON.stringify(_aiPickData));
+
+  // Also update any existing user pick for this race that was locked in before the sim ran
+  const _allPicks = _getMyPicks();
+  if (_allPicks[trackId] && !_allPicks[trackId].aiPickLastName) {
+    _allPicks[trackId].aiPickName     = _aiPickData.driverName;
+    _allPicks[trackId].aiPickLastName = _aiPickData.driverLastName;
+    localStorage.setItem('gridiq_my_picks', JSON.stringify(_allPicks));
+    renderPickHistory();
+  }
 }
 
 function renderSimResults(results, track, weather) {
@@ -1392,6 +1402,16 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     init();
   }
+
+  // Inject disclaimer into every tab section
+  document.querySelectorAll('.section-scroll').forEach(function(scroll) {
+    const wrap = document.createElement('div');
+    wrap.className = 'section-disclaimer-wrap';
+    wrap.innerHTML = '<p class="footer-disclaimer">GridIQ is an unofficial fan application and is not associated in any way with the Formula 1 companies, Formula One Digital Media Limited, or the FIA. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>';
+    const spacer = scroll.querySelector('.spacer');
+    if (spacer) scroll.insertBefore(wrap, spacer);
+    else scroll.appendChild(wrap);
+  });
 
   // ── Android hardware back button (Capacitor) ────────────
   if (typeof window.Capacitor !== 'undefined' &&
