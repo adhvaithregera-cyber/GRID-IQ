@@ -24,17 +24,17 @@ import { getAuth, signInWithPopup, signInWithCredential, signOut as fbSignOut,
 import { getRemoteConfig, fetchAndActivate, getValue }           from 'firebase/remote-config';
 import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
 
-/* ── Config — values injected by Vite at build time ─────── */
+/* ── Config — injected from GitHub Secrets via Vite at build time ── */
 const FIREBASE_CONFIG = {
-  apiKey:            'AIzaSyDJ2DaKWEBANaF21kf5kdRL5BL89uPPPrM',
-  authDomain:        'grid-iq-520cb.firebaseapp.com',
-  projectId:         'grid-iq-520cb',
-  storageBucket:     'grid-iq-520cb.firebasestorage.app',
-  messagingSenderId: '862615362572',
-  appId:             '1:862615362572:web:22dfef581a971be0d16229',
-  measurementId:     'G-ZHCKH7LTRY',
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
-const RECAPTCHA_SITE_KEY = '';
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
 
 /* ── Rate limiting (email/password only) ─────────────────── */
 const _RL = { MAX: 5, LOCKOUT_MS: 10 * 60 * 1000 };
