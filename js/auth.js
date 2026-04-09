@@ -22,6 +22,7 @@ import { getAuth, signInWithPopup, signInWithCredential, signOut as fbSignOut,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
          signInWithPhoneNumber, RecaptchaVerifier }               from 'firebase/auth';
 import { getRemoteConfig, fetchAndActivate, getValue }           from 'firebase/remote-config';
+import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
 
 /* ── Config — values injected by Vite at build time ─────── */
 const FIREBASE_CONFIG = {
@@ -68,6 +69,7 @@ function _clearRateLimit() {
 
 /* ── Init ─────────────────────────────────────────────────── */
 let _auth               = null;
+let _db                 = null;
 let _emailMode          = 'signin';
 let _confirmationResult = null;
 let _recaptchaVerifier  = null;
@@ -84,6 +86,7 @@ function _getAuth() {
       });
     }
     _auth = getAuth(app);
+    _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     _fetchRemoteConfig(app);
     return _auth;
@@ -102,6 +105,47 @@ function _onAuthStateChanged(user) {
   if (user) {
     closeUserMenu();
     _clearRateLimit();
+    _syncUserWithFirestore(user);
+  } else {
+    // Clear Pro flags on sign-out
+    localStorage.removeItem('gridiq_pro');
+    localStorage.removeItem('gridiq_owner');
+    if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
+  }
+}
+
+/* ── Firestore: sync user doc & Pro status ────────────────── */
+async function _syncUserWithFirestore(user) {
+  if (!_db) return;
+  try {
+    const ref  = doc(_db, 'users', user.uid);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      // Sync Pro status granted via Firestore console
+      const data = snap.data();
+      if (data.isPro === true) {
+        localStorage.setItem('gridiq_pro', 'true');
+      } else {
+        localStorage.removeItem('gridiq_pro');
+      }
+    }
+
+    // Write / refresh user record so you can look users up by email in console
+    await setDoc(ref, {
+      email:       user.email       || '',
+      displayName: user.displayName || '',
+      lastSeen:    new Date().toISOString(),
+    }, { merge: true });
+
+    if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
+
+    // Owner auto-grant
+    if (typeof window.grantOwnerProIfMatch === 'function') {
+      await window.grantOwnerProIfMatch(user.email);
+    }
+  } catch (e) {
+    console.warn('[GridIQ] Firestore sync failed:', e.message);
   }
 }
 

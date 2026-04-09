@@ -40,26 +40,47 @@ function teamColor(constructorId) {
 }
 
 /* ─── NAVIGATION ─────────────────────────────────────────── */
-function switchTab(tab) {
-  if ((tab === 'fantasy' || tab === 'compare') && typeof isGridIQPro === 'function' && !isGridIQPro()) {
-    openProModal();
-    return;
-  }
-  if (STATE.activeTab === tab) return;
+const _VALID_TABS = ['home', 'predictor', 'fantasy', 'compare', 'more'];
+
+// Updates the DOM to show the given tab — no auth checks, no URL changes.
+function _activateTab(tab) {
+  if (!_VALID_TABS.includes(tab)) tab = 'home';
   STATE.activeTab = tab;
   document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
+  document.querySelectorAll('.bnav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
   document.getElementById('section-' + tab).classList.add('active');
-  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
-  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
-  // Close mobile hamburger menu
+  document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
+  document.querySelectorAll(`.bnav-btn[data-tab="${tab}"]`).forEach(b => { b.classList.add('active'); b.setAttribute('aria-current', 'page'); });
   document.getElementById('top-nav').classList.remove('nav-open');
   const hamburger = document.getElementById('nav-hamburger');
   if (hamburger) hamburger.textContent = '☰';
 }
 
+// Called by user clicks — updates hash (which drives history).
+function switchTab(tab) {
+  if (STATE.activeTab === tab) return;
+  _activateTab(tab);
+  if (tab === 'home') {
+    history.replaceState(null, '', location.pathname);
+  } else {
+    location.hash = tab;
+  }
+}
+
+// hashchange fires on browser back/forward AND when switchTab sets location.hash.
+// STATE.activeTab guard prevents double-activation from the latter.
+window.addEventListener('hashchange', function() {
+  const tab = location.hash.replace('#', '') || 'home';
+  if (!_VALID_TABS.includes(tab)) return;
+  if (STATE.activeTab === tab) return; // already active — came from switchTab click
+  _activateTab(tab);
+});
+
 document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
@@ -102,7 +123,7 @@ function renderHeroStats() {
 function getNextRace() {
   const now = new Date();
   const upcoming = GRIDIQ_DATABASE.races
-    .filter(r => new Date(r.date + 'T15:00:00Z') > now)
+    .filter(r => new Date(r.date + 'T13:00:00Z') > now)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
   return upcoming[0] || GRIDIQ_DATABASE.races[GRIDIQ_DATABASE.races.length - 1];
 }
@@ -161,7 +182,7 @@ function updateCountdown(race) {
   const els = document.querySelectorAll('.countdown-display');
   if (!els.length) return;
   const now = new Date();
-  const target = new Date(race.date + 'T15:00:00Z');
+  const target = new Date(race.date + 'T13:00:00Z');
   const diff = target - now;
 
   let html;
@@ -365,7 +386,7 @@ function runSimulation() {
   // Collect penalties
   const penalties = {};
   document.querySelectorAll('.pen-input').forEach(inp => {
-    const val = parseInt(inp.value) || 0;
+    const val = Math.min(20, Math.max(0, parseInt(inp.value) || 0));
     if (val > 0) penalties[inp.dataset.driver] = val;
   });
 
@@ -787,8 +808,6 @@ function renderGuideTeams() {
 function maybeShowWelcomeModal() {
   if (localStorage.getItem('gridiq_welcomed')) return;
   setTimeout(function() {
-    var proModal = document.getElementById('pro-modal');
-    if (proModal && !proModal.classList.contains('hidden')) return;
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.classList.remove('hidden');
     sessionStorage.setItem('gridiq_promo_shown', '1');
@@ -966,7 +985,11 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.style.opacity = '1';
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+  clearTimeout(toast._r);
+  toast._t = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast._r = setTimeout(() => { toast.remove(); }, 300);
+  }, 2500);
 }
 
 /* ─── HEAD-TO-HEAD COMPARE ───────────────────────────────── */
@@ -1152,6 +1175,9 @@ function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  // ── Nav logo → home ─────────────────────────────────────
+  document.getElementById('nav-logo')?.addEventListener('click', () => switchTab('home'));
+
   // ── View Season Calendar button ─────────────────────────
   document.querySelectorAll('.btn-view-calendar').forEach(calBtn => calBtn.addEventListener('click', () => {
     switchTab('more');
@@ -1163,11 +1189,6 @@ function init() {
     document.getElementById('guide-calendar')?.classList.add('active');
     document.querySelector('[data-target="guide-calendar"]')?.classList.add('active');
   }));
-
-  // ── Bottom nav tab buttons ──────────────────────────────
-  document.querySelectorAll('.bnav-btn[data-tab]').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
 
   // ── Hamburger menu toggle ───────────────────────────────
   const hamburger = document.getElementById('nav-hamburger');
@@ -1210,4 +1231,19 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     init();
   }
+
+  // ── Android hardware back button (Capacitor) ────────────
+  if (typeof window.Capacitor !== 'undefined' &&
+      window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', function() {
+      const authModal   = document.getElementById('auth-modal');
+      const customModal = document.getElementById('custom-modal');
+      if (authModal   && !authModal.classList.contains('hidden'))   { closeAuthModal(); return; }
+      if (customModal && !customModal.classList.contains('hidden'))  { closeModal();     return; }
+      if (STATE.activeTab !== 'home') { switchTab('home'); return; }
+      window.Capacitor.Plugins.App.exitApp();
+    });
+  }
 });
+
+window.showToast = showToast;

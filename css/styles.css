@@ -1584,6 +1584,12 @@ select, input { font-family: var(--font-body); }
   line-height: 1.6;
   text-align: center;
 }
+.auth-terms-link {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.auth-terms-link:hover { color: var(--text); }
 
 /* ── Auth modal: multi-view system ── */
 .auth-view.hidden { display: none; }

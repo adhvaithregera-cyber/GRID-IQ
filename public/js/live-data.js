@@ -57,7 +57,10 @@ function applyConstructorStandings(data) {
   list.forEach(function(entry) {
     var jolpicaId = entry.Constructor && entry.Constructor.constructorId;
     var ctor = GRIDIQ_DATABASE.constructors.find(function(c) { return c.id === mapCtor(jolpicaId); });
-    if (!ctor) return;
+    if (!ctor) {
+      console.warn('GridIQ live-data: unknown constructor ID:', jolpicaId);
+      return;
+    }
     ctor.points = parseInt(entry.points, 10) || ctor.points;
   });
 }
@@ -128,12 +131,19 @@ window.applyLiveData = function() {
     var rRes = results[2];
     var ok   = false;
 
-    if (dRes.status === 'fulfilled') { applyDriverStandings(dRes.value);     ok = true; }
-    if (cRes.status === 'fulfilled') { applyConstructorStandings(cRes.value); ok = true; }
-    if (rRes.status === 'fulfilled') { applyRaceResults(rRes.value);          ok = true; }
+    if (dRes.status === 'fulfilled') { applyDriverStandings(dRes.value);      ok = true; }
+    else { console.warn('GridIQ live-data: driver standings failed', dRes.reason); }
 
-    /* LIVE badge removed */
-  }).catch(function() {
-    /* Swallow any unexpected error so init() always runs */
+    if (cRes.status === 'fulfilled') { applyConstructorStandings(cRes.value); ok = true; }
+    else { console.warn('GridIQ live-data: constructor standings failed', cRes.reason); }
+
+    if (rRes.status === 'fulfilled') { applyRaceResults(rRes.value);          ok = true; }
+    else { console.warn('GridIQ live-data: race results failed', rRes.reason); }
+
+    if (!ok && typeof window.showToast === 'function') {
+      window.showToast('Live data unavailable — showing cached standings');
+    }
+  }).catch(function(err) {
+    console.warn('GridIQ live-data: unexpected error', err);
   });
 };
