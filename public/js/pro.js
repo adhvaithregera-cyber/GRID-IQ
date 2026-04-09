@@ -2,45 +2,54 @@
    GridIQ — PRO Subscription  |  pro.js
 
    ── CONFIG ──────────────────────────────────────────────────
-   PAYMENT_LINK_* — paste your Razorpay / Gumroad link here
-   LAUNCH_DATE    — set to launch date to activate promo codes
+   UPI_ID       — your UPI address (e.g. yourname@upi)
+   CONTACT_EMAIL — email users send payment proof to
    ── ─────────────────────────────────────────────────────── */
 
-/* ── Owner config ───────────────────────────────────────── */
-var OWNER_EMAILS = [
-  'adhvaith.regera@gmail.com'
-];
+/* ── Owner config (SHA-256 of owner email — never store plaintext) ── */
+var OWNER_EMAIL_HASH = '3f3f6c85347fa6ca01e2601e1ba6bbe4bbb33652e39f12bd460073bdb0d7d136';
+
+/* ── UPI payment config ─────────────────────────────────── */
+var UPI_ID        = 'adhvaith.regera@oksbi';
+var UPI_NAME      = 'GridIQ';
+var UPI_AMOUNT    = '199';
+var CONTACT_EMAIL = 'gridiq.app@gmail.com';
 
 /* ── PRO features list (shown in upgrade modal) ─────────── */
 var PRO_FEATURES = [
-  { label: 'Fantasy Team Builder',   desc: '5 drivers + 2 constructors, budget cap & PPM rankings', live: true  },
-  { label: 'H2H Driver Comparison',  desc: 'Radar chart comparing any two drivers across 5 axes',   live: true  },
-  { label: 'Driver Form Index',      desc: 'Hot/cold streak indicator based on recent race results', live: false },
-  { label: 'More features this season', desc: 'New PRO tools added throughout the 2026 F1 season',  live: false },
+  { label: 'Fantasy Team Builder',      desc: '5 drivers + 2 constructors, budget cap & PPM rankings', live: true  },
+  { label: 'H2H Driver Comparison',     desc: 'Radar chart comparing any two drivers across 5 axes',   live: true  },
+  { label: 'Driver Form Index',         desc: 'Hot/cold streak indicator based on recent race results', live: false },
+  { label: 'More features this season', desc: 'New PRO tools added throughout the 2026 season',        live: false },
 ];
 
 /* ── Beta & trial config ────────────────────────────────── */
 var BETA_END_DATE = '2026-11-30';
 var TRIAL_DAYS    = 3;
 
-/* ── Launch config ──────────────────────────────────────── */
-var LAUNCH_DATE     = null;
+/* ─────────────────────────────────────────────────────────
+   UPI
+───────────────────────────────────────────────────────── */
+function _getUpiQrUrl() {
+  var upiString = 'upi://pay?pa=' + encodeURIComponent(UPI_ID) +
+    '&pn=' + encodeURIComponent(UPI_NAME) +
+    '&am=' + UPI_AMOUNT +
+    '&cu=INR' +
+    '&tn=' + encodeURIComponent('GridIQ Pro Subscription');
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(upiString);
+}
 
-/* ── Payment link config ────────────────────────────────── */
-var PAYMENT_LINK_GLOBAL = 'PASTE_PAYMENT_LINK_HERE';
-var PAYMENT_LINK_INDIA  = 'PASTE_PAYMENT_LINK_HERE';
+function _getContactMailto() {
+  var subject = encodeURIComponent('GridIQ Pro Payment');
+  var body = encodeURIComponent('UPI Transaction ID / UTR:\nAccount email I signed in with:\n');
+  return 'mailto:' + CONTACT_EMAIL + '?subject=' + subject + '&body=' + body;
+}
 
 /* ─────────────────────────────────────────────────────────
    PRO STATUS
 ───────────────────────────────────────────────────────── */
 function isGridIQPro() {
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
-  // owner/paid flags are only trustworthy when the user is signed in
-  // (auth.js strips them on sign-out and syncs them from Firestore on sign-in)
-  var signedIn = typeof firebase !== 'undefined'
-    ? false // legacy guard — unused
-    : !!(window._gridiqAuthUser);
-  // window._gridiqAuthUser is set by auth.js when Firebase confirms the session
   if (window._gridiqAuthUser) {
     if (localStorage.getItem('gridiq_owner') === 'true') return true;
     if (localStorage.getItem('gridiq_pro') === 'true') return true;
@@ -48,7 +57,6 @@ function isGridIQPro() {
   return _isOnActiveTrial();
 }
 
-/* Trial is only active if the user explicitly started it */
 function _isOnActiveTrial() {
   if (new Date() > new Date(BETA_END_DATE)) return false;
   var ts = localStorage.getItem('gridiq_trial_start');
@@ -68,7 +76,21 @@ function getTrialDaysLeft() {
   return Math.max(0, left);
 }
 
-/* True if the user can still opt into a trial */
+function getTrialTimeLeft() {
+  var ts = localStorage.getItem('gridiq_trial_start');
+  if (!ts) return '';
+  var msLeft = TRIAL_DAYS * 86400000 - (Date.now() - parseInt(ts, 10));
+  if (msLeft <= 0) return '0';
+  var totalSec = Math.floor(msLeft / 1000);
+  var d = Math.floor(totalSec / 86400);
+  var h = Math.floor((totalSec % 86400) / 3600);
+  var m = Math.floor((totalSec % 3600) / 60);
+  var s = totalSec % 60;
+  if (d > 0) return d + 'D ' + h + 'H';
+  if (h > 0) return h + 'H ' + (m < 10 ? '0' : '') + m + 'M';
+  return m + 'M ' + (s < 10 ? '0' : '') + s + 'S';
+}
+
 function trialAvailable() {
   if (!window._gridiqAuthUser) return false;
   if (localStorage.getItem('gridiq_pro') === 'true') return false;
@@ -76,7 +98,6 @@ function trialAvailable() {
   return !localStorage.getItem('gridiq_trial_start');
 }
 
-/* Called when user clicks "Start free trial" in the modal */
 function startTrial() {
   if (!window._gridiqAuthUser) { openAuthModal(); return; }
   if (localStorage.getItem('gridiq_trial_start')) return;
@@ -87,62 +108,24 @@ function startTrial() {
 }
 
 /* ── Owner auto-grant (called from auth.js on sign-in) ──── */
-/* Returns true if the signed-in email is an owner, so auth.js
-   can also write the status to Firestore. */
-function grantOwnerProIfMatch(email) {
+async function grantOwnerProIfMatch(email) {
   if (!email) return false;
-  if (OWNER_EMAILS.indexOf(email) !== -1) {
-    localStorage.setItem('gridiq_pro', 'true');
-    localStorage.setItem('gridiq_owner', 'true');
-    localStorage.removeItem('gridiq_trial_start');
-    updateProNavBadge();
-    return true;
-  }
+  try {
+    var msgBuf  = new TextEncoder().encode(email.trim().toLowerCase());
+    var hashBuf = await crypto.subtle.digest('SHA-256', msgBuf);
+    var hashHex = Array.from(new Uint8Array(hashBuf))
+      .map(function(b) { return b.toString(16).padStart(2, '0'); })
+      .join('');
+    if (hashHex === OWNER_EMAIL_HASH) {
+      localStorage.setItem('gridiq_pro', 'true');
+      localStorage.setItem('gridiq_owner', 'true');
+      localStorage.removeItem('gridiq_trial_start');
+      updateProNavBadge();
+      return true;
+    }
+  } catch (_) {}
   return false;
 }
-
-
-/* ─────────────────────────────────────────────────────────
-   PAYMENT LINKS
-───────────────────────────────────────────────────────── */
-function _isIndia() {
-  var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return tz.indexOf('Calcutta') !== -1 || tz.indexOf('Kolkata') !== -1;
-}
-
-function getProPrice() {
-  return _isIndia() ? '₹199 / month' : '$1.99 / month';
-}
-
-function getPaymentLink() {
-  var base = _isIndia() ? PAYMENT_LINK_INDIA : PAYMENT_LINK_GLOBAL;
-  if (base.indexOf('PASTE_') === 0) return null;
-  var successUrl = encodeURIComponent(location.origin + location.pathname + '?pro=1');
-  return base + (base.indexOf('?') === -1 ? '?' : '&') + 'success_url=' + successUrl;
-}
-
-function handleUpgradeClick() {
-  var link = getPaymentLink();
-  if (!link) {
-    var el = document.getElementById('pro-payment-note');
-    if (el) { el.textContent = 'Payment coming soon — check back shortly!'; el.classList.remove('hidden'); }
-    return;
-  }
-  window.open(link, '_blank');
-}
-
-/* ── Detect payment success redirect (?pro=1) ───────────── */
-/* NOTE: We do NOT set localStorage here. PRO status is authoritative
-   in Firestore. After a real payment, the provider's webhook writes
-   isPro:true to Firestore, and _syncProFromFirestore (auth.js) grants
-   the flag on the next sign-in. Setting it client-side from a URL
-   param would allow any user to self-grant PRO by visiting ?pro=1. */
-(function detectProRedirect() {
-  if (new URLSearchParams(location.search).get('pro') === '1') {
-    history.replaceState({}, '', location.pathname);
-    window._proJustUnlocked = true;
-  }
-})();
 
 /* ─────────────────────────────────────────────────────────
    PRO MODAL
@@ -153,7 +136,6 @@ function openProModal() {
   var modal = document.getElementById('pro-modal');
   if (!modal) return;
 
-  // Dismiss welcome modal so they don't stack
   var welcomeModal = document.getElementById('welcome-modal');
   if (welcomeModal) welcomeModal.classList.add('hidden');
 
@@ -168,11 +150,26 @@ function openProModal() {
     }).join('');
   }
 
-  // Locale price
-  var priceEl = document.getElementById('pro-price-display');
-  if (priceEl) priceEl.textContent = getProPrice();
+  // UPI QR code
+  var qrImg = document.getElementById('upi-qr-img');
+  if (qrImg && UPI_ID.indexOf('PASTE_') !== 0) qrImg.src = _getUpiQrUrl();
 
-  // Trial section — shown only when trial is still available; reset button lock
+  // UPI ID display
+  var upiDisplay = document.getElementById('upi-id-display');
+  if (upiDisplay) upiDisplay.textContent = UPI_ID.indexOf('PASTE_') === 0 ? 'Coming soon' : UPI_ID;
+
+  // Contact email link
+  var contactLink = document.getElementById('upi-contact-link');
+  if (contactLink) {
+    if (CONTACT_EMAIL.indexOf('PASTE_') === 0) {
+      contactLink.classList.add('hidden');
+    } else {
+      contactLink.href = _getContactMailto();
+      contactLink.classList.remove('hidden');
+    }
+  }
+
+  // Trial section
   var trialSection = document.getElementById('pro-trial-section');
   if (trialSection) trialSection.classList.toggle('hidden', !trialAvailable());
   var trialStartBtn = document.getElementById('pro-trial-start-btn');
@@ -190,31 +187,39 @@ function closeProModal() {
    NAV BADGE
 ───────────────────────────────────────────────────────── */
 function updateProNavBadge() {
+  var loggedIn = !!window._gridiqAuthUser;
+  var isPro    = isGridIQPro();
+  var onTrial  = isOnTrial();
+
   var badge = document.getElementById('pro-nav-btn');
   if (badge) {
-    if (localStorage.getItem('gridiq_pro') === 'true' ||
-        location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    if (!loggedIn) {
+      badge.className = 'pro-nav-badge hidden';
+    } else if (isPro) {
       badge.className = 'pro-nav-badge pro-nav-badge--active';
       badge.innerHTML = '&#9733; PRO';
-      badge.onclick = null;
-      badge.style.cursor = 'default';
-    } else if (isOnTrial()) {
-      var days = getTrialDaysLeft();
+    } else if (onTrial) {
       badge.className = 'pro-nav-badge pro-nav-badge--trial';
-      badge.innerHTML = '&#9733; TRIAL &bull; ' + days + 'D LEFT';
-      badge.onclick = openProModal;
-      badge.style.cursor = 'pointer';
+      badge.innerHTML = '&#9733; TRIAL &bull; ' + getTrialTimeLeft() + ' LEFT';
+    } else {
+      badge.className = 'pro-nav-badge';
+      badge.innerHTML = '&#9733; GO PRO';
     }
   }
 
   var bnavBtn = document.getElementById('bnav-pro-btn');
   if (bnavBtn) {
-    if (localStorage.getItem('gridiq_pro') === 'true' ||
-        location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      bnavBtn.classList.add('bnav-pro-btn--active');
+    if (!loggedIn) {
+      bnavBtn.className = 'bnav-pro-btn hidden';
+    } else if (isPro) {
+      bnavBtn.className = 'bnav-pro-btn bnav-pro-btn--active';
       bnavBtn.querySelector('.bnav-lbl').textContent = 'PRO ★';
-    } else if (isOnTrial()) {
-      bnavBtn.querySelector('.bnav-lbl').textContent = 'TRIAL';
+    } else if (onTrial) {
+      bnavBtn.className = 'bnav-pro-btn';
+      bnavBtn.querySelector('.bnav-lbl').textContent = getTrialTimeLeft();
+    } else {
+      bnavBtn.className = 'bnav-pro-btn';
+      bnavBtn.querySelector('.bnav-lbl').textContent = 'GO PRO';
     }
   }
 }
@@ -239,11 +244,8 @@ function showProSuccessToast(msg) {
 ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   updateProNavBadge();
-  if (window._proJustUnlocked) {
-    showProSuccessToast();
-  }
+  if (window._proJustUnlocked) showProSuccessToast();
 
-  /* ── Pro modal event listeners (replaces inline onclick= attrs) ── */
   var proNavBtn = document.getElementById('pro-nav-btn');
   if (proNavBtn) proNavBtn.addEventListener('click', function() {
     if (isGridIQPro()) return;
@@ -265,8 +267,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (proCloseBtn) proCloseBtn.addEventListener('click', closeProModal);
   }
 
-  var upgradeBtn = document.querySelector('.pro-upgrade-btn');
-  if (upgradeBtn) upgradeBtn.addEventListener('click', handleUpgradeClick);
+  // UPI copy button
+  var copyBtn = document.getElementById('upi-copy-btn');
+  if (copyBtn) copyBtn.addEventListener('click', function() {
+    if (UPI_ID.indexOf('PASTE_') === 0) return;
+    navigator.clipboard.writeText(UPI_ID).then(function() {
+      copyBtn.textContent = 'COPIED!';
+      setTimeout(function() { copyBtn.textContent = 'COPY'; }, 2000);
+    });
+  });
 
   var igFollowBtn = document.getElementById('pro-ig-follow-btn');
   if (igFollowBtn) igFollowBtn.addEventListener('click', function() {
@@ -279,6 +288,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var skipBtn = document.querySelector('.pro-skip-btn');
   if (skipBtn) skipBtn.addEventListener('click', closeProModal);
+
+  // Live countdown ticker — runs every second while trial is active
+  if (isOnTrial()) {
+    var _trialTicker = setInterval(function() {
+      if (!isOnTrial()) {
+        clearInterval(_trialTicker);
+        updateProNavBadge();
+        if (typeof STATE !== 'undefined' &&
+            (STATE.activeTab === 'fantasy' || STATE.activeTab === 'compare')) {
+          if (typeof switchTab === 'function') switchTab('home');
+        }
+        showProSuccessToast('Your free trial has ended — upgrade to keep full access.');
+        return;
+      }
+      updateProNavBadge();
+    }, 1000);
+    window.addEventListener('beforeunload', function() { clearInterval(_trialTicker); });
+  }
 });
 
 /* ─────────────────────────────────────────────────────────
@@ -291,6 +318,5 @@ window.getTrialDaysLeft     = getTrialDaysLeft;
 window.startTrial           = startTrial;
 window.openProModal         = openProModal;
 window.closeProModal        = closeProModal;
-window.handleUpgradeClick   = handleUpgradeClick;
+window.updateProNavBadge    = updateProNavBadge;
 window.grantOwnerProIfMatch = grantOwnerProIfMatch;
-window.getPaymentLink       = getPaymentLink;
