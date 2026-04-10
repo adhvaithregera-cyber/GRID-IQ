@@ -15,7 +15,20 @@
       "Bash(find /c/Users/Adhvaith -name posthog*)",
       "Bash(curl -s \"https://adhvaithregera-cyber.github.io/GRID-IQ/\")",
       "Bash(npm install:*)",
-      "Bash(npx cap:*)"
+      "Bash(npx cap:*)",
+      "Bash(./gradlew dependencies:*)",
+      "Bash(java -version)",
+      "Bash(where java:*)",
+      "Read(//c/Program Files/Android/Android Studio/jbr/bin/**)",
+      "Bash(\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\\\\bin\\\\java.exe\" -version 2>&1)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\" ./gradlew dependencies --configuration releaseRuntimeClasspath)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\" ./gradlew :app:dependencies --configuration releaseRuntimeClasspath)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\" ./gradlew assembleDebug)",
+      "Bash(xargs -I {} cat {})",
+      "Bash(sed -n '70,85p' \"C:/Users/Adhvaith/OneDrive/Desktop/Grid IQ/android/app/src/main/assets/public/index.html\")",
+      "Bash(sed -n '120,200p' \"C:/Users/Adhvaith/OneDrive/Desktop/Grid IQ/android/app/src/main/assets/public/index.html\")",
+      "Bash(grep:*)",
+      "Bash(wc:*)"
     ]
   }
 }

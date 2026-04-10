@@ -1,9 +1,0 @@
-{
-  "name": "gridiq-functions",
-  "version": "1.0.0",
-  "engines": { "node": "20" },
-  "main": "index.js",
-  "dependencies": {
-    "firebase-functions": "^6.0.0"
-  }
-}
