@@ -86,10 +86,6 @@ function _getAuth() {
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     _fetchRemoteConfig(app);
-    // Handle redirect result on mobile after returning from OAuth
-    if (_isMobile) getRedirectResult(_auth)
-      .then(result => { if (result?.user) _onAuthStateChanged(result.user); })
-      .catch(e => console.warn('[GridIQ] Redirect sign-in error:', e.message));
     return _auth;
   } catch (e) {
     console.warn('[GridIQ auth] Firebase init failed:', e.message);
@@ -222,8 +218,14 @@ function authSignInGoogle() {
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
-  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
-  else           signInWithPopup(auth, provider).catch(_handleAuthError);
+  signInWithPopup(auth, provider).catch(e => {
+    if (e.code === 'auth/popup-blocked') {
+      authSetEmailMode('signin');
+      authShowEmailView();
+    } else {
+      _handleAuthError(e);
+    }
+  });
 }
 
 function authSignInGitHub() {
@@ -231,8 +233,14 @@ function authSignInGitHub() {
   if (!auth) return;
   const provider = new GithubAuthProvider();
   provider.addScope('user:email');
-  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
-  else           signInWithPopup(auth, provider).catch(_handleAuthError);
+  signInWithPopup(auth, provider).catch(e => {
+    if (e.code === 'auth/popup-blocked') {
+      authSetEmailMode('signin');
+      authShowEmailView();
+    } else {
+      _handleAuthError(e);
+    }
+  });
 }
 
 function authSignOut() {
