@@ -24,17 +24,8 @@ import { getAuth, signInWithPopup, signInWithCredential, signOut as fbSignOut,
 import { getRemoteConfig, fetchAndActivate, getValue }           from 'firebase/remote-config';
 import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
 
-/* ── Config — injected from GitHub Secrets via Vite at build time ── */
-const FIREBASE_CONFIG = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
+/* ── Config — fetched from backend Cloud Function, never hardcoded ── */
+const _CONFIG_URL = 'https://us-central1-grid-iq-520cb.cloudfunctions.net/getConfig';
 
 /* ── Rate limiting (email/password only) ─────────────────── */
 const _RL = { MAX: 5, LOCKOUT_MS: 10 * 60 * 1000 };
@@ -75,26 +66,21 @@ let _confirmationResult = null;
 let _recaptchaVerifier  = null;
 
 function _getAuth() {
-  if (_auth) return _auth;
-  try {
-    const app = initializeApp(FIREBASE_CONFIG);
+  return _auth;
+}
+
+// Fetch config from backend and initialize Firebase immediately on module load
+fetch(_CONFIG_URL)
+  .then(r => r.json())
+  .then(cfg => {
+    const app = initializeApp(cfg);
     try { getAnalytics(app); } catch (_) {}
-    if (RECAPTCHA_SITE_KEY && RECAPTCHA_SITE_KEY !== 'PASTE_RECAPTCHA_V3_SITE_KEY_HERE') {
-      initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
-        isTokenAutoRefreshEnabled: true
-      });
-    }
     _auth = getAuth(app);
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     _fetchRemoteConfig(app);
-    return _auth;
-  } catch (e) {
-    console.warn('[GridIQ auth] Firebase init failed:', e.message);
-    return null;
-  }
-}
+  })
+  .catch(e => console.warn('[GridIQ] Config fetch failed — auth unavailable:', e.message));
 
 /* ── Auth state listener ──────────────────────────────────── */
 function _onAuthStateChanged(user) {
@@ -551,7 +537,6 @@ function _bindUIEvents() {
 }
 
 /* ── Kick off auth state on load ─────────────────────────── */
-_getAuth();
 _renderAuthBtn(null);
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _bindUIEvents);

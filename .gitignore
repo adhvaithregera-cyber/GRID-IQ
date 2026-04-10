@@ -6,3 +6,4 @@ dist/
 # Firebase — contains API keys, never commit
 android/app/google-services.json
 GoogleService-Info.plist
+functions/.env
