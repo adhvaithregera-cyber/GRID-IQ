@@ -24,8 +24,17 @@ import { getAuth, signInWithPopup, signInWithCredential, signOut as fbSignOut,
 import { getRemoteConfig, fetchAndActivate, getValue }           from 'firebase/remote-config';
 import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
 
-/* ── Config — fetched from backend Cloud Function, never hardcoded ── */
-const _CONFIG_URL = 'https://gridiq-config.gridiqapp.workers.dev';
+/* ── Firebase client config (safe to be public — keys only identify the project,
+      security enforced by Firestore rules + authorized domains in Firebase console) ── */
+const FIREBASE_CONFIG = {
+  apiKey:            'AIzaSyDJ2DaKWEBANaF21kf5kdRL5BL89uPPPrM',
+  authDomain:        'grid-iq-520cb.firebaseapp.com',
+  projectId:         'grid-iq-520cb',
+  storageBucket:     'grid-iq-520cb.firebasestorage.app',
+  messagingSenderId: '862615362572',
+  appId:             '1:862615362572:web:22dfef581a971be0d16229',
+  measurementId:     'G-ZHCKH7LTRY',
+};
 
 /* ── Rate limiting (email/password only) ─────────────────── */
 const _RL = { MAX: 5, LOCKOUT_MS: 10 * 60 * 1000 };
@@ -66,21 +75,20 @@ let _confirmationResult = null;
 let _recaptchaVerifier  = null;
 
 function _getAuth() {
-  return _auth;
-}
-
-// Fetch config from backend and initialize Firebase immediately on module load
-fetch(_CONFIG_URL)
-  .then(r => r.json())
-  .then(cfg => {
-    const app = initializeApp(cfg);
+  if (_auth) return _auth;
+  try {
+    const app = initializeApp(FIREBASE_CONFIG);
     try { getAnalytics(app); } catch (_) {}
     _auth = getAuth(app);
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     _fetchRemoteConfig(app);
-  })
-  .catch(e => console.warn('[GridIQ] Config fetch failed — auth unavailable:', e.message));
+    return _auth;
+  } catch (e) {
+    console.warn('[GridIQ auth] Firebase init failed:', e.message);
+    return null;
+  }
+}
 
 /* ── Auth state listener ──────────────────────────────────── */
 function _onAuthStateChanged(user) {
@@ -537,6 +545,7 @@ function _bindUIEvents() {
 }
 
 /* ── Kick off auth state on load ─────────────────────────── */
+_getAuth();
 _renderAuthBtn(null);
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _bindUIEvents);
