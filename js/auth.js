@@ -16,7 +16,7 @@
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
-import { getAuth, signInWithPopup,
+import { getAuth, signInWithPopup, browserPopupRedirectResolver,
          signInWithCredential, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
@@ -218,7 +218,7 @@ function authSignInGoogle() {
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
-  signInWithPopup(auth, provider).catch(_handleAuthError);
+  signInWithPopup(auth, provider, browserPopupRedirectResolver).catch(_handleAuthError);
 }
 
 function authSignInGitHub() {
@@ -226,7 +226,7 @@ function authSignInGitHub() {
   if (!auth) return;
   const provider = new GithubAuthProvider();
   provider.addScope('user:email');
-  signInWithPopup(auth, provider).catch(_handleAuthError);
+  signInWithPopup(auth, provider, browserPopupRedirectResolver).catch(_handleAuthError);
 }
 
 function authSignOut() {
