@@ -16,8 +16,7 @@
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
-import { initializeAuth, browserLocalPersistence,
-         signInWithPopup, signInWithRedirect, getRedirectResult,
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult,
          signInWithCredential, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
@@ -83,7 +82,7 @@ function _getAuth() {
   try {
     const app = initializeApp(FIREBASE_CONFIG);
     try { getAnalytics(app); } catch (_) {}
-    _auth = initializeAuth(app, { persistence: browserLocalPersistence });
+    _auth = getAuth(app);
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     // On mobile, handle any pending redirect sign-in from a previous page load
