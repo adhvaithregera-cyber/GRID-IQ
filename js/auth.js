@@ -457,9 +457,14 @@ function openAuthModal() {
   const m = document.getElementById('auth-modal');
   if (!m) return;
   m.classList.remove('hidden');
-  // Google Sign-In now works on Android via the native FirebaseBridgePlugin,
-  // so always show the main view with the Google button.
-  authShowMainView();
+  // On mobile, OAuth popups fail due to browser sessionStorage partitioning.
+  // Go straight to email sign-in which always works reliably.
+  if (_isMobile) {
+    authSetEmailMode('signin');
+    authShowEmailView();
+  } else {
+    authShowMainView();
+  }
 }
 
 function closeAuthModal() {
