@@ -16,7 +16,8 @@
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult,
+import { initializeAuth, browserLocalPersistence,
+         signInWithPopup, signInWithRedirect, getRedirectResult,
          signInWithCredential, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
@@ -82,9 +83,13 @@ function _getAuth() {
   try {
     const app = initializeApp(FIREBASE_CONFIG);
     try { getAnalytics(app); } catch (_) {}
-    _auth = getAuth(app);
+    _auth = initializeAuth(app, { persistence: browserLocalPersistence });
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
+    // On mobile, handle any pending redirect sign-in from a previous page load
+    if (_isMobile) getRedirectResult(_auth)
+      .then(result => { if (result?.user) _onAuthStateChanged(result.user); })
+      .catch(e => console.warn('[GridIQ] Redirect result:', e.message));
     _fetchRemoteConfig(app);
     return _auth;
   } catch (e) {
@@ -114,13 +119,18 @@ function _onAuthStateChanged(user) {
 
 /* ── Firestore: sync user doc & Pro status ────────────────── */
 async function _syncUserWithFirestore(user) {
+  // Owner auto-grant always runs first, regardless of Firestore
+  if (typeof window.grantOwnerProIfMatch === 'function') {
+    await window.grantOwnerProIfMatch(user.email);
+  }
+
   if (!_db) return;
   try {
     const ref  = doc(_db, 'users', user.uid);
     const snap = await getDoc(ref);
 
-    // Set in-memory PRO flags — never touch localStorage for PRO status
-    if (typeof window._setGridIQProVerified === 'function') {
+    // Set in-memory PRO flags from Firestore (owner grant above takes precedence)
+    if (typeof window._setGridIQProVerified === 'function' && !window.isGridIQPro()) {
       if (snap.exists()) {
         const data = snap.data();
         window._setGridIQProVerified(data.isPro === true, data.isOwner === true);
@@ -137,11 +147,6 @@ async function _syncUserWithFirestore(user) {
     }, { merge: true });
 
     if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
-
-    // Owner auto-grant via SHA-256 (sets memory flags, not localStorage)
-    if (typeof window.grantOwnerProIfMatch === 'function') {
-      await window.grantOwnerProIfMatch(user.email);
-    }
   } catch (e) {
     console.warn('[GridIQ] Firestore sync failed:', e.message);
   }
@@ -218,14 +223,8 @@ function authSignInGoogle() {
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
-  signInWithPopup(auth, provider).catch(e => {
-    if (e.code === 'auth/popup-blocked') {
-      authSetEmailMode('signin');
-      authShowEmailView();
-    } else {
-      _handleAuthError(e);
-    }
-  });
+  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
+  else           signInWithPopup(auth, provider).catch(_handleAuthError);
 }
 
 function authSignInGitHub() {
@@ -233,14 +232,8 @@ function authSignInGitHub() {
   if (!auth) return;
   const provider = new GithubAuthProvider();
   provider.addScope('user:email');
-  signInWithPopup(auth, provider).catch(e => {
-    if (e.code === 'auth/popup-blocked') {
-      authSetEmailMode('signin');
-      authShowEmailView();
-    } else {
-      _handleAuthError(e);
-    }
-  });
+  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
+  else           signInWithPopup(auth, provider).catch(_handleAuthError);
 }
 
 function authSignOut() {
@@ -457,14 +450,7 @@ function openAuthModal() {
   const m = document.getElementById('auth-modal');
   if (!m) return;
   m.classList.remove('hidden');
-  // On mobile, OAuth popups fail due to browser sessionStorage partitioning.
-  // Go straight to email sign-in which always works reliably.
-  if (_isMobile) {
-    authSetEmailMode('signin');
-    authShowEmailView();
-  } else {
-    authShowMainView();
-  }
+  authShowMainView();
 }
 
 function closeAuthModal() {
