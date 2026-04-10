@@ -16,7 +16,7 @@
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult,
+import { getAuth, signInWithPopup,
          signInWithCredential, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
@@ -85,10 +85,6 @@ function _getAuth() {
     _auth = getAuth(app);
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
-    // On mobile, handle any pending redirect sign-in from a previous page load
-    if (_isMobile) getRedirectResult(_auth)
-      .then(result => { if (result?.user) _onAuthStateChanged(result.user); })
-      .catch(e => console.warn('[GridIQ] Redirect result:', e.message));
     _fetchRemoteConfig(app);
     return _auth;
   } catch (e) {
@@ -222,8 +218,7 @@ function authSignInGoogle() {
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
-  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
-  else           signInWithPopup(auth, provider).catch(_handleAuthError);
+  signInWithPopup(auth, provider).catch(_handleAuthError);
 }
 
 function authSignInGitHub() {
@@ -231,8 +226,7 @@ function authSignInGitHub() {
   if (!auth) return;
   const provider = new GithubAuthProvider();
   provider.addScope('user:email');
-  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
-  else           signInWithPopup(auth, provider).catch(_handleAuthError);
+  signInWithPopup(auth, provider).catch(_handleAuthError);
 }
 
 function authSignOut() {
