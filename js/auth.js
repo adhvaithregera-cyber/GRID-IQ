@@ -16,7 +16,8 @@
 import { initializeApp }                                          from 'firebase/app';
 import { getAnalytics }                                           from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider }               from 'firebase/app-check';
-import { getAuth, signInWithPopup, signInWithCredential, signOut as fbSignOut,
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult,
+         signInWithCredential, signOut as fbSignOut,
          onAuthStateChanged,
          GoogleAuthProvider, GithubAuthProvider,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -74,6 +75,8 @@ let _emailMode          = 'signin';
 let _confirmationResult = null;
 let _recaptchaVerifier  = null;
 
+const _isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 function _getAuth() {
   if (_auth) return _auth;
   try {
@@ -83,6 +86,8 @@ function _getAuth() {
     _db   = getFirestore(app);
     onAuthStateChanged(_auth, _onAuthStateChanged);
     _fetchRemoteConfig(app);
+    // Handle redirect result on mobile after returning from OAuth
+    if (_isMobile) getRedirectResult(_auth).catch(() => {});
     return _auth;
   } catch (e) {
     console.warn('[GridIQ auth] Firebase init failed:', e.message);
@@ -215,7 +220,8 @@ function authSignInGoogle() {
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
-  signInWithPopup(auth, provider).catch(_handleAuthError);
+  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
+  else           signInWithPopup(auth, provider).catch(_handleAuthError);
 }
 
 function authSignInGitHub() {
@@ -223,7 +229,8 @@ function authSignInGitHub() {
   if (!auth) return;
   const provider = new GithubAuthProvider();
   provider.addScope('user:email');
-  signInWithPopup(auth, provider).catch(_handleAuthError);
+  if (_isMobile) signInWithRedirect(auth, provider).catch(_handleAuthError);
+  else           signInWithPopup(auth, provider).catch(_handleAuthError);
 }
 
 function authSignOut() {
