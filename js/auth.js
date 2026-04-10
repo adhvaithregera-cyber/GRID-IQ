@@ -107,9 +107,10 @@ function _onAuthStateChanged(user) {
     _clearRateLimit();
     _syncUserWithFirestore(user);
   } else {
-    // Clear Pro flags on sign-out
-    localStorage.removeItem('gridiq_pro');
-    localStorage.removeItem('gridiq_owner');
+    // Clear in-memory Pro flags on sign-out
+    if (typeof window._setGridIQProVerified === 'function') {
+      window._setGridIQProVerified(false, false);
+    }
     if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
   }
 }
@@ -121,17 +122,17 @@ async function _syncUserWithFirestore(user) {
     const ref  = doc(_db, 'users', user.uid);
     const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      // Sync Pro status granted via Firestore console
-      const data = snap.data();
-      if (data.isPro === true) {
-        localStorage.setItem('gridiq_pro', 'true');
+    // Set in-memory PRO flags — never touch localStorage for PRO status
+    if (typeof window._setGridIQProVerified === 'function') {
+      if (snap.exists()) {
+        const data = snap.data();
+        window._setGridIQProVerified(data.isPro === true, data.isOwner === true);
       } else {
-        localStorage.removeItem('gridiq_pro');
+        window._setGridIQProVerified(false, false);
       }
     }
 
-    // Write / refresh user record so you can look users up by email in console
+    // Write / refresh user record — never write isPro from the client
     await setDoc(ref, {
       email:       user.email       || '',
       displayName: user.displayName || '',
@@ -140,7 +141,7 @@ async function _syncUserWithFirestore(user) {
 
     if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
 
-    // Owner auto-grant
+    // Owner auto-grant via SHA-256 (sets memory flags, not localStorage)
     if (typeof window.grantOwnerProIfMatch === 'function') {
       await window.grantOwnerProIfMatch(user.email);
     }

@@ -7,17 +7,13 @@ service cloud.firestore {
       // A user can read only their own document
       allow read: if request.auth != null && request.auth.uid == userId;
 
-      // Writes are allowed ONLY for the owner account setting their own flags.
-      // All other writes (e.g. payment confirmations) must go through
-      // a Firebase Admin SDK / Cloud Function — never from the client.
+      // Users can update only non-sensitive fields (email, displayName, lastSeen).
+      // isPro and isOwner can NEVER be written from the client — set them manually
+      // via the Firebase console or Admin SDK only.
       allow write: if request.auth != null
                    && request.auth.uid == userId
-                   && request.auth.token.email in [
-                       'adhvaith.regera@gmail.com'
-                     ]
-                   // Only allow setting isPro/isOwner to true — never false
-                   && request.resource.data.isPro == true
-                   && request.resource.data.isOwner == true;
+                   && !('isPro'    in request.resource.data)
+                   && !('isOwner'  in request.resource.data);
     }
 
     // Block everything else

@@ -27,6 +27,16 @@ var PRO_FEATURES = [
 var BETA_END_DATE = '2026-11-30';
 var TRIAL_DAYS    = 3;
 
+/* ── PRO status — set ONLY by Firestore sync in auth.js ── */
+var _proVerified   = false;
+var _ownerVerified = false;
+
+function _setProVerified(isPro, isOwner) {
+  _proVerified   = isPro   === true;
+  _ownerVerified = isOwner === true;
+}
+window._setGridIQProVerified = _setProVerified;
+
 /* ─────────────────────────────────────────────────────────
    UPI
 ───────────────────────────────────────────────────────── */
@@ -51,8 +61,8 @@ function _getContactMailto() {
 function isGridIQPro() {
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
   if (window._gridiqAuthUser) {
-    if (localStorage.getItem('gridiq_owner') === 'true') return true;
-    if (localStorage.getItem('gridiq_pro') === 'true') return true;
+    if (_ownerVerified) return true;
+    if (_proVerified)   return true;
   }
   return _isOnActiveTrial();
 }
@@ -65,7 +75,7 @@ function _isOnActiveTrial() {
 }
 
 function isOnTrial() {
-  if (localStorage.getItem('gridiq_pro') === 'true') return false;
+  if (_proVerified || _ownerVerified) return false;
   return _isOnActiveTrial();
 }
 
@@ -93,7 +103,7 @@ function getTrialTimeLeft() {
 
 function trialAvailable() {
   if (!window._gridiqAuthUser) return false;
-  if (localStorage.getItem('gridiq_pro') === 'true') return false;
+  if (_proVerified || _ownerVerified) return false;
   if (new Date() > new Date(BETA_END_DATE)) return false;
   return !localStorage.getItem('gridiq_trial_start');
 }
@@ -117,8 +127,7 @@ async function grantOwnerProIfMatch(email) {
       .map(function(b) { return b.toString(16).padStart(2, '0'); })
       .join('');
     if (hashHex === OWNER_EMAIL_HASH) {
-      localStorage.setItem('gridiq_pro', 'true');
-      localStorage.setItem('gridiq_owner', 'true');
+      _setProVerified(true, true);
       localStorage.removeItem('gridiq_trial_start');
       updateProNavBadge();
       return true;
