@@ -202,8 +202,11 @@ function updateProNavBadge() {
 
   var badge = document.getElementById('pro-nav-btn');
   if (badge) {
-    if (!loggedIn || isPro) {
+    if (!loggedIn) {
       badge.className = 'pro-nav-badge hidden';
+    } else if (isPro) {
+      badge.className = 'pro-nav-badge pro-nav-badge--active';
+      badge.innerHTML = '&#9733; PRO';
     } else if (onTrial) {
       badge.className = 'pro-nav-badge pro-nav-badge--trial';
       badge.innerHTML = '&#9733; TRIAL &bull; ' + getTrialTimeLeft() + ' LEFT';
@@ -215,8 +218,11 @@ function updateProNavBadge() {
 
   var bnavBtn = document.getElementById('bnav-pro-btn');
   if (bnavBtn) {
-    if (!loggedIn || isPro) {
+    if (!loggedIn) {
       bnavBtn.className = 'bnav-pro-btn hidden';
+    } else if (isPro) {
+      bnavBtn.className = 'bnav-pro-btn bnav-pro-btn--active';
+      bnavBtn.querySelector('.bnav-lbl').textContent = 'PRO ★';
     } else if (onTrial) {
       bnavBtn.className = 'bnav-pro-btn';
       bnavBtn.querySelector('.bnav-lbl').textContent = getTrialTimeLeft();
