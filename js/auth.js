@@ -25,7 +25,7 @@ import { getRemoteConfig, fetchAndActivate, getValue }           from 'firebase/
 import { getFirestore, doc, getDoc, setDoc }                     from 'firebase/firestore';
 
 /* ── Config — fetched from backend Cloud Function, never hardcoded ── */
-const _CONFIG_URL = 'https://us-central1-grid-iq-520cb.cloudfunctions.net/getConfig';
+const _CONFIG_URL = 'https://gridiq-config.gridiqapp.workers.dev';
 
 /* ── Rate limiting (email/password only) ─────────────────── */
 const _RL = { MAX: 5, LOCKOUT_MS: 10 * 60 * 1000 };
