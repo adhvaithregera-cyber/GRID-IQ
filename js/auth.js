@@ -87,7 +87,9 @@ function _getAuth() {
     onAuthStateChanged(_auth, _onAuthStateChanged);
     _fetchRemoteConfig(app);
     // Handle redirect result on mobile after returning from OAuth
-    if (_isMobile) getRedirectResult(_auth).catch(() => {});
+    if (_isMobile) getRedirectResult(_auth)
+      .then(result => { if (result?.user) _onAuthStateChanged(result.user); })
+      .catch(e => console.warn('[GridIQ] Redirect sign-in error:', e.message));
     return _auth;
   } catch (e) {
     console.warn('[GridIQ auth] Firebase init failed:', e.message);
