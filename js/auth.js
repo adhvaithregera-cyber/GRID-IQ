@@ -144,6 +144,7 @@ async function _syncUserWithFirestore(user) {
     if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
   } catch (e) {
     console.warn('[GridIQ] Firestore sync failed:', e.message);
+    if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
   }
 }
 
