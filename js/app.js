@@ -1321,7 +1321,7 @@ function init() {
   renderHeroStats();
   renderRaceHero();
   renderChampionshipHub();
-  if (typeof initSmoke === 'function') initSmoke();
+  // smoke canvas replaced by static hero image
   renderConstructorStandings();
   renderDriverStandings();
   initPredictor();
