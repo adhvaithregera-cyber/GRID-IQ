@@ -1301,7 +1301,7 @@ select, input { font-family: var(--font-body); }
   :root { --content-pad: 48px; }
 
   /* Bigger home hero */
-  .home-hero { min-height: 360px; padding-top: 52px; }
+  .home-hero { min-height: 460px; padding-top: 52px; }
   .home-hero-title { font-size: 88px; letter-spacing: 6px; }
 
   /* Bigger race hero typography */
@@ -1332,6 +1332,7 @@ select, input { font-family: var(--font-body); }
   :root { --content-pad: 72px; }
 
   .home-hero { min-height: 360px; }
+  .hero-bg-img { object-position: center 67%; }
   .home-hero-title { font-size: 108px; letter-spacing: 8px; }
   .home-col-left { flex: 0 0 480px; }
   .pred-col-left  { flex: 0 0 420px; }
