@@ -2,18 +2,30 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // users/{uid} — stores isPro and isOwner flags
+    // users/{uid} — stores isPro, isOwner, and trialStart flags
     match /users/{userId} {
       // A user can read only their own document
       allow read: if request.auth != null && request.auth.uid == userId;
 
-      // Users can update only non-sensitive fields (email, displayName, lastSeen).
-      // isPro and isOwner can NEVER be written from the client — set them manually
-      // via the Firebase console or Admin SDK only.
-      allow write: if request.auth != null
-                   && request.auth.uid == userId
-                   && !('isPro'    in request.resource.data)
-                   && !('isOwner'  in request.resource.data);
+      // New document — client can set any safe fields except isPro / isOwner.
+      // trialStart can be written once on create.
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && !('isPro'   in request.resource.data)
+                    && !('isOwner' in request.resource.data);
+
+      // Existing document — client can update safe fields (email, displayName,
+      // lastSeen, trialStart). Rules:
+      //   • isPro and isOwner can never be changed by the client.
+      //   • trialStart can only be written if it does not already exist —
+      //     prevents users from resetting their trial via DevTools.
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPro', 'isOwner'])
+                    && (
+                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['trialStart'])
+                      || !('trialStart' in resource.data)
+                    );
     }
 
     // Block everything else

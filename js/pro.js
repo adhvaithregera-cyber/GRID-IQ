@@ -1,19 +1,9 @@
 /* ============================================================
    GridIQ — PRO Subscription  |  pro.js
-
-   ── CONFIG ──────────────────────────────────────────────────
-   UPI_ID       — your UPI address (e.g. yourname@upi)
-   CONTACT_EMAIL — email users send payment proof to
    ── ─────────────────────────────────────────────────────── */
 
 /* ── Owner config (SHA-256 of owner email — never store plaintext) ── */
 var OWNER_EMAIL_HASH = '3f3f6c85347fa6ca01e2601e1ba6bbe4bbb33652e39f12bd460073bdb0d7d136';
-
-/* ── UPI payment config ─────────────────────────────────── */
-var UPI_ID        = 'adhvaith.regera@oksbi';
-var UPI_NAME      = 'GridIQ';
-var UPI_AMOUNT    = '199';
-var CONTACT_EMAIL = 'gridiq.app@gmail.com';
 
 /* ── PRO features list (shown in upgrade modal) ─────────── */
 var PRO_FEATURES = [
@@ -25,11 +15,12 @@ var PRO_FEATURES = [
 
 /* ── Beta & trial config ────────────────────────────────── */
 var BETA_END_DATE = '2026-11-30';
-var TRIAL_DAYS    = 3;
+var TRIAL_DAYS    = 7;
 
 /* ── PRO status — set ONLY by Firestore sync in auth.js ── */
 var _proVerified   = false;
 var _ownerVerified = false;
+var _trialStart    = null;   // authoritative trial timestamp from Firestore
 
 function _setProVerified(isPro, isOwner) {
   _proVerified   = isPro   === true;
@@ -37,23 +28,10 @@ function _setProVerified(isPro, isOwner) {
 }
 window._setGridIQProVerified = _setProVerified;
 
-/* ─────────────────────────────────────────────────────────
-   UPI
-───────────────────────────────────────────────────────── */
-function _getUpiQrUrl() {
-  var upiString = 'upi://pay?pa=' + encodeURIComponent(UPI_ID) +
-    '&pn=' + encodeURIComponent(UPI_NAME) +
-    '&am=' + UPI_AMOUNT +
-    '&cu=INR' +
-    '&tn=' + encodeURIComponent('GridIQ Pro Subscription');
-  return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(upiString);
+function _setTrialStart(ts) {
+  _trialStart = ts ? parseInt(ts, 10) : null;
 }
-
-function _getContactMailto() {
-  var subject = encodeURIComponent('GridIQ Pro Payment');
-  var body = encodeURIComponent('UPI Transaction ID / UTR:\nAccount email I signed in with:\n');
-  return 'mailto:' + CONTACT_EMAIL + '?subject=' + subject + '&body=' + body;
-}
+window._setTrialStart = _setTrialStart;
 
 /* ─────────────────────────────────────────────────────────
    PRO STATUS
@@ -69,9 +47,11 @@ function isGridIQPro() {
 
 function _isOnActiveTrial() {
   if (new Date() > new Date(BETA_END_DATE)) return false;
-  var ts = localStorage.getItem('gridiq_trial_start');
+  // _trialStart is set by Firestore sync (authoritative). Fall back to
+  // localStorage only before the first sync completes (e.g. slow network).
+  var ts = _trialStart !== null ? _trialStart : parseInt(localStorage.getItem('gridiq_trial_start') || '0', 10);
   if (!ts) return false;
-  return (Date.now() - parseInt(ts, 10)) < TRIAL_DAYS * 86400000;
+  return (Date.now() - ts) < TRIAL_DAYS * 86400000;
 }
 
 function isOnTrial() {
@@ -80,16 +60,16 @@ function isOnTrial() {
 }
 
 function getTrialDaysLeft() {
-  var ts = localStorage.getItem('gridiq_trial_start');
+  var ts = _trialStart !== null ? _trialStart : parseInt(localStorage.getItem('gridiq_trial_start') || '0', 10);
   if (!ts) return TRIAL_DAYS;
-  var left = Math.ceil((TRIAL_DAYS * 86400000 - (Date.now() - parseInt(ts, 10))) / 86400000);
+  var left = Math.ceil((TRIAL_DAYS * 86400000 - (Date.now() - ts)) / 86400000);
   return Math.max(0, left);
 }
 
 function getTrialTimeLeft() {
-  var ts = localStorage.getItem('gridiq_trial_start');
+  var ts = _trialStart !== null ? _trialStart : parseInt(localStorage.getItem('gridiq_trial_start') || '0', 10);
   if (!ts) return '';
-  var msLeft = TRIAL_DAYS * 86400000 - (Date.now() - parseInt(ts, 10));
+  var msLeft = TRIAL_DAYS * 86400000 - (Date.now() - ts);
   if (msLeft <= 0) return '0';
   var totalSec = Math.floor(msLeft / 1000);
   var d = Math.floor(totalSec / 86400);
@@ -105,16 +85,21 @@ function trialAvailable() {
   if (!window._gridiqAuthUser) return false;
   if (_proVerified || _ownerVerified) return false;
   if (new Date() > new Date(BETA_END_DATE)) return false;
-  return !localStorage.getItem('gridiq_trial_start');
+  // Firestore is authoritative: if _trialStart is set, trial was already used
+  return _trialStart === null && !localStorage.getItem('gridiq_trial_start');
 }
 
 function startTrial() {
   if (!window._gridiqAuthUser) { openAuthModal(); return; }
-  if (localStorage.getItem('gridiq_trial_start')) return;
-  localStorage.setItem('gridiq_trial_start', Date.now().toString());
+  if (_trialStart !== null || localStorage.getItem('gridiq_trial_start')) return;
+  var now = Date.now();
+  _trialStart = now;
+  localStorage.setItem('gridiq_trial_start', now.toString());
+  // Persist to Firestore — write-once rule prevents users from resetting it
+  if (typeof window._writeTrialStart === 'function') window._writeTrialStart(now);
   updateProNavBadge();
   closeProModal();
-  showProSuccessToast('★ ' + TRIAL_DAYS + '-day free trial started — full PRO access unlocked!');
+  showProSuccessToast('★ 7-day free trial started — full PRO access unlocked!');
 }
 
 /* ── Owner auto-grant (called from auth.js on sign-in) ──── */
@@ -157,25 +142,6 @@ function openProModal() {
         : '<span class="pro-check pro-check--dim">✦</span>';
       return '<li>' + icon + ' <strong>' + f.label + '</strong> — ' + f.desc + '</li>';
     }).join('');
-  }
-
-  // UPI QR code
-  var qrImg = document.getElementById('upi-qr-img');
-  if (qrImg && UPI_ID.indexOf('PASTE_') !== 0) qrImg.src = _getUpiQrUrl();
-
-  // UPI ID display
-  var upiDisplay = document.getElementById('upi-id-display');
-  if (upiDisplay) upiDisplay.textContent = UPI_ID.indexOf('PASTE_') === 0 ? 'Coming soon' : UPI_ID;
-
-  // Contact email link
-  var contactLink = document.getElementById('upi-contact-link');
-  if (contactLink) {
-    if (CONTACT_EMAIL.indexOf('PASTE_') === 0) {
-      contactLink.classList.add('hidden');
-    } else {
-      contactLink.href = _getContactMailto();
-      contactLink.classList.remove('hidden');
-    }
   }
 
   // Trial section
@@ -277,16 +243,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var proCloseBtn = proModalOverlay.querySelector('.auth-modal-close');
     if (proCloseBtn) proCloseBtn.addEventListener('click', closeProModal);
   }
-
-  // UPI copy button
-  var copyBtn = document.getElementById('upi-copy-btn');
-  if (copyBtn) copyBtn.addEventListener('click', function() {
-    if (UPI_ID.indexOf('PASTE_') === 0) return;
-    navigator.clipboard.writeText(UPI_ID).then(function() {
-      copyBtn.textContent = 'COPIED!';
-      setTimeout(function() { copyBtn.textContent = 'COPY'; }, 2000);
-    });
-  });
 
   var igFollowBtn = document.getElementById('pro-ig-follow-btn');
   if (igFollowBtn) igFollowBtn.addEventListener('click', function() {

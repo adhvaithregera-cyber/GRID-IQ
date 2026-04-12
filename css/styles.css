@@ -79,6 +79,8 @@ select, input { font-family: var(--font-body); }
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 0 var(--content-pad);
   scrollbar-width: thin;
   scrollbar-color: rgba(255,30,0,0.2) transparent;
@@ -308,11 +310,11 @@ select, input { font-family: var(--font-body); }
 /* ─── HOME HERO BANNER ───────────────────────────────────── */
 .home-hero {
   position: relative;
-  min-height: 240px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 44px var(--content-pad) 28px;
+  padding: 36px var(--content-pad) 16px;
   margin: 0 calc(-1 * var(--content-pad));
   background: linear-gradient(135deg, #0e0202 0%, #0a0606 25%, #080808 55%, #05050c 100%);
   overflow: hidden;
@@ -1224,7 +1226,7 @@ select, input { font-family: var(--font-body); }
   :root { --content-pad: 32px; }
 
   /* ── Home hero scales up ── */
-  .home-hero { min-height: 340px; padding-top: 52px; }
+  .home-hero { min-height: 260px; padding-top: 44px; }
   .home-hero-title { font-size: 72px; }
   .home-hero-tagline { font-size: 11px; }
 
@@ -1288,7 +1290,7 @@ select, input { font-family: var(--font-body); }
   :root { --content-pad: 48px; }
 
   /* Bigger home hero */
-  .home-hero { min-height: 380px; padding-top: 60px; }
+  .home-hero { min-height: 300px; padding-top: 52px; }
   .home-hero-title { font-size: 88px; letter-spacing: 6px; }
 
   /* Bigger race hero typography */
@@ -1899,7 +1901,7 @@ select, input { font-family: var(--font-body); }
 }
 
 /* ── UPI payment block ── */
-.upi-pay-block {
+.rzp-pay-block {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1926,50 +1928,19 @@ select, input { font-family: var(--font-body); }
   font-size: 13px;
   color: var(--text-2);
 }
-.upi-qr {
-  width: 160px;
-  height: 160px;
-  border-radius: var(--radius-sm);
-  background: #fff;
-  padding: 6px;
-}
-.upi-id-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-}
-.upi-id-val {
-  font-family: var(--font-tech);
-  font-size: 13px;
-  color: var(--text);
-  letter-spacing: 0.04em;
-}
-.upi-copy-btn {
-  flex-shrink: 0;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-family: var(--font-tech);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-.upi-instruct {
+.rzp-pay-desc,
+.rzp-pay-note {
   font-family: var(--font-body);
   font-size: 12px;
   color: var(--text-2);
   text-align: center;
   line-height: 1.65;
   margin: 0;
+}
+.rzp-btn-form {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 .upi-contact-btn {
   display: block;
@@ -2675,6 +2646,11 @@ select, input { font-family: var(--font-body); }
   padding: 16px var(--content-pad) calc(16px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   margin-top: 8px;
+}
+@media (max-width: 639px) {
+  /* Footer sits in normal flow behind absolute-positioned tab sections;
+     on iOS it flashes visible during overscroll rubber-banding — hide it. */
+  #app-footer { display: none; }
 }
 
 .footer-disclaimer {

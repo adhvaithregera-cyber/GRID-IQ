@@ -125,12 +125,21 @@ async function _syncUserWithFirestore(user) {
     const snap = await getDoc(ref);
 
     // Set in-memory PRO flags from Firestore (owner grant above takes precedence)
-    if (typeof window._setGridIQProVerified === 'function' && !window.isGridIQPro()) {
-      if (snap.exists()) {
-        const data = snap.data();
+    if (snap.exists()) {
+      const data = snap.data();
+      if (typeof window._setGridIQProVerified === 'function' && !window.isGridIQPro()) {
         window._setGridIQProVerified(data.isPro === true, data.isOwner === true);
-      } else {
+      }
+      // Sync trial start timestamp — authoritative source (prevents localStorage tampering)
+      if (typeof window._setTrialStart === 'function') {
+        window._setTrialStart(data.trialStart || null);
+      }
+    } else {
+      if (typeof window._setGridIQProVerified === 'function' && !window.isGridIQPro()) {
         window._setGridIQProVerified(false, false);
+      }
+      if (typeof window._setTrialStart === 'function') {
+        window._setTrialStart(null);
       }
     }
 
@@ -147,6 +156,18 @@ async function _syncUserWithFirestore(user) {
     if (typeof window.updateProNavBadge === 'function') window.updateProNavBadge();
   }
 }
+
+/* ── Trial: write trialStart to Firestore (write-once enforced by rules) ── */
+async function _writeTrialStart(ts) {
+  if (!_db || !_auth || !_auth.currentUser) return;
+  try {
+    const ref = doc(_db, 'users', _auth.currentUser.uid);
+    await setDoc(ref, { trialStart: parseInt(ts, 10) }, { merge: true });
+  } catch (e) {
+    console.warn('[GridIQ] Failed to save trial start:', e.message);
+  }
+}
+window._writeTrialStart = _writeTrialStart;
 
 /* ── Remote Config ────────────────────────────────────────── */
 async function _fetchRemoteConfig(app) {

@@ -155,27 +155,29 @@
 
       <ul class="pro-features-list" id="pro-features-list"></ul>
 
-      <div class="upi-pay-block">
+      <div class="rzp-pay-block">
         <div class="upi-amount-row">
-          <span class="upi-amount">₹199</span>
+          <span class="upi-amount">₹99</span>
           <span class="upi-period">/ month</span>
         </div>
-        <img class="upi-qr" id="upi-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi%3A%2F%2Fpay%3Fpa%3Dadhvaith.regera%40oksbi%26pn%3DGridIQ%26am%3D199%26cu%3DINR%26tn%3DGridIQ%2BPro%2BSubscription" alt="UPI QR Code">
-        <div class="upi-id-row">
-          <span class="upi-id-val" id="upi-id-display">adhvaith.regera@oksbi</span>
-          <button class="upi-copy-btn" id="upi-copy-btn">COPY</button>
-        </div>
-        <p class="upi-instruct">Pay via any UPI app, then send your <strong>UTR / Transaction ID</strong> and <strong>sign-in email</strong> to activate your account.</p>
-        <a id="upi-contact-link" class="upi-contact-btn" href="mailto:gridiq.app@gmail.com?subject=GridIQ%20Pro%20Payment&body=UPI%20Transaction%20ID%20%2F%20UTR%3A%0AAccount%20email%20I%20signed%20in%20with%3A%0A" target="_blank" rel="noopener">EMAIL PAYMENT PROOF →</a>
+        <p class="rzp-pay-desc">Pay securely with UPI, cards, or netbanking via Razorpay.</p>
+        <!-- Replace data-payment_button_id with your real ID from the Razorpay dashboard -->
+        <form class="rzp-btn-form">
+          <script src="https://checkout.razorpay.com/v1/payment-button.js"
+                  data-payment_button_id="PASTE_BUTTON_ID_HERE"
+                  async></script>
+        </form>
+        <p class="rzp-pay-note">After payment, email your <strong>Razorpay Order ID</strong> and <strong>sign-in email</strong> to activate.</p>
+        <a class="upi-contact-btn" href="mailto:gridiq.app@gmail.com?subject=GridIQ%20Pro%20Payment&body=Razorpay%20Order%20ID%3A%0AAccount%20email%20I%20signed%20in%20with%3A%0A" target="_blank" rel="noopener">EMAIL PAYMENT PROOF →</a>
       </div>
 
       <!-- Trial section — shown only when trial is still available -->
       <div id="pro-trial-section" class="hidden">
-        <div class="auth-divider"><span>OR GET 3 DAYS FREE</span></div>
-        <p class="pro-trial-instr">Follow <strong>@gridiq.app</strong> on Instagram to unlock your free trial.</p>
-        <a href="https://www.instagram.com/gridiq.app/" target="_blank" rel="noopener" id="pro-ig-follow-btn" class="pro-ig-btn">FOLLOW @gridiq.app →</a>
-        <button class="pro-trial-btn" id="pro-trial-start-btn" disabled>START FREE TRIAL</button>
-        <p class="pro-trial-note">No card needed &bull; Beta only &bull; One per user</p>
+        <div class="auth-divider"><span>OR GET 7 DAYS FREE</span></div>
+        <p class="pro-trial-instr">Follow <strong>@gridiq.app</strong> on Instagram, then tap the button below to unlock your free week.</p>
+        <a href="https://www.instagram.com/gridiq.app/" target="_blank" rel="noopener" id="pro-ig-follow-btn" class="pro-ig-btn">FOLLOW @gridiq.app ON INSTAGRAM →</a>
+        <button class="pro-trial-btn" id="pro-trial-start-btn" disabled>START 7-DAY FREE TRIAL</button>
+        <p class="pro-trial-note">No card needed &bull; Beta only &bull; One per account</p>
       </div>
 
       <button class="pro-skip-btn">Maybe Later</button>
