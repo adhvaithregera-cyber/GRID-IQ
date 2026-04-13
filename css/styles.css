@@ -1260,7 +1260,7 @@ select, input { font-family: var(--font-body); }
   /* ── Predictor: outer two-col (simulator left, your prediction right) ── */
   .pred-outer { flex-direction: row; gap: 24px; align-items: flex-start; }
   .pred-main { flex: 1; min-width: 0; }
-  .pred-side { flex: 0 0 300px; position: sticky; top: 80px; }
+  .pred-side { flex: 0 0 300px; }
 
   /* ── Predictor: form left, results right ── */
   .pred-cols {
