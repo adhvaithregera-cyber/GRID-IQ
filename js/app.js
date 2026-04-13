@@ -667,7 +667,11 @@ function initYourPickSection() {
     const d1   = p1El.value ? getDriver(p1El.value) : null;
     const d2   = p2El.value ? getDriver(p2El.value) : null;
     const d3   = p3El.value ? getDriver(p3El.value) : null;
-    if (!race || !d1 || !d2 || !d3) return;
+    if (!race || !d1 || !d2 || !d3) {
+      btn.textContent = 'SELECT ALL FIELDS ✕';
+      setTimeout(() => { btn.textContent = 'LOCK IN PICK \u00a0→'; }, 2000);
+      return;
+    }
 
     let aiPick = null;
     try { aiPick = JSON.parse(localStorage.getItem('gridiq_ai_pick_' + race.id)); } catch(_) {}
