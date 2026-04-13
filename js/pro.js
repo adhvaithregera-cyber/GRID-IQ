@@ -21,6 +21,7 @@ var TRIAL_DAYS    = 7;
 var _proVerified   = false;
 var _ownerVerified = false;
 var _trialStart    = null;   // authoritative trial timestamp from Firestore
+var _proExpiry     = null;   // subscription end timestamp from Firestore (ms)
 
 function _setProVerified(isPro, isOwner) {
   _proVerified   = isPro   === true;
@@ -32,6 +33,11 @@ function _setTrialStart(ts) {
   _trialStart = ts ? parseInt(ts, 10) : null;
 }
 window._setTrialStart = _setTrialStart;
+
+function _setProExpiry(ts) {
+  _proExpiry = ts ? parseInt(ts, 10) : null;
+}
+window._setProExpiry = _setProExpiry;
 
 /* ─────────────────────────────────────────────────────────
    PRO STATUS
@@ -159,6 +165,49 @@ function closeProModal() {
 }
 
 /* ─────────────────────────────────────────────────────────
+   PRO STATUS MODAL (shown when already PRO)
+───────────────────────────────────────────────────────── */
+function openProStatusModal() {
+  var existing = document.getElementById('pro-status-modal');
+  if (existing) { existing.remove(); return; }
+
+  var user = window._gridiqAuthUser;
+  var name = user ? (user.displayName || user.email || '') : '';
+
+  var statusLine, expiryLine;
+  if (_ownerVerified) {
+    statusLine = 'OWNER ACCOUNT';
+    expiryLine = 'Lifetime Access';
+  } else if (isOnTrial()) {
+    statusLine = 'FREE TRIAL';
+    expiryLine = getTrialTimeLeft() + ' remaining';
+  } else if (_proExpiry) {
+    statusLine = 'ACTIVE SUBSCRIPTION';
+    var expDate = new Date(_proExpiry);
+    expiryLine = 'Expires ' + expDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  } else {
+    statusLine = 'ACTIVE SUBSCRIPTION';
+    expiryLine = '2026 Season Pass';
+  }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'pro-status-modal';
+  overlay.className = 'auth-modal-overlay';
+  overlay.innerHTML =
+    '<div class="pro-modal-box pro-status-box">' +
+      '<button class="auth-modal-close" id="pro-status-close-btn">&#10005;</button>' +
+      '<div class="pro-modal-crown">&#9733;</div>' +
+      '<div class="pro-modal-badge-label">GRID IQ PRO</div>' +
+      (name ? '<div class="pro-status-name">' + name + '</div>' : '') +
+      '<div class="pro-status-line">' + statusLine + '</div>' +
+      '<div class="pro-status-expiry">' + expiryLine + '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('pro-status-close-btn').addEventListener('click', function() { overlay.remove(); });
+}
+
+/* ─────────────────────────────────────────────────────────
    NAV BADGE
 ───────────────────────────────────────────────────────── */
 function updateProNavBadge() {
@@ -225,13 +274,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var proNavBtn = document.getElementById('pro-nav-btn');
   if (proNavBtn) proNavBtn.addEventListener('click', function() {
-    if (isGridIQPro()) return;
+    if (isGridIQPro()) { openProStatusModal(); return; }
     openProModal();
   });
 
   var bnavProBtn = document.getElementById('bnav-pro-btn');
   if (bnavProBtn) bnavProBtn.addEventListener('click', function() {
-    if (isGridIQPro()) return;
+    if (isGridIQPro()) { openProStatusModal(); return; }
     openProModal();
   });
 
@@ -278,6 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* ─────────────────────────────────────────────────────────
    GLOBALS
 ───────────────────────────────────────────────────────── */
+window.openProStatusModal   = openProStatusModal;
 window.isGridIQPro          = isGridIQPro;
 window.isOnTrial            = isOnTrial;
 window.trialAvailable       = trialAvailable;

@@ -134,6 +134,9 @@ async function _syncUserWithFirestore(user) {
       if (typeof window._setTrialStart === 'function') {
         window._setTrialStart(data.trialStart || null);
       }
+      if (typeof window._setProExpiry === 'function') {
+        window._setProExpiry(data.subscriptionEnd || data.proExpiry || null);
+      }
     } else {
       if (typeof window._setGridIQProVerified === 'function' && !window.isGridIQPro()) {
         window._setGridIQProVerified(false, false);

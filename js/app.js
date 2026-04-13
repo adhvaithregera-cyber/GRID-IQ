@@ -367,16 +367,16 @@ function renderConstructorStandings() {
 function initPredictor() {
   // Populate track selector
   const sel = document.getElementById('pred-track');
+  const placeholderOpt = document.createElement('option');
+  placeholderOpt.value = ''; placeholderOpt.disabled = true; placeholderOpt.selected = true;
+  placeholderOpt.textContent = 'SELECT RACE';
+  sel.appendChild(placeholderOpt);
   GRIDIQ_DATABASE.races.forEach(r => {
     const opt = document.createElement('option');
     opt.value = r.id;
     opt.textContent = `${r.flag} ${r.name}`;
     sel.appendChild(opt);
   });
-
-  // Default to next race
-  const next = getNextRace();
-  if (next) sel.value = next.id;
 
   // Weather toggles
   document.querySelectorAll('.wx-btn').forEach(btn => {
@@ -584,19 +584,23 @@ function renderPickHistory() {
     const race = getRace(pick.raceId);
     if (!race) return '';
     if (race.status === 'completed') {
-      const userHit = pick.driverLastName === race.winner;
-      const aiHit   = pick.aiPickLastName && pick.aiPickLastName === race.winner;
+      const p1Hit = pick.p1LastName === race.winner;
+      const p2Hit = pick.p2LastName === race.winner;
+      const p3Hit = pick.p3LastName === race.winner;
+      const anyHit = p1Hit || p2Hit || p3Hit;
+      const aiHit  = pick.aiPickLastName && pick.aiPickLastName === race.winner;
       return `
         <div class="pick-row">
           <div class="pick-race-lbl">${pick.raceFlag} R${pick.raceRound} — ${pick.raceName}</div>
           <div class="pick-vs-grid">
-            <div class="pick-vs-cell${userHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
-              <div class="pick-vs-label">YOU</div>
-              <div class="pick-vs-name">${pick.driverLastName}</div>
-              <div class="pick-vs-result">${userHit ? '✓' : '✗'}</div>
+            <div class="pick-vs-cell pick-top3-col${anyHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
+              <div class="pick-vs-label">YOUR PICKS</div>
+              <div class="pick-top3-row"><span class="pick-pos">P1</span><span class="pick-top3-name${p1Hit ? ' pick-top3-hit' : ''}">${pick.p1LastName || '—'}${p1Hit ? ' ✓' : ''}</span></div>
+              <div class="pick-top3-row"><span class="pick-pos">P2</span><span class="pick-top3-name${p2Hit ? ' pick-top3-hit' : ''}">${pick.p2LastName || '—'}${p2Hit ? ' ✓' : ''}</span></div>
+              <div class="pick-top3-row"><span class="pick-pos">P3</span><span class="pick-top3-name${p3Hit ? ' pick-top3-hit' : ''}">${pick.p3LastName || '—'}${p3Hit ? ' ✓' : ''}</span></div>
             </div>
             <div class="pick-vs-cell${aiHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
-              <div class="pick-vs-label">AI</div>
+              <div class="pick-vs-label">AI P1</div>
               <div class="pick-vs-name">${pick.aiPickLastName || '—'}</div>
               <div class="pick-vs-result">${pick.aiPickLastName ? (aiHit ? '✓' : '✗') : '—'}</div>
             </div>
@@ -612,7 +616,7 @@ function renderPickHistory() {
       return `
         <div class="pick-row pick-row--pending">
           <div class="pick-race-lbl">${pick.raceFlag} R${pick.raceRound} — ${pick.raceName}</div>
-          <div class="pick-pending-txt">⚡ Your pick: <strong>${pick.driverName}</strong></div>
+          <div class="pick-pending-txt">⚡ P1: <strong>${pick.p1Name || '—'}</strong> · P2: <strong>${pick.p2Name || '—'}</strong> · P3: <strong>${pick.p3Name || '—'}</strong></div>
         </div>
       `;
     }
@@ -620,23 +624,38 @@ function renderPickHistory() {
 }
 
 function initYourPickSection() {
-  const raceEl   = document.getElementById('your-pick-race');
-  const driverEl = document.getElementById('your-pick-driver');
-  const btn      = document.getElementById('your-pick-btn');
-  if (!raceEl || !driverEl || !btn) return;
+  const raceEl = document.getElementById('your-pick-race');
+  const p1El   = document.getElementById('your-pick-p1');
+  const p2El   = document.getElementById('your-pick-p2');
+  const p3El   = document.getElementById('your-pick-p3');
+  const btn    = document.getElementById('your-pick-btn');
+  if (!raceEl || !p1El || !p2El || !p3El || !btn) return;
 
   // Races dropdown
-  raceEl.innerHTML = GRIDIQ_DATABASE.races.map(r =>
-    `<option value="${r.id}">${r.flag} R${r.round} — ${r.name}${r.status === 'completed' ? ' ✓' : ''}</option>`
-  ).join('');
-  const nextRace = getNextRace();
-  if (nextRace) raceEl.value = nextRace.id;
+  raceEl.innerHTML = `<option value="" disabled selected>SELECT RACE</option>` +
+    GRIDIQ_DATABASE.races.map(r =>
+      `<option value="${r.id}">${r.flag} R${r.round} — ${r.name}${r.status === 'completed' ? ' ✓' : ''}</option>`
+    ).join('');
 
-  // Drivers dropdown (sorted by points)
+  // Driver options (sorted by points)
   const drivers = [...GRIDIQ_DATABASE.drivers].sort((a,b) => b.points - a.points);
-  driverEl.innerHTML = drivers.map(d =>
-    `<option value="${d.id}">${d.firstName} ${d.lastName}</option>`
-  ).join('');
+  const placeholder = `<option value="" disabled selected>SELECT DRIVER</option>`;
+  const driverOpts = drivers.map(d => `<option value="${d.id}">${d.firstName} ${d.lastName}</option>`).join('');
+  p1El.innerHTML = placeholder + driverOpts;
+  p2El.innerHTML = placeholder + driverOpts;
+  p3El.innerHTML = placeholder + driverOpts;
+
+  function refreshDriverOpts() {
+    const v1 = p1El.value, v2 = p2El.value, v3 = p3El.value;
+    [p1El, p2El, p3El].forEach((el, i) => {
+      const others = [v1, v2, v3].filter((_, j) => j !== i);
+      Array.from(el.options).forEach(opt => { opt.disabled = opt.value !== '' && others.includes(opt.value); });
+    });
+  }
+  refreshDriverOpts();
+  p1El.addEventListener('change', refreshDriverOpts);
+  p2El.addEventListener('change', refreshDriverOpts);
+  p3El.addEventListener('change', refreshDriverOpts);
 
   // Sync race selection with pred-track
   const predTrack = document.getElementById('pred-track');
@@ -644,9 +663,11 @@ function initYourPickSection() {
   raceEl.addEventListener('change', renderPickHistory);
 
   btn.addEventListener('click', () => {
-    const race   = getRace(raceEl.value);
-    const driver = getDriver(driverEl.value);
-    if (!race || !driver) return;
+    const race = getRace(raceEl.value);
+    const d1   = p1El.value ? getDriver(p1El.value) : null;
+    const d2   = p2El.value ? getDriver(p2El.value) : null;
+    const d3   = p3El.value ? getDriver(p3El.value) : null;
+    if (!race || !d1 || !d2 || !d3) return;
 
     let aiPick = null;
     try { aiPick = JSON.parse(localStorage.getItem('gridiq_ai_pick_' + race.id)); } catch(_) {}
@@ -654,9 +675,9 @@ function initYourPickSection() {
     const allPicks = _getMyPicks();
     allPicks[race.id] = {
       raceId: race.id, raceName: race.name, raceRound: race.round, raceFlag: race.flag,
-      driverId: driver.id,
-      driverName: driver.firstName + ' ' + driver.lastName,
-      driverLastName: driver.lastName,
+      p1Name: d1.firstName + ' ' + d1.lastName, p1LastName: d1.lastName,
+      p2Name: d2.firstName + ' ' + d2.lastName, p2LastName: d2.lastName,
+      p3Name: d3.firstName + ' ' + d3.lastName, p3LastName: d3.lastName,
       aiPickName: aiPick ? aiPick.driverName : null,
       aiPickLastName: aiPick ? aiPick.driverLastName : null,
     };

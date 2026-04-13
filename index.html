@@ -75,10 +75,10 @@
 
     <div class="nav-links" id="nav-links">
       <button class="nav-btn active" data-tab="home" aria-label="Home" aria-current="page"><span class="nav-lbl">HOME</span></button>
+      <button class="nav-btn" data-tab="more" aria-label="Racing Guide"><span class="nav-lbl">RACING GUIDE</span></button>
       <button class="nav-btn" data-tab="predictor" aria-label="Race Predictor"><span class="nav-lbl">PREDICTOR</span></button>
       <button class="nav-btn" data-tab="fantasy" aria-label="Fantasy Team Builder"><span class="nav-lbl">FANTASY</span></button>
       <button class="nav-btn" data-tab="compare" aria-label="Head-to-Head Driver Compare"><span class="nav-lbl">H2H</span></button>
-      <button class="nav-btn" data-tab="more" aria-label="Racing Guide"><span class="nav-lbl">RACING GUIDE</span></button>
     </div>
 
     <div class="nav-actions">
@@ -118,6 +118,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       <span class="bnav-lbl">HOME</span>
     </button>
+    <button class="bnav-btn" data-tab="more" aria-label="Racing Guide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      <span class="bnav-lbl">GUIDE</span>
+    </button>
     <button class="bnav-btn" data-tab="predictor" aria-label="Race Predictor">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
       <span class="bnav-lbl">PREDICT</span>
@@ -129,10 +133,6 @@
     <button class="bnav-btn" data-tab="compare" aria-label="Head-to-Head Driver Compare">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7H4m0 0l4 4M4 7l4-4M16 17h4m0 0l-4-4m4 4l-4 4"/></svg>
       <span class="bnav-lbl">H2H</span>
-    </button>
-    <button class="bnav-btn" data-tab="more" aria-label="Racing Guide">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-      <span class="bnav-lbl">GUIDE</span>
     </button>
     <button class="bnav-pro-btn hidden" id="bnav-pro-btn" aria-label="Upgrade to GridIQ Pro">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -319,6 +319,10 @@
 
       </div><!-- /.home-cols -->
 
+      <footer id="app-footer">
+        <p class="footer-disclaimer">This app is unofficial and is not associated in any way with the Formula 1 companies. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>
+      </footer>
+
       <div class="spacer"></div>
     </div>
   </section>
@@ -336,6 +340,8 @@
         <div class="header-chip">SIM v2.6</div>
       </header>
 
+      <div class="pred-outer">
+      <div class="pred-main">
       <div class="pred-cols">
 
         <div class="pred-col-left">
@@ -389,11 +395,12 @@
         </div>
 
       </div>
-
+      </div><!-- /pred-main -->
+      <div class="pred-side">
       <!-- YOUR PREDICTION vs AI -->
       <div class="card your-pick-card">
         <div class="label">YOUR PREDICTION</div>
-        <p class="your-pick-desc">Pick who YOU think will win — then see how you compare to the AI after the race.</p>
+        <p class="your-pick-desc">Pick your top 3 — then see how you compare to the AI after the race.</p>
         <div class="your-pick-form">
           <div class="form-group">
             <label class="form-lbl">RACE</label>
@@ -403,9 +410,23 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-lbl">YOUR PICK TO WIN</label>
+            <label class="form-lbl">P1 — RACE WINNER</label>
             <div class="sel-wrap">
-              <select id="your-pick-driver" class="custom-sel"></select>
+              <select id="your-pick-p1" class="custom-sel"></select>
+              <div class="sel-arrow">▼</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-lbl">P2 — SECOND PLACE</label>
+            <div class="sel-wrap">
+              <select id="your-pick-p2" class="custom-sel"></select>
+              <div class="sel-arrow">▼</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-lbl">P3 — THIRD PLACE</label>
+            <div class="sel-wrap">
+              <select id="your-pick-p3" class="custom-sel"></select>
               <div class="sel-arrow">▼</div>
             </div>
           </div>
@@ -413,6 +434,8 @@
         </div>
         <div id="your-pick-history"></div>
       </div>
+      </div><!-- /pred-side -->
+      </div><!-- /pred-outer -->
 
       <div class="spacer"></div>
     </div>
@@ -774,12 +797,6 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       FOOTER DISCLAIMER
-  ══════════════════════════════════════════════ -->
-  <footer id="app-footer">
-    <p class="footer-disclaimer">This app is unofficial and is not associated in any way with the Formula 1 companies. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>
-  </footer>
 
   <!-- ══════════════════════════════════════════
        DISCLAIMER MODAL — shown once on first launch
