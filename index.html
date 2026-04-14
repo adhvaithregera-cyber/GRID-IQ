@@ -319,10 +319,6 @@
 
       </div><!-- /.home-cols -->
 
-      <footer id="app-footer">
-        <p class="footer-disclaimer">This app is unofficial and is not associated in any way with the Formula 1 companies. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>
-      </footer>
-
       <div class="spacer"></div>
     </div>
   </section>
@@ -409,27 +405,30 @@
               <div class="sel-arrow">▼</div>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-lbl">P1 — RACE WINNER</label>
-            <div class="sel-wrap">
-              <select id="your-pick-p1" class="custom-sel"></select>
-              <div class="sel-arrow">▼</div>
+          <div class="pick-slots">
+            <div class="pick-slot">
+              <span class="pick-slot-pos">P1</span>
+              <div class="pick-slot-sel sel-wrap">
+                <select id="your-pick-p1" class="custom-sel"></select>
+                <div class="sel-arrow">▼</div>
+              </div>
+            </div>
+            <div class="pick-slot">
+              <span class="pick-slot-pos">P2</span>
+              <div class="pick-slot-sel sel-wrap">
+                <select id="your-pick-p2" class="custom-sel"></select>
+                <div class="sel-arrow">▼</div>
+              </div>
+            </div>
+            <div class="pick-slot">
+              <span class="pick-slot-pos">P3</span>
+              <div class="pick-slot-sel sel-wrap">
+                <select id="your-pick-p3" class="custom-sel"></select>
+                <div class="sel-arrow">▼</div>
+              </div>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-lbl">P2 — SECOND PLACE</label>
-            <div class="sel-wrap">
-              <select id="your-pick-p2" class="custom-sel"></select>
-              <div class="sel-arrow">▼</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-lbl">P3 — THIRD PLACE</label>
-            <div class="sel-wrap">
-              <select id="your-pick-p3" class="custom-sel"></select>
-              <div class="sel-arrow">▼</div>
-            </div>
-          </div>
+          <div id="your-pick-msg" class="your-pick-msg hidden"></div>
           <button id="your-pick-btn" class="btn-primary">LOCK IN PICK &nbsp;→</button>
         </div>
         <div id="your-pick-history"></div>

@@ -580,47 +580,48 @@ function renderPickHistory() {
   const entries = Object.values(picks).sort((a,b) => a.raceRound - b.raceRound);
   if (!entries.length) { container.innerHTML = ''; return; }
 
-  container.innerHTML = entries.map(pick => {
-    const race = getRace(pick.raceId);
-    if (!race) return '';
-    if (race.status === 'completed') {
-      const p1Hit = pick.p1LastName === race.winner;
-      const p2Hit = pick.p2LastName === race.winner;
-      const p3Hit = pick.p3LastName === race.winner;
-      const anyHit = p1Hit || p2Hit || p3Hit;
-      const aiHit  = pick.aiPickLastName && pick.aiPickLastName === race.winner;
-      return `
-        <div class="pick-row">
-          <div class="pick-race-lbl">${pick.raceFlag} R${pick.raceRound} — ${pick.raceName}</div>
-          <div class="pick-vs-grid">
-            <div class="pick-vs-cell pick-top3-col${anyHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
-              <div class="pick-vs-label">YOUR PICKS</div>
-              <div class="pick-top3-row"><span class="pick-pos">P1</span><span class="pick-top3-name${p1Hit ? ' pick-top3-hit' : ''}">${pick.p1LastName || '—'}${p1Hit ? ' ✓' : ''}</span></div>
-              <div class="pick-top3-row"><span class="pick-pos">P2</span><span class="pick-top3-name${p2Hit ? ' pick-top3-hit' : ''}">${pick.p2LastName || '—'}${p2Hit ? ' ✓' : ''}</span></div>
-              <div class="pick-top3-row"><span class="pick-pos">P3</span><span class="pick-top3-name${p3Hit ? ' pick-top3-hit' : ''}">${pick.p3LastName || '—'}${p3Hit ? ' ✓' : ''}</span></div>
-            </div>
-            <div class="pick-vs-cell${aiHit ? ' pick-vs-hit' : ' pick-vs-miss'}">
-              <div class="pick-vs-label">AI P1</div>
-              <div class="pick-vs-name">${pick.aiPickLastName || '—'}</div>
-              <div class="pick-vs-result">${pick.aiPickLastName ? (aiHit ? '✓' : '✗') : '—'}</div>
-            </div>
-            <div class="pick-vs-cell pick-vs-actual">
-              <div class="pick-vs-label">WINNER</div>
-              <div class="pick-vs-name">${race.winner}</div>
-              <div class="pick-vs-result">🏆</div>
-            </div>
-          </div>
-        </div>
-      `;
-    } else {
-      return `
-        <div class="pick-row pick-row--pending">
-          <div class="pick-race-lbl">${pick.raceFlag} R${pick.raceRound} — ${pick.raceName}</div>
-          <div class="pick-pending-txt">⚡ P1: <strong>${pick.p1Name || '—'}</strong> · P2: <strong>${pick.p2Name || '—'}</strong> · P3: <strong>${pick.p3Name || '—'}</strong></div>
-        </div>
-      `;
-    }
-  }).join('');
+  container.innerHTML = '<div class="pick-history-hdr">YOUR PICKS</div>' +
+    entries.map(function(pick) {
+      const race = getRace(pick.raceId);
+      if (!race) return '';
+      if (race.status === 'completed') {
+        const p1Hit = pick.p1LastName === race.winner;
+        const p2Hit = pick.p2LastName === race.winner;
+        const p3Hit = pick.p3LastName === race.winner;
+        const anyHit = p1Hit || p2Hit || p3Hit;
+        const aiHit  = pick.aiPickLastName && pick.aiPickLastName === race.winner;
+        return '<div class="pick-row">' +
+          '<div class="pick-race-lbl">' + pick.raceFlag + ' R' + pick.raceRound + ' \u2014 ' + pick.raceName + '</div>' +
+          '<div class="pick-result-grid">' +
+            '<div class="pick-result-col' + (anyHit ? ' pick-result-col--hit' : ' pick-result-col--miss') + '">' +
+              '<div class="pick-result-title">YOUR PICKS</div>' +
+              '<div class="pick-result-entry"><span class="pick-pos-lbl">P1</span><span class="pick-result-name' + (p1Hit ? ' pick-result-name--hit' : '') + '">' + (pick.p1LastName || '\u2014') + (p1Hit ? ' \u2713' : '') + '</span></div>' +
+              '<div class="pick-result-entry"><span class="pick-pos-lbl">P2</span><span class="pick-result-name' + (p2Hit ? ' pick-result-name--hit' : '') + '">' + (pick.p2LastName || '\u2014') + (p2Hit ? ' \u2713' : '') + '</span></div>' +
+              '<div class="pick-result-entry"><span class="pick-pos-lbl">P3</span><span class="pick-result-name' + (p3Hit ? ' pick-result-name--hit' : '') + '">' + (pick.p3LastName || '\u2014') + (p3Hit ? ' \u2713' : '') + '</span></div>' +
+            '</div>' +
+            '<div class="pick-result-col' + (aiHit ? ' pick-result-col--hit' : ' pick-result-col--miss') + '">' +
+              '<div class="pick-result-title">AI P1</div>' +
+              '<div class="pick-result-entry"><span class="pick-result-name">' + (pick.aiPickLastName || '\u2014') + '</span></div>' +
+              '<div class="pick-result-check">' + (pick.aiPickLastName ? (aiHit ? '\u2713' : '\u2717') : '\u2014') + '</div>' +
+            '</div>' +
+            '<div class="pick-result-col pick-result-col--actual">' +
+              '<div class="pick-result-title">WINNER</div>' +
+              '<div class="pick-result-entry"><span class="pick-result-name pick-result-name--actual">' + race.winner + '</span></div>' +
+              '<div class="pick-result-check">\uD83C\uDFC6</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      } else {
+        return '<div class="pick-row pick-row--pending">' +
+          '<div class="pick-race-lbl">' + pick.raceFlag + ' R' + pick.raceRound + ' \u2014 ' + pick.raceName + '</div>' +
+          '<div class="pick-pending-slots">' +
+            '<div class="pick-pending-slot"><span class="pick-pending-slot-pos">P1</span><strong>' + (pick.p1Name || '\u2014') + '</strong></div>' +
+            '<div class="pick-pending-slot"><span class="pick-pending-slot-pos">P2</span><strong>' + (pick.p2Name || '\u2014') + '</strong></div>' +
+            '<div class="pick-pending-slot"><span class="pick-pending-slot-pos">P3</span><strong>' + (pick.p3Name || '\u2014') + '</strong></div>' +
+          '</div>' +
+        '</div>';
+      }
+    }).join('');
 }
 
 function initYourPickSection() {
@@ -629,27 +630,41 @@ function initYourPickSection() {
   const p2El   = document.getElementById('your-pick-p2');
   const p3El   = document.getElementById('your-pick-p3');
   const btn    = document.getElementById('your-pick-btn');
+  const msgEl  = document.getElementById('your-pick-msg');
   if (!raceEl || !p1El || !p2El || !p3El || !btn) return;
 
-  // Races dropdown
-  raceEl.innerHTML = `<option value="" disabled selected>SELECT RACE</option>` +
-    GRIDIQ_DATABASE.races.map(r =>
-      `<option value="${r.id}">${r.flag} R${r.round} — ${r.name}${r.status === 'completed' ? ' ✓' : ''}</option>`
-    ).join('');
+  var _msgTimer = null;
+  function showMsg(text, isError) {
+    if (!msgEl) return;
+    clearTimeout(_msgTimer);
+    msgEl.textContent = text;
+    msgEl.className = 'your-pick-msg ' + (isError ? 'your-pick-msg--error' : 'your-pick-msg--ok');
+    _msgTimer = setTimeout(function() { msgEl.className = 'your-pick-msg hidden'; }, 2500);
+  }
 
-  // Driver options (sorted by points)
-  const drivers = [...GRIDIQ_DATABASE.drivers].sort((a,b) => b.points - a.points);
-  const placeholder = `<option value="" disabled selected>SELECT DRIVER</option>`;
-  const driverOpts = drivers.map(d => `<option value="${d.id}">${d.firstName} ${d.lastName}</option>`).join('');
+  // Races dropdown
+  raceEl.innerHTML = '<option value="" disabled selected>SELECT RACE</option>' +
+    GRIDIQ_DATABASE.races.map(function(r) {
+      return '<option value="' + r.id + '">' + r.flag + ' R' + r.round + ' \u2014 ' + r.name + (r.status === 'completed' ? ' \u2713' : '') + '</option>';
+    }).join('');
+
+  // Driver options sorted by points descending
+  const drivers = [...GRIDIQ_DATABASE.drivers].sort(function(a,b) { return b.points - a.points; });
+  const placeholder = '<option value="" disabled selected>SELECT DRIVER</option>';
+  const driverOpts = drivers.map(function(d) {
+    return '<option value="' + d.id + '">' + d.firstName + ' ' + d.lastName + '</option>';
+  }).join('');
   p1El.innerHTML = placeholder + driverOpts;
   p2El.innerHTML = placeholder + driverOpts;
   p3El.innerHTML = placeholder + driverOpts;
 
   function refreshDriverOpts() {
     const v1 = p1El.value, v2 = p2El.value, v3 = p3El.value;
-    [p1El, p2El, p3El].forEach((el, i) => {
-      const others = [v1, v2, v3].filter((_, j) => j !== i);
-      Array.from(el.options).forEach(opt => { opt.disabled = opt.value !== '' && others.includes(opt.value); });
+    [p1El, p2El, p3El].forEach(function(el, i) {
+      const others = [v1, v2, v3].filter(function(_, j) { return j !== i; });
+      Array.from(el.options).forEach(function(opt) {
+        opt.disabled = opt.value !== '' && others.includes(opt.value);
+      });
     });
   }
   refreshDriverOpts();
@@ -657,19 +672,23 @@ function initYourPickSection() {
   p2El.addEventListener('change', refreshDriverOpts);
   p3El.addEventListener('change', refreshDriverOpts);
 
-  // Sync race selection with pred-track
+  // Sync race selection with pred-track selector
   const predTrack = document.getElementById('pred-track');
-  if (predTrack) predTrack.addEventListener('change', () => { raceEl.value = predTrack.value; });
+  if (predTrack) {
+    predTrack.addEventListener('change', function() {
+      raceEl.value = predTrack.value;
+      renderPickHistory();
+    });
+  }
   raceEl.addEventListener('change', renderPickHistory);
 
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', function() {
     const race = getRace(raceEl.value);
     const d1   = p1El.value ? getDriver(p1El.value) : null;
     const d2   = p2El.value ? getDriver(p2El.value) : null;
     const d3   = p3El.value ? getDriver(p3El.value) : null;
     if (!race || !d1 || !d2 || !d3) {
-      btn.textContent = 'SELECT ALL FIELDS ✕';
-      setTimeout(() => { btn.textContent = 'LOCK IN PICK \u00a0→'; }, 2000);
+      showMsg('SELECT A RACE AND ALL 3 DRIVERS', true);
       return;
     }
 
@@ -686,10 +705,7 @@ function initYourPickSection() {
       aiPickLastName: aiPick ? aiPick.driverLastName : null,
     };
     localStorage.setItem('gridiq_my_picks', JSON.stringify(allPicks));
-
-    const orig = btn.textContent;
-    btn.textContent = 'PICK SAVED ✓';
-    setTimeout(() => { btn.textContent = orig; }, 2000);
+    showMsg('PICK SAVED \u2713', false);
     renderPickHistory();
   });
 
@@ -1436,8 +1452,9 @@ document.addEventListener('DOMContentLoaded', function() {
     init();
   }
 
-  // Inject disclaimer into every tab section
+  // Inject disclaimer into every tab section except home
   document.querySelectorAll('.section-scroll').forEach(function(scroll) {
+    if (scroll.closest('#section-home')) return;
     const wrap = document.createElement('div');
     wrap.className = 'section-disclaimer-wrap';
     wrap.innerHTML = '<p class="footer-disclaimer">GridIQ is an unofficial fan application and is not associated in any way with the Formula 1 companies, Formula One Digital Media Limited, or the FIA. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>';
