@@ -478,7 +478,7 @@ select, input { font-family: var(--font-body); }
 .champ-pts-lbl { font-size: 10px; color: var(--text-2); letter-spacing: 1px; }
 
 /* ─── STANDINGS LIST ─────────────────────────────────────── */
-.standings { display: flex; flex-direction: column; gap: 5px; }
+.standings { display: flex; flex-direction: column; gap: 5px; min-height: 200px; }
 .s-row {
   display: flex;
   align-items: center;
