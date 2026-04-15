@@ -2683,6 +2683,9 @@ select, input { font-family: var(--font-body); }
 
 /* ── Footer disclaimer ──────────────────────────────────── */
 .section-disclaimer-wrap { padding: 0 var(--content-pad); margin-top: 24px; }
+.site-footer-links { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; padding: 16px var(--content-pad) 8px; }
+.footer-nav-link { font-family: var(--font-tech); font-size: 10px; letter-spacing: 0.08em; color: var(--text-3); text-decoration: none; text-transform: uppercase; }
+.footer-nav-link:hover { color: var(--text-2); }
 
 #app-footer {
   padding: 16px var(--content-pad) calc(16px + env(safe-area-inset-bottom));
