@@ -322,11 +322,11 @@ select, input { font-family: var(--font-body); }
 /* ─── HOME HERO BANNER ───────────────────────────────────── */
 .home-hero {
   position: relative;
-  min-height: 180px;
+  min-height: 260px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 36px var(--content-pad) 16px;
+  justify-content: center;
+  padding: 36px var(--content-pad);
   margin: 0 calc(-1 * var(--content-pad));
   background: linear-gradient(135deg, #0e0202 0%, #0a0606 25%, #080808 55%, #05050c 100%);
   overflow: hidden;
@@ -376,7 +376,7 @@ select, input { font-family: var(--font-body); }
   flex-direction: column;
   gap: 6px;
 }
-.hero-title-wordmark { display: block; }
+.hero-title-wordmark { display: block; font-family: 'Chakra Petch', sans-serif; font-weight: 700; }
 .hero-title-sub {
   font-family: var(--font-tech);
   font-size: 13px;
@@ -1268,7 +1268,7 @@ select, input { font-family: var(--font-body); }
   :root { --content-pad: 32px; }
 
   /* ── Home hero scales up ── */
-  .home-hero { min-height: 260px; padding-top: 44px; }
+  .home-hero { min-height: 300px; padding: 44px 32px; }
   .home-hero-title { font-size: 72px; }
   .home-hero-tagline { font-size: 11px; }
 
@@ -1337,7 +1337,7 @@ select, input { font-family: var(--font-body); }
   :root { --content-pad: 48px; }
 
   /* Bigger home hero */
-  .home-hero { min-height: 460px; padding-top: 52px; }
+  .home-hero { min-height: 460px; padding: 52px 48px; }
   .home-hero-title { font-size: 88px; letter-spacing: 6px; }
 
   /* Bigger race hero typography */
