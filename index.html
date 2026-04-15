@@ -70,7 +70,8 @@
     "about": { "@type": "SportsOrganization", "name": "Formula 1", "sport": "Motorsport" }
   }
   </script>
-  <link rel="preload" as="image" href="assets/hero-bg.jpg">
+  <link rel="preload" as="image" href="assets/hero-bg-mobile.jpg" media="(max-width: 767px)">
+  <link rel="preload" as="image" href="assets/hero-bg.jpg" media="(min-width: 768px)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=optional" rel="stylesheet">
@@ -285,7 +286,10 @@
 
       <!-- Hero Banner (smoke animation + branding only) -->
       <div class="home-hero">
-        <img src="assets/hero-bg.jpg" class="hero-bg-img" alt="" aria-hidden="true" draggable="false" fetchpriority="high">
+        <picture>
+          <source srcset="assets/hero-bg-mobile.jpg" media="(max-width: 767px)">
+          <img src="assets/hero-bg.jpg" class="hero-bg-img" alt="" aria-hidden="true" draggable="false" fetchpriority="high">
+        </picture>
         <div class="hero-scrim"></div>
         <div class="home-hero-inner">
           <div class="home-hero-eyebrow">RACE STRATEGY INTELLIGENCE</div>
