@@ -172,6 +172,7 @@ select, input { font-family: var(--font-body); }
   position: relative;
   overflow: hidden;
   margin-bottom: 10px;
+  min-height: 120px;
 }
 .race-hero::before {
   content: '';
@@ -415,6 +416,7 @@ select, input { font-family: var(--font-body); }
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 16px;
+  min-height: 80px;
 }
 .hero-stat {
   background: var(--bg-card);
