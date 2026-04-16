@@ -2418,14 +2418,17 @@ select, input { font-family: var(--font-body); }
 @media (min-width: 1100px) {
   .compare-body {
     display: grid;
-    grid-template-columns: 1fr 320px 1fr;
-    align-items: start;
+    grid-template-columns: 1fr 460px 1fr;
     gap: 16px;
+    /* default align-items: stretch → equal heights */
   }
   .compare-driver-cards { display: contents; }
-  #compare-card-a { grid-column: 1; grid-row: 1; }
-  .compare-chart-card { grid-column: 2; grid-row: 1; margin-bottom: 0; }
-  #compare-card-b { grid-column: 3; grid-row: 1; }
+  #compare-card-a { grid-column: 1; grid-row: 1; display: flex; }
+  .compare-chart-card { grid-column: 2; grid-row: 1; margin-bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #compare-card-b { grid-column: 3; grid-row: 1; display: flex; }
+  #compare-card-a .cdc-card,
+  #compare-card-b .cdc-card { flex: 1; }
+  .radar-svg { max-width: 440px; }
 }
 
 /* ── Driver H2H side-by-side cards ─────────────────────── */
@@ -2436,22 +2439,14 @@ select, input { font-family: var(--font-body); }
   margin-bottom: 4px;
 }
 .cdc-card {
-  background: linear-gradient(140deg, #110808 0%, #0f0a00 50%, #080808 100%);
-  border: 1px solid var(--border-red);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 14px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(255, 30, 0, 0.08);
 }
-.cdc-card::before {
-  content: '';
-  position: absolute;
-  top: -40px; right: -40px;
-  width: 180px; height: 180px;
-  background: radial-gradient(circle, rgba(255,30,0,0.09) 0%, transparent 70%);
-  pointer-events: none;
-}
+.cdc-card::before { display: none; }
 .cdc-card-header {
   display: flex;
   align-items: center;

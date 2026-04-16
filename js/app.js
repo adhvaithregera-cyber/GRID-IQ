@@ -1307,7 +1307,7 @@ function _renderCompareRadar(dA, dB) {
     `<text x="180" y="19" class="radar-legend">${dB.lastName.toUpperCase()}</text>`;
 
   el.innerHTML =
-    `<svg viewBox="0 0 300 308" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
+    `<svg viewBox="-30 0 360 308" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
     gridPolys + axes + polyA + polyB + lbls + legend +
     `</svg>`;
 }
