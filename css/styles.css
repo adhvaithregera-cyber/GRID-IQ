@@ -2285,6 +2285,7 @@ select, input { font-family: var(--font-body); }
 .compare-chart-card {
   padding: 16px 8px;
   margin-bottom: 12px;
+  overflow: visible;
 }
 .radar-svg {
   width: 100%;
@@ -2418,7 +2419,7 @@ select, input { font-family: var(--font-body); }
 @media (min-width: 1100px) {
   .compare-body {
     display: grid;
-    grid-template-columns: 1fr 460px 1fr;
+    grid-template-columns: 1fr 500px 1fr;
     gap: 16px;
     /* default align-items: stretch → equal heights */
   }

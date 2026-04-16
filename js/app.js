@@ -1267,7 +1267,7 @@ function _renderCompareRadar(dA, dB) {
   const keys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
   const labels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
   const n = keys.length;
-  const cx = 160, cy = 185, r = 130;
+  const cx = 160, cy = 200, r = 140;
   const colorA = '#FF1E00', colorB = '#00D2BE';
   const RADAR_MIN = 60, RADAR_MAX = 100;
 
@@ -1292,7 +1292,7 @@ function _renderCompareRadar(dA, dB) {
 
   const lbls = labels.map((lbl, i) => {
     const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
-    const lr = r + 24;
+    const lr = r + 26;
     const x = (cx + lr * Math.cos(angle)).toFixed(1);
     const y = (cy + lr * Math.sin(angle)).toFixed(1);
     const anchor = Math.cos(angle) > 0.15 ? 'start' : Math.cos(angle) < -0.15 ? 'end' : 'middle';
@@ -1300,15 +1300,22 @@ function _renderCompareRadar(dA, dB) {
     return `<text x="${x}" y="${y}" text-anchor="${anchor}" dy="${dy}" class="radar-label">${lbl}</text>`;
   }).join('');
 
+  const defs =
+    `<defs><filter id="lglow" x="-60%" y="-60%" width="220%" height="220%">` +
+    `<feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b"/>` +
+    `<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>` +
+    `</filter></defs>`;
+
+  const lf = 'font-family="\'Chakra Petch\',sans-serif" font-size="14" font-weight="700" letter-spacing="1.5"';
   const legend =
-    `<rect x="5" y="10" width="18" height="3" rx="1.5" fill="${colorA}"/>` +
-    `<text x="30" y="17" class="radar-legend">${dA.lastName.toUpperCase()}</text>` +
-    `<rect x="195" y="10" width="18" height="3" rx="1.5" fill="${colorB}"/>` +
-    `<text x="220" y="17" class="radar-legend">${dB.lastName.toUpperCase()}</text>`;
+    `<rect x="-60" y="10" width="26" height="6" rx="3" fill="${colorA}" filter="url(#lglow)"/>` +
+    `<text x="-28" y="23" text-anchor="start" ${lf} fill="${colorA}" filter="url(#lglow)">${dA.lastName.toUpperCase()}</text>` +
+    `<text x="315" y="23" text-anchor="end" ${lf} fill="${colorB}" filter="url(#lglow)">${dB.lastName.toUpperCase()}</text>` +
+    `<rect x="319" y="10" width="26" height="6" rx="3" fill="${colorB}" filter="url(#lglow)"/>`;
 
   el.innerHTML =
-    `<svg viewBox="-55 0 390 325" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
-    gridPolys + axes + polyA + polyB + lbls + legend +
+    `<svg viewBox="-65 0 415 355" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
+    defs + gridPolys + axes + polyA + polyB + lbls + legend +
     `</svg>`;
 }
 
