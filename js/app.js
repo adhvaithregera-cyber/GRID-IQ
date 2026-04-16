@@ -1313,8 +1313,9 @@ function _renderCompareRadar(dA, dB) {
 }
 
 function _renderCompareStats(dA, dB) {
-  const el = document.getElementById('compare-stats');
-  if (!el) return;
+  const elA = document.getElementById('compare-card-a');
+  const elB = document.getElementById('compare-card-b');
+  if (!elA || !elB) return;
 
   const ratingKeys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
   const ratingLabels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
@@ -1357,7 +1358,8 @@ function _renderCompareStats(dA, dB) {
     </div>`;
   }
 
-  el.innerHTML = `<div class="cdc-grid">${buildCard(dA, dB, 'cdc-win-a')}${buildCard(dB, dA, 'cdc-win-b')}</div>`;
+  elA.innerHTML = buildCard(dA, dB, 'cdc-win-a');
+  elB.innerHTML = buildCard(dB, dA, 'cdc-win-b');
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */

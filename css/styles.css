@@ -2402,6 +2402,32 @@ select, input { font-family: var(--font-body); }
   border-top: 1px solid var(--border);
 }
 
+/* ── Compare body wrapper ────────────────────────────────── */
+.compare-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.compare-driver-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.compare-driver-card { min-width: 0; }
+
+@media (min-width: 1100px) {
+  .compare-body {
+    display: grid;
+    grid-template-columns: 1fr 320px 1fr;
+    align-items: start;
+    gap: 16px;
+  }
+  .compare-driver-cards { display: contents; }
+  #compare-card-a { grid-column: 1; grid-row: 1; }
+  .compare-chart-card { grid-column: 2; grid-row: 1; margin-bottom: 0; }
+  #compare-card-b { grid-column: 3; grid-row: 1; }
+}
+
 /* ── Driver H2H side-by-side cards ─────────────────────── */
 .cdc-grid {
   display: grid;
