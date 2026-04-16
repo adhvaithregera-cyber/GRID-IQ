@@ -142,7 +142,7 @@ function renderHeroStats() {
 function getNextRace() {
   const now = new Date();
   const upcoming = GRIDIQ_DATABASE.races
-    .filter(r => new Date(r.date + 'T13:00:00Z') > now)
+    .filter(r => new Date(r.startUTC || r.date + 'T13:00:00Z') > now)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
   return upcoming[0] || GRIDIQ_DATABASE.races[GRIDIQ_DATABASE.races.length - 1];
 }
@@ -171,11 +171,21 @@ function renderRaceHero() {
       </div>
     `;
   } else if (nextPick) {
+    const pickName = nextPick.p1Name || nextPick.driverName;
     predHtml = `
       <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:12px;border-left:2px solid var(--accent)">
         <div>
           <div style="font-family:var(--font-tech);font-size:9px;letter-spacing:2px;color:var(--text-3);margin-bottom:2px">YOUR PICK · R${race.round}</div>
-          <div style="font-family:var(--font-tech);font-size:12px;color:var(--text)">⚡ <strong style="color:var(--accent)">${nextPick.driverName}</strong> to win ${nextPick.raceName}</div>
+          <div style="font-family:var(--font-tech);font-size:12px;color:var(--text)">⚡ <strong style="color:var(--accent)">${pickName}</strong> to win ${nextPick.raceName}</div>
+        </div>
+      </div>
+    `;
+  } else {
+    predHtml = `
+      <div onclick="switchTab('predictor')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:12px;border-left:2px solid var(--accent)">
+        <div>
+          <div style="font-family:var(--font-tech);font-size:9px;letter-spacing:2px;color:var(--text-3);margin-bottom:2px">YOUR PICK · R${race.round}</div>
+          <div style="font-family:var(--font-tech);font-size:12px;color:var(--accent)">MAKE YOUR PREDICTION →</div>
         </div>
       </div>
     `;
@@ -230,7 +240,7 @@ function updateCountdown(race) {
   const els = document.querySelectorAll('.countdown-display');
   if (!els.length) return;
   const now = new Date();
-  const target = new Date(race.date + 'T13:00:00Z');
+  const target = new Date(race.startUTC || race.date + 'T13:00:00Z');
   const diff = target - now;
 
   let html;

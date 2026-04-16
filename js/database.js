@@ -49,7 +49,7 @@ const GRIDIQ_DATABASE = {
     },
     {
       round:4,  id:"MIA", name:"Miami GP",         country:"USA",          city:"Miami",
-      circuit:"Miami International Autodrome",date:"2026-05-03", laps:57, length:5.412, flag:"🇺🇸",
+      circuit:"Miami International Autodrome",date:"2026-05-04", startUTC:"2026-05-03T20:00:00Z", laps:57, length:5.412, flag:"🇺🇸",
       trackType:"balanced",  preferredAeroMode:"X", drsZones:3, tireWear:"medium",
       winner:null, status:"upcoming",
       desc:"Purpose-built circuit blending power straights with a technical stadium section. X-mode speed is rewarded."
