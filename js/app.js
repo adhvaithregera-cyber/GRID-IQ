@@ -1267,7 +1267,7 @@ function _renderCompareRadar(dA, dB) {
   const keys   = ['overall', 'wet', 'technical', 'power', 'racecraft'];
   const labels = ['OVERALL', 'WET', 'TECHNICAL', 'POWER', 'RACECRAFT'];
   const n = keys.length;
-  const cx = 150, cy = 158, r = 100;
+  const cx = 160, cy = 185, r = 130;
   const colorA = '#FF1E00', colorB = '#00D2BE';
   const RADAR_MIN = 60, RADAR_MAX = 100;
 
@@ -1292,7 +1292,7 @@ function _renderCompareRadar(dA, dB) {
 
   const lbls = labels.map((lbl, i) => {
     const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
-    const lr = r + 20;
+    const lr = r + 24;
     const x = (cx + lr * Math.cos(angle)).toFixed(1);
     const y = (cy + lr * Math.sin(angle)).toFixed(1);
     const anchor = Math.cos(angle) > 0.15 ? 'start' : Math.cos(angle) < -0.15 ? 'end' : 'middle';
@@ -1301,13 +1301,13 @@ function _renderCompareRadar(dA, dB) {
   }).join('');
 
   const legend =
-    `<rect x="20" y="14" width="14" height="3" rx="1.5" fill="${colorA}"/>` +
-    `<text x="40" y="19" class="radar-legend">${dA.lastName.toUpperCase()}</text>` +
-    `<rect x="160" y="14" width="14" height="3" rx="1.5" fill="${colorB}"/>` +
-    `<text x="180" y="19" class="radar-legend">${dB.lastName.toUpperCase()}</text>`;
+    `<rect x="5" y="10" width="18" height="3" rx="1.5" fill="${colorA}"/>` +
+    `<text x="30" y="17" class="radar-legend">${dA.lastName.toUpperCase()}</text>` +
+    `<rect x="195" y="10" width="18" height="3" rx="1.5" fill="${colorB}"/>` +
+    `<text x="220" y="17" class="radar-legend">${dB.lastName.toUpperCase()}</text>`;
 
   el.innerHTML =
-    `<svg viewBox="-30 0 360 308" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
+    `<svg viewBox="-55 0 390 325" xmlns="http://www.w3.org/2000/svg" class="radar-svg">` +
     gridPolys + axes + polyA + polyB + lbls + legend +
     `</svg>`;
 }
