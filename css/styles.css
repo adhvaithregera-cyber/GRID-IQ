@@ -2225,7 +2225,7 @@ select, input { font-family: var(--font-body); }
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .compare-picker .label { margin-top: 0; margin-bottom: 10px; }
 .compare-picker {
@@ -2409,7 +2409,7 @@ select, input { font-family: var(--font-body); }
 .compare-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 .compare-driver-cards {
   display: grid;
@@ -2445,7 +2445,7 @@ select, input { font-family: var(--font-body); }
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 14px;
+  padding: 20px 16px;
   position: relative;
   overflow: hidden;
 }
@@ -2491,23 +2491,25 @@ select, input { font-family: var(--font-body); }
 }
 .cdc-section-label {
   font-family: var(--font-tech);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 2.5px;
-  color: var(--text-3);
+  color: var(--text-2);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--border);
 }
 .cdc-section-label--ratings {
-  margin-top: 14px;
+  margin-top: 20px;
 }
 .cdc-section-label--profile {
-  margin-top: 14px;
+  margin-top: 20px;
 }
 .cdc-profile-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 7px;
+  margin-bottom: 10px;
 }
 .cdc-bio {
   font-family: var(--font-body);
@@ -2520,16 +2522,16 @@ select, input { font-family: var(--font-body); }
 }
 /* verdict card */
 .compare-verdict-card {
-  margin-top: 12px;
+  margin-top: 0;
 }
 .compare-verdict-edges {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 .compare-edge-chip {
-  padding: 10px 8px;
+  padding: 14px 8px;
   border-radius: var(--radius-sm);
   background: var(--bg-raised);
   border: 1px solid var(--border);
@@ -2540,11 +2542,11 @@ select, input { font-family: var(--font-body); }
 .compare-edge-chip--tie { opacity: 0.6; }
 .compare-edge-lbl {
   font-family: var(--font-tech);
-  font-size: 7px;
+  font-size: 9px;
   letter-spacing: 0.12em;
-  color: var(--text-3);
+  color: var(--text-2);
   text-transform: uppercase;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .compare-edge-name {
   font-family: var(--font-tech);
@@ -2558,8 +2560,8 @@ select, input { font-family: var(--font-body); }
 .compare-edge-chip--b .compare-edge-name { color: #00D2BE; }
 .compare-edge-sub {
   font-family: var(--font-tech);
-  font-size: 8px;
-  color: var(--text-3);
+  font-size: 9px;
+  color: var(--text-2);
   letter-spacing: 0.05em;
 }
 .compare-verdict-text {
@@ -2580,7 +2582,7 @@ select, input { font-family: var(--font-body); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 7px;
+  margin-bottom: 10px;
 }
 .cdc-stat-lbl {
   font-family: var(--font-tech);
