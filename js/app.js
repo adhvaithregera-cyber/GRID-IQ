@@ -1557,9 +1557,9 @@ document.addEventListener('DOMContentLoaded', function() {
     init();
   }
 
-  // Inject disclaimer into every tab section except home
+  // Inject disclaimer into every tab section except home and compare
   document.querySelectorAll('.section-scroll').forEach(function(scroll) {
-    if (scroll.closest('#section-home')) return;
+    if (scroll.closest('#section-home') || scroll.closest('#section-compare')) return;
     const wrap = document.createElement('div');
     wrap.className = 'section-disclaimer-wrap';
     wrap.innerHTML = '<p class="footer-disclaimer">GridIQ is an unofficial fan application and is not associated in any way with the Formula 1 companies, Formula One Digital Media Limited, or the FIA. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>';
