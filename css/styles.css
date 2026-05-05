@@ -2432,6 +2432,7 @@ select, input { font-family: var(--font-body); }
   #compare-card-a .cdc-card,
   #compare-card-b .cdc-card { flex: 1; }
   .radar-svg { max-width: 100%; }
+  #compare-verdict { grid-column: 1 / -1; grid-row: 2; }
 }
 
 /* ── Driver H2H side-by-side cards ─────────────────────── */
@@ -2523,7 +2524,10 @@ select, input { font-family: var(--font-body); }
 /* verdict card */
 .compare-verdict-card {
   margin-top: 0;
+  margin-bottom: 0;
   padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .compare-verdict-edges {
   display: grid;
