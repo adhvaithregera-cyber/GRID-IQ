@@ -75,10 +75,14 @@ function applyRaceResults(data) {
     var dbRace = GRIDIQ_DATABASE.races.find(function(r) { return r.round === round; });
     if (!dbRace) return;
     var p1 = apiRace.Results && apiRace.Results.find(function(r) { return r.position === '1'; });
+    var p2 = apiRace.Results && apiRace.Results.find(function(r) { return r.position === '2'; });
+    var p3 = apiRace.Results && apiRace.Results.find(function(r) { return r.position === '3'; });
     if (p1) {
       dbRace.status = 'completed';
       dbRace.winner = (p1.Driver && p1.Driver.familyName) || dbRace.winner;
     }
+    if (p2) dbRace.p2 = (p2.Driver && p2.Driver.familyName) || dbRace.p2;
+    if (p3) dbRace.p3 = (p3.Driver && p3.Driver.familyName) || dbRace.p3;
   });
 
   /* Recount from status field so racesCompleted stays in sync */

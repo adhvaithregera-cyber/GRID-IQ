@@ -596,30 +596,34 @@ function renderPickHistory() {
       if (!race) return '';
       if (race.status === 'completed') {
         const p1Hit = pick.p1LastName === race.winner;
-        const p2Hit = pick.p2LastName === race.winner;
-        const p3Hit = pick.p3LastName === race.winner;
-        const anyHit = p1Hit || p2Hit || p3Hit;
+        const p2Hit = race.p2 ? pick.p2LastName === race.p2 : false;
+        const p3Hit = race.p3 ? pick.p3LastName === race.p3 : false;
         const aiHit  = pick.aiPickLastName && pick.aiPickLastName === race.winner;
+        const score = [p1Hit, p2Hit, p3Hit].filter(Boolean).length;
         return '<div class="pick-row">' +
-          '<div class="pick-race-lbl">' + pick.raceFlag + ' R' + pick.raceRound + ' \u2014 ' + pick.raceName + '</div>' +
-          '<div class="pick-result-grid">' +
-            '<div class="pick-result-col' + (anyHit ? ' pick-result-col--hit' : ' pick-result-col--miss') + '">' +
-              '<div class="pick-result-title">YOUR PICKS</div>' +
-              '<div class="pick-result-entry"><span class="pick-pos-lbl">P1</span><span class="pick-result-name' + (p1Hit ? ' pick-result-name--hit' : '') + '">' + (pick.p1LastName || '\u2014') + (p1Hit ? ' \u2713' : '') + '</span></div>' +
-              '<div class="pick-result-entry"><span class="pick-pos-lbl">P2</span><span class="pick-result-name' + (p2Hit ? ' pick-result-name--hit' : '') + '">' + (pick.p2LastName || '\u2014') + (p2Hit ? ' \u2713' : '') + '</span></div>' +
-              '<div class="pick-result-entry"><span class="pick-pos-lbl">P3</span><span class="pick-result-name' + (p3Hit ? ' pick-result-name--hit' : '') + '">' + (pick.p3LastName || '\u2014') + (p3Hit ? ' \u2713' : '') + '</span></div>' +
+          '<div class="pick-row-hdr">' +
+            '<span class="pick-race-lbl">' + pick.raceFlag + ' R' + pick.raceRound + ' \u2014 ' + pick.raceName + '</span>' +
+            '<span class="pick-score-badge ' + (score > 0 ? 'pick-score-badge--hit' : 'pick-score-badge--miss') + '">' + score + '/3</span>' +
+          '</div>' +
+          '<div class="pick-comparison">' +
+            '<div class="pick-cmp-col">' +
+              '<div class="pick-cmp-lbl">YOUR PICKS</div>' +
+              '<div class="pick-cmp-slot"><span class="pick-pos-lbl">P1</span><span class="pick-cmp-name ' + (p1Hit ? 'pick-cmp-name--hit' : 'pick-cmp-name--miss') + '">' + (pick.p1LastName || '\u2014') + (p1Hit ? ' \u2713' : '') + '</span></div>' +
+              '<div class="pick-cmp-slot"><span class="pick-pos-lbl">P2</span><span class="pick-cmp-name ' + (p2Hit ? 'pick-cmp-name--hit' : (race.p2 ? 'pick-cmp-name--miss' : '')) + '">' + (pick.p2LastName || '\u2014') + (p2Hit ? ' \u2713' : '') + '</span></div>' +
+              '<div class="pick-cmp-slot"><span class="pick-pos-lbl">P3</span><span class="pick-cmp-name ' + (p3Hit ? 'pick-cmp-name--hit' : (race.p3 ? 'pick-cmp-name--miss' : '')) + '">' + (pick.p3LastName || '\u2014') + (p3Hit ? ' \u2713' : '') + '</span></div>' +
             '</div>' +
-            '<div class="pick-result-col' + (aiHit ? ' pick-result-col--hit' : ' pick-result-col--miss') + '">' +
-              '<div class="pick-result-title">AI P1</div>' +
-              '<div class="pick-result-entry"><span class="pick-result-name">' + (pick.aiPickLastName || '\u2014') + '</span></div>' +
-              '<div class="pick-result-check">' + (pick.aiPickLastName ? (aiHit ? '\u2713' : '\u2717') : '\u2014') + '</div>' +
-            '</div>' +
-            '<div class="pick-result-col pick-result-col--actual">' +
-              '<div class="pick-result-title">WINNER</div>' +
-              '<div class="pick-result-entry"><span class="pick-result-name pick-result-name--actual">' + race.winner + '</span></div>' +
-              '<div class="pick-result-check">\uD83C\uDFC6</div>' +
+            '<div class="pick-cmp-col pick-cmp-col--actual">' +
+              '<div class="pick-cmp-lbl">ACTUAL PODIUM</div>' +
+              '<div class="pick-cmp-slot"><span class="pick-pos-lbl">P1</span><span class="pick-cmp-name pick-cmp-name--actual">' + (race.winner || '\u2014') + '</span></div>' +
+              '<div class="pick-cmp-slot"><span class="pick-pos-lbl">P2</span><span class="pick-cmp-name pick-cmp-name--actual">' + (race.p2 || '\u2014') + '</span></div>' +
+              '<div class="pick-cmp-slot"><span class="pick-pos-lbl">P3</span><span class="pick-cmp-name pick-cmp-name--actual">' + (race.p3 || '\u2014') + '</span></div>' +
             '</div>' +
           '</div>' +
+          (pick.aiPickLastName ?
+            '<div class="pick-ai-row">' +
+              '<span class="pick-ai-lbl">AI PICK</span>' +
+              '<span class="pick-cmp-name ' + (aiHit ? 'pick-cmp-name--hit' : 'pick-cmp-name--miss') + '">' + pick.aiPickLastName + (aiHit ? ' \u2713' : ' \u2717') + '</span>' +
+            '</div>' : '') +
         '</div>';
       } else {
         return '<div class="pick-row pick-row--pending">' +
@@ -1249,6 +1253,7 @@ function renderCompare() {
   _renderCompareBadge('compare-badge-b', dB, '#00D2BE');
   _renderCompareRadar(dA, dB);
   _renderCompareStats(dA, dB);
+  _renderCompareVerdict(dA, dB);
 }
 
 function _renderCompareBadge(id, d, color) {
@@ -1319,6 +1324,15 @@ function _renderCompareRadar(dA, dB) {
     `</svg>`;
 }
 
+function _driverAge(born) {
+  var d = new Date(born);
+  if (isNaN(d)) return '—';
+  var now = new Date(), age = now.getFullYear() - d.getFullYear();
+  if (now.getMonth() - d.getMonth() < 0 ||
+     (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
+  return age;
+}
+
 function _renderCompareStats(dA, dB) {
   const elA = document.getElementById('compare-card-a');
   const elB = document.getElementById('compare-card-b');
@@ -1350,6 +1364,9 @@ function _renderCompareStats(dA, dB) {
       </div>`;
     }).join('');
 
+    const bioText = d.bio || '';
+    const bioTrunc = bioText.length > 110 ? bioText.slice(0, 110) + '…' : bioText;
+
     return `<div class="cdc-card">
       <div class="cdc-card-header">
         <span class="cdc-dot" style="background:${dotColor}"></span>
@@ -1362,11 +1379,80 @@ function _renderCompareStats(dA, dB) {
       ${careerRows}
       <div class="cdc-section-label cdc-section-label--ratings">RATINGS</div>
       ${ratingRows}
+      <div class="cdc-section-label cdc-section-label--profile">PROFILE</div>
+      <div class="cdc-profile-row"><span class="cdc-stat-lbl">NO.</span><span class="cdc-stat-val">#${d.number}</span></div>
+      <div class="cdc-profile-row"><span class="cdc-stat-lbl">AGE</span><span class="cdc-stat-val">${_driverAge(d.born)}</span></div>
+      <div class="cdc-profile-row"><span class="cdc-stat-lbl">NATION</span><span class="cdc-stat-val">${d.nationality}</span></div>
+      <div class="cdc-profile-row"><span class="cdc-stat-lbl">DEBUT</span><span class="cdc-stat-val">${d.debut}</span></div>
+      ${bioTrunc ? `<div class="cdc-bio">${bioTrunc}</div>` : ''}
     </div>`;
   }
 
   elA.innerHTML = buildCard(dA, dB, 'cdc-win-a');
   elB.innerHTML = buildCard(dB, dA, 'cdc-win-b');
+}
+
+function _renderCompareVerdict(dA, dB) {
+  const el = document.getElementById('compare-verdict');
+  if (!el) return;
+
+  const ratingKeys = ['overall', 'wet', 'technical', 'power', 'racecraft'];
+  const careerKeys = ['wins', 'poles', 'podiums', 'championships'];
+
+  const ratingA = ratingKeys.filter(k => (dA.rating[k] || 0) > (dB.rating[k] || 0)).length;
+  const ratingB = ratingKeys.filter(k => (dB.rating[k] || 0) > (dA.rating[k] || 0)).length;
+
+  const careerA = careerKeys.filter(k => (dA[k] || 0) > (dB[k] || 0)).length;
+  const careerB = careerKeys.filter(k => (dB[k] || 0) > (dA[k] || 0)).length;
+
+  const pointsA = dA.points || 0, pointsB = dB.points || 0;
+
+  const ratingWinner = ratingA > ratingB ? 'A' : ratingB > ratingA ? 'B' : 'TIE';
+  const careerWinner = careerA > careerB ? 'A' : careerB > careerA ? 'B' : 'TIE';
+  const pointsWinner = pointsA > pointsB ? 'A' : pointsB > pointsA ? 'B' : 'TIE';
+
+  const overallA = [ratingWinner, careerWinner, pointsWinner].filter(w => w === 'A').length;
+  const overallB = [ratingWinner, careerWinner, pointsWinner].filter(w => w === 'B').length;
+
+  function chipCls(winner) {
+    return winner === 'A' ? 'compare-edge-chip--a' : winner === 'B' ? 'compare-edge-chip--b' : 'compare-edge-chip--tie';
+  }
+  function chipName(winner) {
+    return winner === 'A' ? dA.lastName.toUpperCase() : winner === 'B' ? dB.lastName.toUpperCase() : 'TIED';
+  }
+
+  let verdictText, verdictCls;
+  if (overallA > overallB) {
+    verdictText = `OVERALL EDGE — ${dA.lastName.toUpperCase()} leads on ${overallA} of 3 categories`;
+    verdictCls = 'compare-verdict-text--a';
+  } else if (overallB > overallA) {
+    verdictText = `OVERALL EDGE — ${dB.lastName.toUpperCase()} leads on ${overallB} of 3 categories`;
+    verdictCls = 'compare-verdict-text--b';
+  } else {
+    verdictText = 'TOO CLOSE TO CALL — drivers are evenly matched';
+    verdictCls = 'compare-verdict-text--tie';
+  }
+
+  el.innerHTML = `<div class="compare-verdict-card card">
+    <div class="compare-verdict-edges">
+      <div class="compare-edge-chip ${chipCls(ratingWinner)}">
+        <div class="compare-edge-lbl">RATINGS</div>
+        <div class="compare-edge-name">${chipName(ratingWinner)}</div>
+        <div class="compare-edge-sub">${ratingA > ratingB ? ratingA : ratingB}/5 leads</div>
+      </div>
+      <div class="compare-edge-chip ${chipCls(careerWinner)}">
+        <div class="compare-edge-lbl">CAREER STATS</div>
+        <div class="compare-edge-name">${chipName(careerWinner)}</div>
+        <div class="compare-edge-sub">${careerA > careerB ? careerA : careerB}/4 leads</div>
+      </div>
+      <div class="compare-edge-chip ${chipCls(pointsWinner)}">
+        <div class="compare-edge-lbl">2026 SEASON</div>
+        <div class="compare-edge-name">${chipName(pointsWinner)}</div>
+        <div class="compare-edge-sub">${pointsA} vs ${pointsB} pts</div>
+      </div>
+    </div>
+    <div class="compare-verdict-text ${verdictCls}">${verdictText}</div>
+  </div>`;
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */

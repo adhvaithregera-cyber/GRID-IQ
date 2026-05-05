@@ -1,6 +1,6 @@
 /* ============================================================
    GRIDIQ_DATABASE — 2026 Season Live Data
-   Last synced: 31 March 2026 (after Round 3 — Japanese GP)
+   Last synced: 4 May 2026 (after Round 4 — Miami GP)
    Source: Ergast F1 API (jolpi.ca) + public race reports
    ============================================================
 
@@ -22,7 +22,7 @@
 
 const GRIDIQ_DATABASE = {
   season: 2026,
-  racesCompleted: 3,   // ← STEP 1: change this number
+  racesCompleted: 4,   // ← STEP 1: change this number
 
   /* ── 2026 RACE CALENDAR — 22 ROUNDS ────────────────────── */
   races: [
@@ -51,7 +51,7 @@ const GRIDIQ_DATABASE = {
       round:4,  id:"MIA", name:"Miami GP",         country:"USA",          city:"Miami",
       circuit:"Miami International Autodrome",date:"2026-05-04", startUTC:"2026-05-03T20:00:00Z", laps:57, length:5.412, flag:"🇺🇸",
       trackType:"balanced",  preferredAeroMode:"X", drsZones:3, tireWear:"medium",
-      winner:null, status:"upcoming",
+      winner:"Antonelli", p2:"Norris", p3:"Piastri", status:"completed",
       desc:"Purpose-built circuit blending power straights with a technical stadium section. X-mode speed is rewarded."
     },
     {
